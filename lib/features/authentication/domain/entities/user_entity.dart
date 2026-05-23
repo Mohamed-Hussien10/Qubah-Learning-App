@@ -1,0 +1,42 @@
+import 'package:equatable/equatable.dart';
+
+/// Pure Dart entity representing a user in the domain layer.
+class UserEntity extends Equatable {
+  final String id;
+  final String name;
+  final String email;
+  final String? avatarUrl;
+  final String? phone;
+  final String? stageId;
+  final DateTime? subscriptionExpiry;
+  final bool isActive;
+  final DateTime createdAt;
+
+  const UserEntity({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.avatarUrl,
+    this.phone,
+    this.stageId,
+    this.subscriptionExpiry,
+    this.isActive = true,
+    required this.createdAt,
+  });
+
+  bool get isSubscriptionValid =>
+      subscriptionExpiry != null && subscriptionExpiry!.isAfter(DateTime.now());
+
+  @override
+  List<Object?> get props => [
+    id,
+    name,
+    email,
+    avatarUrl,
+    phone,
+    stageId,
+    subscriptionExpiry,
+    isActive,
+    createdAt,
+  ];
+}

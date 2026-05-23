@@ -1,0 +1,83 @@
+name: qubah_learning_app
+description: "Qubah Learning App - Educational Platform for Children"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # ── State Management ─────────────────────────────────────────────────────
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+
+  # ── Networking ───────────────────────────────────────────────────────────
+  dio: ^5.8.0+1
+  internet_connection_checker_plus: ^2.7.1
+
+  # ── Dependency Injection ─────────────────────────────────────────────────
+  get_it: ^8.0.3
+  injectable: ^2.5.0
+
+  # ── Routing ──────────────────────────────────────────────────────────────
+  go_router: ^14.8.1
+
+  # ── Storage ──────────────────────────────────────────────────────────────
+  flutter_secure_storage: ^9.2.4
+  shared_preferences: ^2.5.3
+
+  # ── JSON Serialization ──────────────────────────────────────────────────
+  json_annotation: ^4.9.0
+  freezed_annotation: ^3.0.0
+
+  # ── Media Players ───────────────────────────────────────────────────────
+  video_player: ^2.9.5
+  chewie: ^1.10.0
+  just_audio: ^0.9.44
+
+  # ── Document Viewers ────────────────────────────────────────────────────
+  syncfusion_flutter_pdfviewer: ^29.1.41
+
+  # ── Interactive Content (SCORM/HTML5) ───────────────────────────────────
+  flutter_inappwebview: ^6.1.5
+  archive: ^4.0.4
+
+  # ── UI Enhancements ────────────────────────────────────────────────────
+  cached_network_image: ^3.4.1
+  flutter_animate: ^4.5.2
+  shimmer: ^3.0.0
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.17
+
+  # ── Utilities ───────────────────────────────────────────────────────────
+  path_provider: ^2.1.5
+  permission_handler: ^11.4.0
+  file_picker: ^8.3.7
+  xml: ^6.5.0
+  uuid: ^4.5.1
+  logger: ^2.5.0
+  intl: ^0.20.2
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.15
+  json_serializable: ^6.9.4
+  freezed: ^3.0.6
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
