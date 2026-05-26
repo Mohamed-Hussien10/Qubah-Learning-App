@@ -31,7 +31,7 @@ class LessonFileModel extends BaseEntity {
       type: json['type'] ?? 'pdf',
       fileUrl: json['file_url'] ?? '',
       fileSize: json['file_size'] ?? '0 KB',
-      isActive: json['is_active'] ?? true,
+      isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])

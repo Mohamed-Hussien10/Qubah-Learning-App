@@ -8,10 +8,13 @@ class SectionsRepository {
   SectionsRepository(this._apiClient);
 
   Future<List<SectionModel>> getByGradeId(String gradeId) async {
-    final response = await _apiClient.get('/grades/$gradeId/sections');
-    final data = response.data['data'] ?? response.data;
-    if (data is List) {
-      return data.map((json) => SectionModel.fromJson(json as Map<String, dynamic>)).toList();
+    final response = await _apiClient.get('/grades/$gradeId');
+    final data = response.data['data'];
+    final sections = data?['sections'];
+    if (sections is List) {
+      return sections
+          .map((json) => SectionModel.fromJson(json as Map<String, dynamic>))
+          .toList();
     }
     return [];
   }

@@ -8,10 +8,13 @@ class GradesRepository {
   GradesRepository(this._apiClient);
 
   Future<List<GradeModel>> getByStageId(String stageId) async {
-    final response = await _apiClient.get('/stages/$stageId/grades');
-    final data = response.data['data'] ?? response.data;
-    if (data is List) {
-      return data.map((json) => GradeModel.fromJson(json as Map<String, dynamic>)).toList();
+    final response = await _apiClient.get('/educational-stages/$stageId');
+    final data = response.data['data'];
+    final grades = data?['grades'];
+    if (grades is List) {
+      return grades
+          .map((json) => GradeModel.fromJson(json as Map<String, dynamic>))
+          .toList();
     }
     return [];
   }

@@ -98,110 +98,112 @@ class _StatCardState extends State<StatCard> {
                     ),
                   ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // ── Top Row: Icon + Trend ────────────────────────────────
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Icon container
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: effectiveIconBg,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      widget.icon,
-                      color: effectiveIconColor,
-                      size: 24,
-                    ),
-                  ),
-
-                  // Trend badge
-                  if (widget.changeText != null &&
-                      widget.isPositiveTrend != null)
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // ── Top Row: Icon + Trend ────────────────────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Icon container
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
-                        color: widget.isPositiveTrend!
-                            ? AppColors.success.withValues(alpha: isDark ? 0.15 : 0.1)
-                            : AppColors.error.withValues(alpha: isDark ? 0.15 : 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: effectiveIconBg,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            widget.isPositiveTrend!
-                                ? Icons.trending_up_rounded
-                                : Icons.trending_down_rounded,
-                            size: 14,
-                            color: widget.isPositiveTrend!
-                                ? AppColors.success
-                                : AppColors.error,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            widget.changeText!,
-                            style: theme.textTheme.labelSmall?.copyWith(
+                      child: Icon(
+                        widget.icon,
+                        color: effectiveIconColor,
+                        size: 24,
+                      ),
+                    ),
+
+                    // Trend badge
+                    if (widget.changeText != null &&
+                        widget.isPositiveTrend != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: widget.isPositiveTrend!
+                              ? AppColors.success.withValues(alpha: isDark ? 0.15 : 0.1)
+                              : AppColors.error.withValues(alpha: isDark ? 0.15 : 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              widget.isPositiveTrend!
+                                  ? Icons.trending_up_rounded
+                                  : Icons.trending_down_rounded,
+                              size: 14,
                               color: widget.isPositiveTrend!
                                   ? AppColors.success
                                   : AppColors.error,
-                              fontWeight: FontWeight.w600,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              widget.changeText!,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: widget.isPositiveTrend!
+                                    ? AppColors.success
+                                    : AppColors.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // ── Title ───────────────────────────────────────────────
-              Text(
-                widget.title,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark
-                      ? AppColors.textSecondaryDark
-                      : AppColors.textSecondaryLight,
+                  ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
 
-              const SizedBox(height: 4),
+                const SizedBox(height: 16),
 
-              // ── Value ───────────────────────────────────────────────
-              Text(
-                widget.value,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-
-              // ── Subtitle ────────────────────────────────────────────
-              if (widget.subtitle != null) ...[
-                const SizedBox(height: 4),
+                // ── Title ───────────────────────────────────────────────
                 Text(
-                  widget.subtitle!,
-                  style: theme.textTheme.labelSmall?.copyWith(
+                  widget.title,
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: isDark
-                        ? AppColors.textTertiaryDark
-                        : AppColors.textTertiaryLight,
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+
+                const SizedBox(height: 4),
+
+                // ── Value ───────────────────────────────────────────────
+                Text(
+                  widget.value,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+
+                // ── Subtitle ────────────────────────────────────────────
+                if (widget.subtitle != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.subtitle!,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: isDark
+                          ? AppColors.textTertiaryDark
+                          : AppColors.textTertiaryLight,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

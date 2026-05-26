@@ -8,10 +8,13 @@ class LessonFilesRepository {
   LessonFilesRepository(this._apiClient);
 
   Future<List<LessonFileModel>> getByLessonId(String lessonId) async {
-    final response = await _apiClient.get('/lessons/$lessonId/files');
-    final data = response.data['data'] ?? response.data;
-    if (data is List) {
-      return data.map((json) => LessonFileModel.fromJson(json as Map<String, dynamic>)).toList();
+    final response = await _apiClient.get('/lessons/$lessonId');
+    final data = response.data['data'];
+    final lessonFiles = data?['lessonFiles'];
+    if (lessonFiles is List) {
+      return lessonFiles
+          .map((json) => LessonFileModel.fromJson(json as Map<String, dynamic>))
+          .toList();
     }
     return [];
   }

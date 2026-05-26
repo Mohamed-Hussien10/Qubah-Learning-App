@@ -25,7 +25,7 @@ class GradeModel extends BaseEntity {
       stageId: json['stage_id']?.toString() ?? '',
       title: json['title'] ?? '',
       description: json['description'],
-      isActive: json['is_active'] ?? true,
+      isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       sectionsCount: json['sections_count'] ?? 0,
       createdAt: json['created_at'] != null

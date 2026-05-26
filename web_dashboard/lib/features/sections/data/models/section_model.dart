@@ -25,7 +25,7 @@ class SectionModel extends BaseEntity {
       gradeId: json['grade_id']?.toString() ?? '',
       title: json['title'] ?? '',
       description: json['description'],
-      isActive: json['is_active'] ?? true,
+      isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       subjectsCount: json['subjects_count'] ?? 0,
       createdAt: json['created_at'] != null

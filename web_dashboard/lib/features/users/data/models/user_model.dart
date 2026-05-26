@@ -67,7 +67,7 @@ class UserModel extends Equatable {
         (e) => e.name == json['role'],
         orElse: () => UserRole.student,
       ),
-      isActive: json['is_active'] as bool? ?? true,
+      isActive: json['is_active'] == 1 || json['is_active'] == true,
       subscriptionStatus: json['subscription_status'] as String? ?? 'none',
       createdAt: DateTime.parse(json['created_at'] as String),
       lastLogin: json['last_login'] != null

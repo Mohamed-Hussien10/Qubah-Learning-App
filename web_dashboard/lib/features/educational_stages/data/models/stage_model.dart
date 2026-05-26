@@ -25,7 +25,7 @@ class StageModel extends BaseEntity {
       title: json['title'] ?? '',
       description: json['description'],
       thumbnailUrl: json['thumbnail_url'],
-      isActive: json['is_active'] ?? true,
+      isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       gradesCount: json['grades_count'] ?? 0,
       createdAt: json['created_at'] != null

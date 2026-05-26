@@ -45,7 +45,7 @@ class PlanModel extends Equatable {
       price: (json['price'] as num).toDouble(),
       durationMonths: json['duration_months'] as int,
       features: List<String>.from(json['features'] as List),
-      isActive: json['is_active'] as bool? ?? true,
+      isActive: json['is_active'] == 1 || json['is_active'] == true,
     );
   }
 

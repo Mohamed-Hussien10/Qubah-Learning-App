@@ -34,8 +34,8 @@ class LessonModel extends BaseEntity {
       description: json['description'],
       thumbnailUrl: json['thumbnail_url'],
       duration: json['duration']?.toString() ?? '00:00',
-      isPublished: json['is_published'] ?? true,
-      isActive: json['is_active'] ?? true,
+      isPublished: json['is_published'] == 1 || json['is_published'] == true,
+      isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       filesCount: json['files_count'] ?? 0,
       createdAt: json['created_at'] != null

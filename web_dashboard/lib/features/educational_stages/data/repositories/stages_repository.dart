@@ -1,3 +1,4 @@
+import 'package:web_dashboard/core/constants/api_endpoints.dart';
 import 'package:web_dashboard/core/network/api_client.dart';
 import 'package:web_dashboard/features/educational_stages/data/models/stage_model.dart';
 
@@ -10,7 +11,7 @@ class StagesRepository {
   // ── Read ─────────────────────────────────────────────────────────────
 
   Future<List<StageModel>> getAll() async {
-    final response = await _apiClient.get('/stages');
+    final response = await _apiClient.get(ApiEndpoints.stages);
     final data = response.data['data'] ?? response.data;
     if (data is List) {
       return data.map((json) => StageModel.fromJson(json as Map<String, dynamic>)).toList();
@@ -19,7 +20,7 @@ class StagesRepository {
   }
 
   Future<StageModel> getById(String id) async {
-    final response = await _apiClient.get('/stages/$id');
+    final response = await _apiClient.get(ApiEndpoints.stage(int.parse(id)));
     final data = response.data['data'] ?? response.data;
     return StageModel.fromJson(data as Map<String, dynamic>);
   }
@@ -28,7 +29,7 @@ class StagesRepository {
 
   Future<StageModel> create(StageModel stage) async {
     final payload = stage.toJson()..remove('id')..remove('created_at');
-    final response = await _apiClient.post('/stages', data: payload);
+    final response = await _apiClient.post(ApiEndpoints.stages, data: payload);
     final data = response.data['data'] ?? response.data;
     return StageModel.fromJson(data as Map<String, dynamic>);
   }
@@ -37,7 +38,7 @@ class StagesRepository {
 
   Future<StageModel> update(StageModel stage) async {
     final payload = stage.toJson()..remove('created_at');
-    final response = await _apiClient.put('/stages/${stage.id}', data: payload);
+    final response = await _apiClient.put(ApiEndpoints.stage(int.parse(stage.id)), data: payload);
     final data = response.data['data'] ?? response.data;
     return StageModel.fromJson(data as Map<String, dynamic>);
   }
@@ -45,7 +46,7 @@ class StagesRepository {
   // ── Delete ───────────────────────────────────────────────────────────
 
   Future<bool> delete(String id) async {
-    await _apiClient.delete('/stages/$id');
+    await _apiClient.delete(ApiEndpoints.stage(int.parse(id)));
     return true;
   }
 
@@ -60,7 +61,7 @@ class StagesRepository {
   // ── Reorder ──────────────────────────────────────────────────────────
 
   Future<bool> reorder(List<String> orderedIds) async {
-    await _apiClient.post('/stages/reorder', data: {'ids': orderedIds});
+    await _apiClient.post('/educational-stages/reorder', data: {'ids': orderedIds});
     return true;
   }
 }

@@ -13,40 +13,32 @@ class ApiEndpoints {
   static const String refreshToken = '/auth/refresh';
 
   // ── Stages (المراحل التعليمية) ────────────────────────────────────────
-  static const String stages = '/stages';
-  static String stage(int id) => '/stages/$id';
+  static const String stages = '/educational-stages';
+  static String stage(int id) => '/educational-stages/$id';
 
   // ── Grades (الصفوف) ──────────────────────────────────────────────────
   static const String grades = '/grades';
   static String grade(int id) => '/grades/$id';
-  static String gradesByStage(int stageId) => '/stages/$stageId/grades';
 
   // ── Sections (الأقسام) ──────────────────────────────────────────────
   static const String sections = '/sections';
   static String section(int id) => '/sections/$id';
-  static String sectionsByGrade(int gradeId) => '/grades/$gradeId/sections';
 
   // ── Subjects (المواد) ────────────────────────────────────────────────
   static const String subjects = '/subjects';
   static String subject(int id) => '/subjects/$id';
-  static String subjectsBySection(int sectionId) =>
-      '/sections/$sectionId/subjects';
 
   // ── Units (الوحدات) ──────────────────────────────────────────────────
   static const String units = '/units';
   static String unit(int id) => '/units/$id';
-  static String unitsBySubject(int subjectId) => '/subjects/$subjectId/units';
 
   // ── Lessons (الدروس) ─────────────────────────────────────────────────
   static const String lessons = '/lessons';
   static String lesson(int id) => '/lessons/$id';
-  static String lessonsByUnit(int unitId) => '/units/$unitId/lessons';
 
   // ── Lesson Files (ملفات الدروس) ──────────────────────────────────────
   static const String lessonFiles = '/lesson-files';
   static String lessonFile(int id) => '/lesson-files/$id';
-  static String lessonFilesByLesson(int lessonId) =>
-      '/lessons/$lessonId/files';
 
   // ── Users (المستخدمون) ──────────────────────────────────────────────
   static const String users = '/users';

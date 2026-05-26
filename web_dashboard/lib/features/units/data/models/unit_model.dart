@@ -25,7 +25,7 @@ class UnitModel extends BaseEntity {
       subjectId: json['subject_id']?.toString() ?? '',
       title: json['title'] ?? '',
       description: json['description'],
-      isActive: json['is_active'] ?? true,
+      isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       lessonsCount: json['lessons_count'] ?? 0,
       createdAt: json['created_at'] != null

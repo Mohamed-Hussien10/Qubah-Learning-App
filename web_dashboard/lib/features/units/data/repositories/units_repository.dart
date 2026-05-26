@@ -8,10 +8,13 @@ class UnitsRepository {
   UnitsRepository(this._apiClient);
 
   Future<List<UnitModel>> getBySubjectId(String subjectId) async {
-    final response = await _apiClient.get('/subjects/$subjectId/units');
-    final data = response.data['data'] ?? response.data;
-    if (data is List) {
-      return data.map((json) => UnitModel.fromJson(json as Map<String, dynamic>)).toList();
+    final response = await _apiClient.get('/subjects/$subjectId');
+    final data = response.data['data'];
+    final units = data?['units'];
+    if (units is List) {
+      return units
+          .map((json) => UnitModel.fromJson(json as Map<String, dynamic>))
+          .toList();
     }
     return [];
   }
