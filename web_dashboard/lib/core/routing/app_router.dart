@@ -1,0 +1,148 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:web_dashboard/core/services/dependency_injection.dart';
+import 'package:web_dashboard/features/authentication/data/repositories/auth_repository.dart';
+import 'package:web_dashboard/features/authentication/presentation/screens/login_screen.dart';
+import 'package:web_dashboard/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:web_dashboard/features/educational_stages/presentation/screens/stages_screen.dart';
+import 'package:web_dashboard/features/grades/presentation/screens/grades_screen.dart';
+import 'package:web_dashboard/features/sections/presentation/screens/sections_screen.dart';
+import 'package:web_dashboard/features/subjects/presentation/screens/subjects_screen.dart';
+import 'package:web_dashboard/features/units/presentation/screens/units_screen.dart';
+import 'package:web_dashboard/features/lessons/presentation/screens/lessons_screen.dart';
+import 'package:web_dashboard/features/lesson_files/presentation/screens/lesson_files_screen.dart';
+import 'package:web_dashboard/features/users/presentation/screens/users_screen.dart';
+import 'package:web_dashboard/features/subscriptions/presentation/screens/subscriptions_screen.dart';
+import 'package:web_dashboard/features/notifications/presentation/screens/notifications_screen.dart';
+import 'package:web_dashboard/features/analytics/presentation/screens/analytics_screen.dart';
+import 'package:web_dashboard/features/settings/presentation/screens/settings_screen.dart';
+import 'package:web_dashboard/features/user_profile/presentation/screens/profile_screen.dart';
+import 'package:web_dashboard/core/widgets/dashboard_shell.dart';
+
+final GoRouter appRouter = GoRouter(
+  initialLocation: '/dashboard',
+  redirect: (BuildContext context, GoRouterState state) async {
+    final authRepo = sl<AuthRepository>();
+    final loggedIn = await authRepo.isLoggedIn();
+    final isLoggingIn = state.uri.toString() == '/login';
+
+    if (!loggedIn) {
+      return '/login';
+    }
+
+    if (loggedIn && isLoggingIn) {
+      return '/dashboard';
+    }
+
+    return null;
+  },
+  routes: [
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    ShellRoute(
+      builder: (context, state, child) => DashboardShell(child: child),
+      routes: [
+        GoRoute(
+          path: '/dashboard',
+          builder: (context, state) => const DashboardScreen(),
+        ),
+        GoRoute(
+          path: '/stages',
+          builder: (context, state) => const StagesScreen(),
+        ),
+        GoRoute(
+          path: '/grades',
+          redirect: (context, state) => '/stages',
+        ),
+        GoRoute(
+          path: '/grades/:stageId',
+          builder: (context, state) {
+            final stageId = state.pathParameters['stageId']!;
+            return GradesScreen(stageId: stageId);
+          },
+        ),
+        GoRoute(
+          path: '/sections',
+          redirect: (context, state) => '/stages',
+        ),
+        GoRoute(
+          path: '/sections/:gradeId',
+          builder: (context, state) {
+            final gradeId = state.pathParameters['gradeId']!;
+            return SectionsScreen(gradeId: gradeId);
+          },
+        ),
+        GoRoute(
+          path: '/subjects',
+          redirect: (context, state) => '/stages',
+        ),
+        GoRoute(
+          path: '/subjects/:sectionId',
+          builder: (context, state) {
+            final sectionId = state.pathParameters['sectionId']!;
+            return SubjectsScreen(sectionId: sectionId);
+          },
+        ),
+        GoRoute(
+          path: '/units',
+          redirect: (context, state) => '/stages',
+        ),
+        GoRoute(
+          path: '/units/:subjectId',
+          builder: (context, state) {
+            final subjectId = state.pathParameters['subjectId']!;
+            return UnitsScreen(subjectId: subjectId);
+          },
+        ),
+        GoRoute(
+          path: '/lessons',
+          redirect: (context, state) => '/stages',
+        ),
+        GoRoute(
+          path: '/lessons/:unitId',
+          builder: (context, state) {
+            final unitId = state.pathParameters['unitId']!;
+            return LessonsScreen(unitId: unitId);
+          },
+        ),
+        GoRoute(
+          path: '/lesson-files',
+          redirect: (context, state) => '/stages',
+        ),
+        GoRoute(
+          path: '/lesson-files/:lessonId',
+          builder: (context, state) {
+            final lessonId = state.pathParameters['lessonId']!;
+            return LessonFilesScreen(lessonId: lessonId);
+          },
+        ),
+        GoRoute(
+          path: '/users',
+          builder: (context, state) => const UsersScreen(),
+        ),
+        GoRoute(
+          path: '/subscriptions',
+          builder: (context, state) => const SubscriptionsScreen(),
+        ),
+        GoRoute(
+          path: '/notifications',
+          builder: (context, state) => const NotificationsScreen(),
+        ),
+        GoRoute(
+          path: '/analytics',
+          builder: (context, state) => const AnalyticsScreen(),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfileScreen(),
+        ),
+      ],
+    ),
+  ],
+);

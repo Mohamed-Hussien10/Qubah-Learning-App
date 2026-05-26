@@ -1,0 +1,617 @@
+import 'package:data_table_2/data_table_2.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
+
+import 'package:web_dashboard/core/constants/app_colors.dart';
+import 'package:web_dashboard/core/constants/app_strings.dart';
+import 'package:web_dashboard/features/units/data/models/unit_model.dart';
+import 'package:web_dashboard/features/units/presentation/manager/units_cubit.dart';
+import 'package:web_dashboard/core/services/dependency_injection.dart';
+import 'package:web_dashboard/features/units/presentation/manager/units_state.dart';
+
+/// Units management screen – filtered by subjectId.
+class UnitsScreen extends StatelessWidget {
+  final String subjectId;
+  const UnitsScreen({super.key, required this.subjectId});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) =>
+          sl<UnitsCubit>()..loadUnits(subjectId),
+      child: _UnitsView(subjectId: subjectId),
+    );
+  }
+}
+
+class _UnitsView extends StatelessWidget {
+  final String subjectId;
+  const _UnitsView({required this.subjectId});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Breadcrumb
+            BlocBuilder<UnitsCubit, UnitsState>(
+              builder: (context, state) {
+                final subjectName =
+                    state is UnitsLoaded ? state.subjectName : '';
+                return _buildBreadcrumb(context, isDark, subjectName);
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildHeader(context, isDark),
+            const SizedBox(height: 20),
+            _buildSearchBar(context, isDark),
+            const SizedBox(height: 20),
+            Expanded(child: _buildBody(context, isDark)),
+          ],
+        ),
+      ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.02, end: 0),
+    );
+  }
+
+  Widget _buildBreadcrumb(
+      BuildContext context, bool isDark, String subjectName) {
+    return Row(
+      children: [
+        InkWell(
+          onTap: () => context.go('/stages'),
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.menu_book_rounded,
+                    size: 16, color: AppColors.primary),
+                const SizedBox(width: 4),
+                const Text('المواد',
+                    style:
+                        TextStyle(color: AppColors.primary, fontSize: 14)),
+              ],
+            ),
+          ),
+        ),
+        Icon(Icons.chevron_left,
+            size: 18,
+            color: isDark
+                ? AppColors.textTertiaryDark
+                : AppColors.textTertiaryLight),
+        Text(subjectName,
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondaryLight)),
+        Icon(Icons.chevron_left,
+            size: 18,
+            color: isDark
+                ? AppColors.textTertiaryDark
+                : AppColors.textTertiaryLight),
+        Text(AppStrings.units,
+            style: TextStyle(
+                fontSize: 14,
+                color: isDark
+                    ? AppColors.textTertiaryDark
+                    : AppColors.textTertiaryLight)),
+      ],
+    ).animate().fadeIn(duration: 200.ms);
+  }
+
+  Widget _buildHeader(BuildContext context, bool isDark) {
+    return Row(
+      children: [
+        Icon(Icons.folder_open_rounded,
+            color: AppColors.primary, size: 28),
+        const SizedBox(width: 12),
+        Text(AppStrings.units,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: isDark
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimaryLight)),
+        const Spacer(),
+        FilledButton.icon(
+          onPressed: () => _showForm(context),
+          icon: const Icon(Icons.add_rounded),
+          label: Text('${AppStrings.add} وحدة'),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context, bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+            color: isDark ? AppColors.borderDark : AppColors.borderLight),
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: AppStrings.search,
+          prefixIcon: const Icon(Icons.search),
+          border: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+        onChanged: (q) => context.read<UnitsCubit>().search(q),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, bool isDark) {
+    return BlocBuilder<UnitsCubit, UnitsState>(
+      builder: (context, state) {
+        if (state is UnitsLoading) return _buildShimmer(isDark);
+        if (state is UnitsError) {
+          return _buildError(context, state.message);
+        }
+        if (state is UnitsLoaded) {
+          if (state.filteredUnits.isEmpty) return _buildEmpty(isDark);
+          return _buildTable(context, state.filteredUnits, isDark);
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildTable(
+      BuildContext context, List<UnitModel> units, bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: isDark ? AppColors.borderDark : AppColors.borderLight),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: DataTable2(
+          columnSpacing: 16,
+          horizontalMargin: 20,
+          minWidth: 600,
+          headingRowColor: WidgetStateProperty.all(
+              isDark ? AppColors.surfaceDark : AppColors.backgroundLight),
+          headingTextStyle: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isDark
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimaryLight),
+          columns: const [
+            DataColumn2(label: Text(AppStrings.order), fixedWidth: 70),
+            DataColumn2(label: Text(AppStrings.title), size: ColumnSize.L),
+            DataColumn2(
+                label: Text(AppStrings.description), size: ColumnSize.L),
+            DataColumn2(label: Text(AppStrings.status), fixedWidth: 100),
+            DataColumn2(label: Text('الدروس'), fixedWidth: 90),
+            DataColumn2(label: Text(AppStrings.actions), fixedWidth: 200),
+          ],
+          rows: units.map((unit) {
+            return DataRow2(
+              onTap: () => _navigateToLessons(context, unit),
+              cells: [
+                DataCell(Text('${unit.order}')),
+                DataCell(Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor:
+                          AppColors.primaryLight.withValues(alpha: 0.2),
+                      child: const Icon(Icons.folder,
+                          size: 18, color: AppColors.primary),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: Text(unit.title,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis)),
+                  ],
+                )),
+                DataCell(Text(unit.description ?? '—',
+                    overflow: TextOverflow.ellipsis)),
+                DataCell(_StatusBadge(isActive: unit.isActive)),
+                DataCell(Text('${unit.lessonsCount}')),
+                DataCell(Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _ActionIcon(
+                        icon: Icons.visibility_rounded,
+                        tooltip: 'عرض الدروس',
+                        color: AppColors.info,
+                        onTap: () =>
+                            _navigateToLessons(context, unit)),
+                    _ActionIcon(
+                        icon: Icons.edit_rounded,
+                        tooltip: AppStrings.edit,
+                        color: AppColors.warning,
+                        onTap: () =>
+                            _showForm(context, unit: unit)),
+                    _ActionIcon(
+                      icon: unit.isActive
+                          ? Icons.toggle_on_rounded
+                          : Icons.toggle_off_rounded,
+                      tooltip: unit.isActive ? 'تعطيل' : 'تفعيل',
+                      color: unit.isActive
+                          ? AppColors.success
+                          : AppColors.textTertiaryLight,
+                      onTap: () => context
+                          .read<UnitsCubit>()
+                          .toggleStatus(unit.id),
+                    ),
+                    _ActionIcon(
+                        icon: Icons.delete_outline_rounded,
+                        tooltip: AppStrings.delete,
+                        color: AppColors.error,
+                        onTap: () =>
+                            _confirmDelete(context, unit)),
+                  ],
+                )),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    ).animate().fadeIn(delay: 200.ms, duration: 400.ms);
+  }
+
+  Widget _buildEmpty(bool isDark) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.folder_open_outlined,
+              size: 80,
+              color: isDark
+                  ? AppColors.textTertiaryDark
+                  : AppColors.textTertiaryLight),
+          const SizedBox(height: 16),
+          Text(AppStrings.noData,
+              style: TextStyle(
+                  fontSize: 18,
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight)),
+          const SizedBox(height: 8),
+          Text('لا توجد وحدات في هذه المادة',
+              style: TextStyle(
+                  color: isDark
+                      ? AppColors.textTertiaryDark
+                      : AppColors.textTertiaryLight)),
+        ],
+      ),
+    ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.9, 0.9));
+  }
+
+  Widget _buildError(BuildContext context, String message) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.error_outline, size: 80, color: AppColors.error),
+          const SizedBox(height: 16),
+          Text(message, style: const TextStyle(color: AppColors.error)),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: () =>
+                context.read<UnitsCubit>().loadUnits(subjectId),
+            icon: const Icon(Icons.refresh),
+            label: const Text(AppStrings.refresh),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmer(bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardDark : AppColors.cardLight,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Shimmer.fromColors(
+        baseColor: isDark ? AppColors.surfaceDark : Colors.grey.shade200,
+        highlightColor: isDark ? AppColors.cardDark : Colors.grey.shade50,
+        child: ListView.builder(
+          padding: const EdgeInsets.all(20),
+          itemCount: 4,
+          itemBuilder: (_, __) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8))),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showForm(BuildContext context, {UnitModel? unit}) {
+    final cubit = context.read<UnitsCubit>();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _UnitFormDialog(
+        unit: unit,
+        subjectId: subjectId,
+        onSave: (u) async {
+          if (unit != null) {
+            await cubit.updateUnit(u);
+          } else {
+            await cubit.createUnit(u);
+          }
+        },
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, UnitModel unit) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(children: [
+          Icon(Icons.warning_amber_rounded, color: AppColors.error),
+          SizedBox(width: 8),
+          Text('تأكيد الحذف'),
+        ]),
+        content: Text('هل أنت متأكد من حذف "${unit.title}"؟'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text(AppStrings.cancel)),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.read<UnitsCubit>().deleteUnit(unit.id);
+            },
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text(AppStrings.delete),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToLessons(BuildContext context, UnitModel unit) {
+    context.go('/lessons/${unit.id}');
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final bool isActive;
+  const _StatusBadge({required this.isActive});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: isActive ? AppColors.successBg : AppColors.errorBg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        isActive ? AppStrings.active : AppStrings.inactive,
+        style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isActive ? AppColors.success : AppColors.error),
+      ),
+    );
+  }
+}
+
+class _ActionIcon extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final Color color;
+  final VoidCallback onTap;
+  const _ActionIcon(
+      {required this.icon,
+      required this.tooltip,
+      required this.color,
+      required this.onTap});
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        child:
+            Padding(padding: const EdgeInsets.all(6), child: Icon(icon, size: 20, color: color)),
+      ),
+    );
+  }
+}
+
+class _UnitFormDialog extends StatefulWidget {
+  final UnitModel? unit;
+  final String subjectId;
+  final Future<void> Function(UnitModel) onSave;
+  const _UnitFormDialog(
+      {this.unit, required this.subjectId, required this.onSave});
+  @override
+  State<_UnitFormDialog> createState() => _UnitFormDialogState();
+}
+
+class _UnitFormDialogState extends State<_UnitFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _titleCtrl;
+  late final TextEditingController _descCtrl;
+  late final TextEditingController _orderCtrl;
+  late bool _isActive;
+  bool _isSaving = false;
+  bool get _isEditing => widget.unit != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleCtrl = TextEditingController(text: widget.unit?.title ?? '');
+    _descCtrl = TextEditingController(text: widget.unit?.description ?? '');
+    _orderCtrl =
+        TextEditingController(text: widget.unit?.order.toString() ?? '0');
+    _isActive = widget.unit?.isActive ?? true;
+  }
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _descCtrl.dispose();
+    _orderCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSave() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isSaving = true);
+    final unit = UnitModel(
+      id: widget.unit?.id ?? '',
+      subjectId: widget.subjectId,
+      title: _titleCtrl.text.trim(),
+      description:
+          _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+      isActive: _isActive,
+      order: int.tryParse(_orderCtrl.text) ?? 0,
+      lessonsCount: widget.unit?.lessonsCount ?? 0,
+      createdAt: widget.unit?.createdAt,
+    );
+    try {
+      await widget.onSave(unit);
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 480),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(children: [
+                  Icon(_isEditing ? Icons.edit : Icons.add,
+                      color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text(_isEditing ? 'تعديل الوحدة' : 'إضافة وحدة جديدة',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  const Spacer(),
+                  IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: _isSaving
+                          ? null
+                          : () => Navigator.of(context).pop()),
+                ]),
+                const SizedBox(height: 24),
+                TextFormField(
+                  controller: _titleCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'العنوان *',
+                    hintText: 'مثال: الوحدة الأولى',
+                    prefixIcon: const Icon(Icons.title),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'العنوان مطلوب' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _descCtrl,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'الوصف',
+                    prefixIcon: const Icon(Icons.description_outlined),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _orderCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'الترتيب',
+                        prefixIcon: const Icon(Icons.reorder),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Column(children: [
+                    const Text('نشط'),
+                    Switch.adaptive(
+                        value: _isActive,
+                        activeColor: AppColors.success,
+                        onChanged: _isSaving
+                            ? null
+                            : (v) => setState(() => _isActive = v)),
+                  ]),
+                ]),
+                const SizedBox(height: 24),
+                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  TextButton(
+                      onPressed: _isSaving
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                      child: const Text(AppStrings.cancel)),
+                  const SizedBox(width: 12),
+                  FilledButton.icon(
+                    onPressed: _isSaving ? null : _handleSave,
+                    icon: _isSaving
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.save_rounded),
+                    label: Text(_isSaving ? 'جاري الحفظ...' : 'حفظ'),
+                  ),
+                ]),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
