@@ -139,7 +139,6 @@ class _UsersScreenBody extends StatelessWidget {
           _FilterTab('الكل', state.totalCount, null),
           _FilterTab('طلاب', state.studentsCount, UserRole.student),
           _FilterTab('مدراء', state.adminsCount, UserRole.admin),
-          _FilterTab('أولياء أمور', state.parentsCount, UserRole.parent),
         ];
 
         return SingleChildScrollView(
@@ -455,10 +454,6 @@ class _UsersScreenBody extends StatelessWidget {
         color = AppColors.error;
         label = 'مدير';
         break;
-      case UserRole.parent:
-        color = AppColors.info;
-        label = 'ولي أمر';
-        break;
       case UserRole.student:
         color = AppColors.success;
         label = 'طالب';
@@ -600,17 +595,16 @@ class _UsersScreenBody extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: isDark ? AppColors.cardDark : Colors.grey[300]!,
       highlightColor: isDark ? AppColors.surfaceDark : Colors.grey[100]!,
-      child: Column(
-        children: List.generate(
-          6,
-          (index) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Container(
-              height: 56,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 6,
+        itemBuilder: (context, index) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Container(
+            height: 56,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
@@ -689,7 +683,7 @@ class _UsersScreenBody extends StatelessWidget {
   void _confirmDelete(BuildContext context, UserModel user) {
     showDialog(
       context: context,
-      builder: (_) => Directionality(
+      builder: (dialogContext) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           title: Text(AppStrings.confirm, style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
@@ -699,13 +693,13 @@ class _UsersScreenBody extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text(AppStrings.cancel, style: GoogleFonts.cairo()),
             ),
             FilledButton(
               onPressed: () {
                 context.read<UsersCubit>().deleteUser(user.id);
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
               },
               style: FilledButton.styleFrom(backgroundColor: AppColors.error),
               child: Text(AppStrings.delete, style: GoogleFonts.cairo()),
@@ -719,7 +713,7 @@ class _UsersScreenBody extends StatelessWidget {
   void _confirmBulkDelete(BuildContext context, int count) {
     showDialog(
       context: context,
-      builder: (_) => Directionality(
+      builder: (dialogContext) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
           title: Text(AppStrings.confirm, style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
@@ -729,13 +723,13 @@ class _UsersScreenBody extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text(AppStrings.cancel, style: GoogleFonts.cairo()),
             ),
             FilledButton(
               onPressed: () {
                 context.read<UsersCubit>().deleteSelected();
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
               },
               style: FilledButton.styleFrom(backgroundColor: AppColors.error),
               child: Text(AppStrings.deleteSelected, style: GoogleFonts.cairo()),

@@ -29,8 +29,8 @@ class LessonFileModel extends BaseEntity {
       lessonId: json['lesson_id']?.toString() ?? '',
       title: json['title'] ?? '',
       type: json['type'] ?? 'pdf',
-      fileUrl: json['file_url'] ?? '',
-      fileSize: json['file_size'] ?? '0 KB',
+      fileUrl: json['file_url'] ?? json['file_path'] ?? '',
+      fileSize: json['file_size'] ?? (json['metadata'] is Map ? json['metadata']['file_size'] : null) ?? '0 KB',
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       createdAt: json['created_at'] != null

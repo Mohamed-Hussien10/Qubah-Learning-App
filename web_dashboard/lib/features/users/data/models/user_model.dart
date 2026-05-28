@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum UserRole { admin, parent, student }
+enum UserRole { admin, student }
 
 class UserModel extends Equatable {
   final int id;
@@ -27,8 +27,6 @@ class UserModel extends Equatable {
     switch (role) {
       case UserRole.admin:
         return 'مدير';
-      case UserRole.parent:
-        return 'ولي أمر';
       case UserRole.student:
         return 'طالب';
     }
@@ -104,7 +102,7 @@ class UserModel extends Equatable {
       id: 2,
       name: 'فاطمة حسن إبراهيم',
       email: 'fatima@example.com',
-      role: UserRole.parent,
+      role: UserRole.student,
       isActive: true,
       subscriptionStatus: 'active',
       createdAt: DateTime(2024, 2, 20),
@@ -144,7 +142,7 @@ class UserModel extends Equatable {
       id: 6,
       name: 'نورة محمد العتيبي',
       email: 'noura@example.com',
-      role: UserRole.parent,
+      role: UserRole.student,
       isActive: true,
       subscriptionStatus: 'active',
       createdAt: DateTime(2024, 6, 22),
@@ -164,7 +162,7 @@ class UserModel extends Equatable {
       id: 8,
       name: 'هند ناصر الحربي',
       email: 'hind@example.com',
-      role: UserRole.parent,
+      role: UserRole.student,
       isActive: false,
       subscriptionStatus: 'expired',
       createdAt: DateTime(2024, 8, 3),

@@ -9,16 +9,16 @@ class UsersCubit extends Cubit<UsersState> {
   UsersCubit(this._repository) : super(const UsersState());
 
   Future<void> loadUsers() async {
-    emit(state.copyWith(status: UsersStatus.loading));
+    safeEmit(state.copyWith(status: UsersStatus.loading));
     try {
       final users = await _repository.getAll();
-      emit(state.copyWith(
+      safeEmit(state.copyWith(
         status: UsersStatus.loaded,
         users: users,
         filteredUsers: users,
       ));
     } catch (e) {
-      emit(state.copyWith(
+      safeEmit(state.copyWith(
         status: UsersStatus.error,
         errorMessage: e.toString(),
       ));
@@ -28,6 +28,7 @@ class UsersCubit extends Cubit<UsersState> {
   Future<void> createUser({
     required String name,
     required String email,
+    required String password,
     required UserRole role,
     bool isActive = true,
   }) async {
@@ -35,13 +36,14 @@ class UsersCubit extends Cubit<UsersState> {
       await _repository.create(
         name: name,
         email: email,
+        password: password,
         role: role,
         isActive: isActive,
       );
       await loadUsers();
       _applyFilters();
     } catch (e) {
-      emit(state.copyWith(
+      safeEmit(state.copyWith(
         status: UsersStatus.error,
         errorMessage: e.toString(),
       ));
@@ -54,7 +56,7 @@ class UsersCubit extends Cubit<UsersState> {
       await loadUsers();
       _applyFilters();
     } catch (e) {
-      emit(state.copyWith(
+      safeEmit(state.copyWith(
         status: UsersStatus.error,
         errorMessage: e.toString(),
       ));
@@ -65,11 +67,11 @@ class UsersCubit extends Cubit<UsersState> {
     try {
       await _repository.delete(id);
       final updatedSelected = Set<int>.from(state.selectedIds)..remove(id);
-      emit(state.copyWith(selectedIds: updatedSelected));
+      safeEmit(state.copyWith(selectedIds: updatedSelected));
       await loadUsers();
       _applyFilters();
     } catch (e) {
-      emit(state.copyWith(
+      safeEmit(state.copyWith(
         status: UsersStatus.error,
         errorMessage: e.toString(),
       ));
@@ -81,11 +83,11 @@ class UsersCubit extends Cubit<UsersState> {
       for (final id in state.selectedIds) {
         await _repository.delete(id);
       }
-      emit(state.copyWith(selectedIds: {}));
+      safeEmit(state.copyWith(selectedIds: {}));
       await loadUsers();
       _applyFilters();
     } catch (e) {
-      emit(state.copyWith(
+      safeEmit(state.copyWith(
         status: UsersStatus.error,
         errorMessage: e.toString(),
       ));
@@ -98,7 +100,7 @@ class UsersCubit extends Cubit<UsersState> {
       await loadUsers();
       _applyFilters();
     } catch (e) {
-      emit(state.copyWith(
+      safeEmit(state.copyWith(
         status: UsersStatus.error,
         errorMessage: e.toString(),
       ));
@@ -106,15 +108,15 @@ class UsersCubit extends Cubit<UsersState> {
   }
 
   void search(String query) {
-    emit(state.copyWith(searchQuery: query, currentPage: 1));
+    safeEmit(state.copyWith(searchQuery: query, currentPage: 1));
     _applyFilters();
   }
 
   void filterByRole(UserRole? role) {
     if (role == null) {
-      emit(state.copyWith(clearRole: true, currentPage: 1));
+      safeEmit(state.copyWith(clearRole: true, currentPage: 1));
     } else {
-      emit(state.copyWith(selectedRole: role, currentPage: 1));
+      safeEmit(state.copyWith(selectedRole: role, currentPage: 1));
     }
     _applyFilters();
   }
@@ -126,21 +128,21 @@ class UsersCubit extends Cubit<UsersState> {
     } else {
       selectedIds.add(id);
     }
-    emit(state.copyWith(selectedIds: selectedIds));
+    safeEmit(state.copyWith(selectedIds: selectedIds));
   }
 
   void selectAll() {
     if (state.selectedIds.length == state.filteredUsers.length) {
-      emit(state.copyWith(selectedIds: {}));
+      safeEmit(state.copyWith(selectedIds: {}));
     } else {
-      emit(state.copyWith(
+      safeEmit(state.copyWith(
         selectedIds: state.filteredUsers.map((u) => u.id).toSet(),
       ));
     }
   }
 
   void changePage(int page) {
-    emit(state.copyWith(currentPage: page));
+    safeEmit(state.copyWith(currentPage: page));
   }
 
   void _applyFilters() {
@@ -160,6 +162,12 @@ class UsersCubit extends Cubit<UsersState> {
           .toList();
     }
 
-    emit(state.copyWith(filteredUsers: filtered));
+    safeEmit(state.copyWith(filteredUsers: filtered));
+  }
+
+  void safeEmit(UsersState newState) {
+    if (!isClosed) {
+      emit(newState);
+    }
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:web_dashboard/core/constants/app_colors.dart';
 import 'package:web_dashboard/core/constants/app_strings.dart';
@@ -259,7 +260,7 @@ class _LessonFilesView extends StatelessWidget {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.download_rounded),
-                        onPressed: () => _downloadFile(file),
+                        onPressed: () => _downloadFile(context, file),
                         tooltip: 'تحميل',
                         style: IconButton.styleFrom(
                           padding: const EdgeInsets.all(8),
@@ -524,45 +525,26 @@ class _LessonFilesView extends StatelessWidget {
     );
   }
 
-  void _previewFile(BuildContext context, LessonFileModel file) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(file.title),
-        content: SizedBox(
-          width: 800,
-          height: 500,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(_getFileIcon(file.type),
-                  size: 100, color: _getFileTypeColor(file.type)),
-              const SizedBox(height: 20),
-              Text(
-                'استعراض الملف: ${file.title}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              const SizedBox(height: 8),
-              Text('الموقع: ${file.fileUrl}'),
-              const SizedBox(height: 24),
-              const CircularProgressIndicator(),
-              const SizedBox(height: 12),
-              const Text('جاري تحميل مشغل المعاينة المباشر...'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('إغلاق'),
-          ),
-        ],
-      ),
-    );
+  Future<void> _previewFile(BuildContext context, LessonFileModel file) async {
+    if (file.fileUrl.isNotEmpty) {
+      final uri = Uri.parse(file.fileUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تعذر فتح الملف')),
+          );
+        }
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('رابط الملف غير متاح')),
+      );
+    }
   }
 
-  void _downloadFile(LessonFileModel file) {
-    // Simply debug print download or launch URL
-    debugPrint('Downloading file: ${file.fileUrl}');
+  void _downloadFile(BuildContext context, LessonFileModel file) {
+    _previewFile(context, file);
   }
 }

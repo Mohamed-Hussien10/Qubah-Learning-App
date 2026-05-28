@@ -132,7 +132,11 @@ class ApiClient {
     return _dio.post(
       path,
       data: formData,
-      options: Options(contentType: 'multipart/form-data'),
+      options: Options(
+        contentType: 'multipart/form-data',
+        sendTimeout: const Duration(hours: 1),
+        receiveTimeout: const Duration(hours: 1),
+      ),
       onSendProgress: onProgress,
       cancelToken: cancelToken,
     );
@@ -156,7 +160,11 @@ class ApiClient {
     return _dio.post(
       path,
       data: formData,
-      options: Options(contentType: 'multipart/form-data'),
+      options: Options(
+        contentType: 'multipart/form-data',
+        sendTimeout: const Duration(hours: 1),
+        receiveTimeout: const Duration(hours: 1),
+      ),
       onSendProgress: onProgress,
       cancelToken: cancelToken,
     );

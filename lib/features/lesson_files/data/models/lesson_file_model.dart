@@ -30,7 +30,7 @@ class LessonFileModel {
         order: json['order'] as int? ?? 0,
         childCount: 0,
         type: json['type'] ?? 'unknown',
-        filePath: json['file_path'] ?? '',
+        filePath: json['file_url'] ?? json['file_path'] ?? '',
       );
 
   LessonFileEntity toEntity() => LessonFileEntity(

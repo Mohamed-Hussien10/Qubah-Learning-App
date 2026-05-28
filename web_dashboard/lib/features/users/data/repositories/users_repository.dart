@@ -28,12 +28,14 @@ class UsersRepository {
   Future<UserModel> create({
     required String name,
     required String email,
+    required String password,
     required UserRole role,
     bool isActive = true,
   }) async {
     final payload = {
       'name': name,
       'email': email,
+      'password': password,
       'role': role.name,
       'is_active': isActive,
     };

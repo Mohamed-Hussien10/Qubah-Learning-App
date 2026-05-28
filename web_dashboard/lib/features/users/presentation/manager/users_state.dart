@@ -40,7 +40,6 @@ class UsersState extends Equatable {
 
   int get totalCount => users.length;
   int get studentsCount => users.where((u) => u.role == UserRole.student).length;
-  int get parentsCount => users.where((u) => u.role == UserRole.parent).length;
   int get adminsCount => users.where((u) => u.role == UserRole.admin).length;
 
   UsersState copyWith({

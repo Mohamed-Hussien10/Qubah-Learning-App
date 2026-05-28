@@ -19,6 +19,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
   late UserRole _selectedRole;
   late bool _isActive;
 
@@ -29,6 +30,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.user?.name ?? '');
     _emailController = TextEditingController(text: widget.user?.email ?? '');
+    _passwordController = TextEditingController();
     _selectedRole = widget.user?.role ?? UserRole.student;
     _isActive = widget.user?.isActive ?? true;
   }
@@ -37,6 +39,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -54,8 +57,9 @@ class _UserFormDialogState extends State<UserFormDialog> {
           padding: const EdgeInsets.all(28),
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ── Title ─────────────────────────────────
@@ -136,6 +140,32 @@ class _UserFormDialogState extends State<UserFormDialog> {
                 ),
                 const SizedBox(height: 16),
 
+                // ── Password ──────────────────────────────
+                if (!isEditing) ...[
+                  Text(
+                    'كلمة المرور',
+                    style: GoogleFonts.cairo(
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    style: GoogleFonts.cairo(
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                    ),
+                    decoration: _inputDecoration('أدخل كلمة المرور', isDark),
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return 'كلمة المرور مطلوبة';
+                      if (v.length < 6) return 'يجب أن تكون 6 أحرف على الأقل';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
                 // ── Role ──────────────────────────────────
                 Text(
                   'الدور',
@@ -154,7 +184,6 @@ class _UserFormDialogState extends State<UserFormDialog> {
                   dropdownColor: isDark ? AppColors.cardDark : AppColors.cardLight,
                   items: const [
                     DropdownMenuItem(value: UserRole.student, child: Text('طالب')),
-                    DropdownMenuItem(value: UserRole.parent, child: Text('ولي أمر')),
                     DropdownMenuItem(value: UserRole.admin, child: Text('مدير')),
                   ],
                   onChanged: (v) {
@@ -234,6 +263,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                 ),
               ],
             ),
+            ),
           ),
         ),
       ),
@@ -288,6 +318,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
       cubit.createUser(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
         role: _selectedRole,
         isActive: _isActive,
       );
