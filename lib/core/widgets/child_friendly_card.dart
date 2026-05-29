@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ChildFriendlyCard extends StatefulWidget {
   final String title;
@@ -10,14 +9,14 @@ class ChildFriendlyCard extends StatefulWidget {
   final IconData defaultIcon;
 
   const ChildFriendlyCard({
-    Key? key,
+    super.key,
     required this.title,
     this.subtitle,
     this.imageUrl,
     required this.onTap,
     required this.color,
     this.defaultIcon = Icons.star_rounded,
-  }) : super(key: key);
+  });
 
   @override
   State<ChildFriendlyCard> createState() => _ChildFriendlyCardState();
@@ -62,7 +61,7 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
           scale: _scaleAnimation.value,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: widget.color.withValues(alpha: 0.2),
@@ -74,11 +73,11 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
-                // Inner highlight simulation
-                const BoxShadow(
-                  color: Colors.white,
+                // Inner highlight simulation (adapts to theme)
+                BoxShadow(
+                  color: Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.white10,
                   blurRadius: 2,
-                  offset: Offset(0, -2),
+                  offset: const Offset(0, -2),
                 ),
               ],
             ),
@@ -137,10 +136,8 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                         Text(
                           widget.title,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.cairo(
-                            fontSize: 16,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade800,
                             height: 1.2,
                           ),
                           maxLines: 2,
@@ -152,10 +149,7 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                           Text(
                             widget.subtitle!,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.cairo(
-                              fontSize: 12,
-                              color: Colors.grey.shade500,
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

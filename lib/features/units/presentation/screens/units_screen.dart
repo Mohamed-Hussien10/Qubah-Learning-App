@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/error_display.dart';
+import '../../../../core/utils/error_utils.dart';
+import '../../../../core/widgets/shimmer_loading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/breadcrumb_nav.dart';
@@ -36,10 +39,8 @@ class _UnitsScreenState extends State<UnitsScreen> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black87,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
-      backgroundColor: Colors.grey.shade50,
       body: Column(
         children: [
           if (widget.titlePath.isNotEmpty)
@@ -48,9 +49,9 @@ class _UnitsScreenState extends State<UnitsScreen> {
             child: BlocBuilder<UnitsCubit, UnitsState>(
               builder: (context, state) {
                 if (state is UnitsLoading)
-                  return const Center(child: CircularProgressIndicator());
+                  return const ShimmerGrid();
                 if (state is UnitsError)
-                  return Center(child: Text(state.message));
+                  return ErrorDisplay(message: ErrorUtils.getFriendlyMessage(state.message));
                 if (state is UnitsLoaded) {
                   if (state.units.isEmpty) {
                     return Center(

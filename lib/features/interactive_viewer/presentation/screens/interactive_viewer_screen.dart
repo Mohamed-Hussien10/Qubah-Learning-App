@@ -26,7 +26,7 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
   ScormPackage? _package;
   double _progress = 0;
   bool _isLoading = true;
-  String _status = 'Preparing...';
+  String _status = 'جاري التجهيز...';
   String? _error;
 
   @override
@@ -39,16 +39,32 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
     try {
       if (!widget.contentUrl.toLowerCase().endsWith('.zip')) {
         setState(() {
-          _error = 'Unsupported file format. Only .zip SCORM files are supported.';
+          _error = 'صيغة الملف غير مدعومة. ندعم ملفات zip التفاعلية فقط.';
           _isLoading = false;
         });
         return;
       }
 
-      setState(() => _status = 'Downloading interactive content...');
       final tempDir = await getTemporaryDirectory();
       final zipFileName = widget.contentUrl.split('/').last;
       final savePath = '${tempDir.path}/$zipFileName';
+      
+      // Deterministic ID based on filename
+      final packageId = zipFileName.replaceAll('.zip', '').replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
+
+      // Check cache first
+      final cachedPackage = await ScormExtractorService.getCachedPackage(packageId, savePath);
+      if (cachedPackage != null) {
+        if (mounted) {
+          setState(() {
+            _package = cachedPackage;
+            _isLoading = false;
+          });
+        }
+        return;
+      }
+
+      setState(() => _status = 'جاري تحميل المحتوى...');
 
       final dio = Dio();
       await dio.download(
@@ -64,12 +80,13 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
       );
 
       setState(() {
-        _status = 'Extracting content...';
+        _status = 'جاري معالجة الملفات...';
         _progress = 0;
       });
 
       final package = await ScormExtractorService.extractAndPrepare(
         savePath,
+        packageId: packageId,
         onProgress: (p) {
           setState(() {
             _progress = p;
@@ -86,7 +103,7 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Failed to load interactive content: $e';
+          _error = 'فشل تحميل المحتوى التفاعلي: $e';
           _isLoading = false;
         });
       }
@@ -106,8 +123,6 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
           widget.title,
           style: GoogleFonts.fredoka(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
         elevation: 1,
       ),
       body: Center(
@@ -130,7 +145,7 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
                     const SizedBox(height: 16),
                     LinearProgressIndicator(
                       value: _progress > 0 ? _progress : null,
-                      backgroundColor: AppColors.primary.withOpacity(0.2),
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.2),
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         AppColors.primary,
                       ),
@@ -147,7 +162,7 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      _error ?? 'An unknown error occurred.',
+                      _error ?? 'حدث خطأ غير معروف.',
                       style:  TextStyle(
                         fontSize: 16,
                         color: AppColors.textPrimaryDark,
@@ -164,7 +179,7 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
                         _downloadAndExtract();
                       },
                       icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Retry'),
+                      label: const Text('إعادة المحاولة'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,

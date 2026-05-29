@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           builder: (context, state) {
             return Container(
-              decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+              decoration:  BoxDecoration(gradient: AppColors.heroGradient),
               child: SafeArea(
                 child: Center(
                   child: SingleChildScrollView(

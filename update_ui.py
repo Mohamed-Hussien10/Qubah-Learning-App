@@ -1,4 +1,3 @@
-import os
 import glob
 import re
 
@@ -16,12 +15,18 @@ for d in directories:
     for filepath in glob.glob(d + '/**/*.dart', recursive=True):
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
+            
+        new_content = content
         
-        # Remove hardcoded background color for Scaffold
-        new_content = re.sub(r'\s*backgroundColor:\s*Colors\.grey\.shade50\s*,', '', content)
+        # Add imports if not present
+        if 'ErrorDisplay' not in new_content and 'state is ' in new_content:
+            new_content = new_content.replace("import 'package:flutter/material.dart';", "import 'package:flutter/material.dart';\nimport '../../../../core/widgets/error_display.dart';\nimport '../../../../core/utils/error_utils.dart';\nimport '../../../../core/widgets/shimmer_loading.dart';")
+            
+        # Replace CircularProgressIndicator with ShimmerGrid
+        new_content = new_content.replace('const Center(child: CircularProgressIndicator())', 'const ShimmerGrid()')
         
-        # Remove hardcoded foreground color for AppBar which breaks dark mode
-        new_content = re.sub(r'\s*foregroundColor:\s*Colors\.black87\s*,', '', new_content)
+        # Replace Center(child: Text(state.message)) with ErrorDisplay
+        new_content = re.sub(r'Center\(child:\s*Text\(state\.message\)\)', 'ErrorDisplay(message: ErrorUtils.getFriendlyMessage(state.message))', new_content)
         
         if content != new_content:
             with open(filepath, 'w', encoding='utf-8') as f:

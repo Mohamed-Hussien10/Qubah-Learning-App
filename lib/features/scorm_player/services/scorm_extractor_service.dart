@@ -24,15 +24,44 @@ class ScormExtractorService {
   /// [zipFilePath] – absolute path to the .zip file on disk.
   /// [onProgress]  – callback with progress value (0.0 – 1.0) during extraction.
   ///
+  ///
   /// Throws [FormatException] if the ZIP is invalid.
   /// Throws [FileSystemException] if extraction fails.
+  static Future<ScormPackage?> getCachedPackage(String packageId, String zipFilePath) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final extractDir = Directory('${appDir.path}/scorm_packages/$packageId');
+    
+    if (await extractDir.exists()) {
+      DebugLogger.fileSystem('Found cached package: $packageId');
+      final manifest = await _parseManifest(extractDir.path);
+      final entryFile = await _detectEntryFile(extractDir.path, manifest);
+      
+      if (entryFile != null) {
+        final now = DateTime.now();
+        final packageName = manifest?.title ?? zipFilePath.split(Platform.pathSeparator).last.replaceAll('.zip', '');
+        return ScormPackage(
+          id: packageId,
+          name: packageName,
+          zipFilePath: zipFilePath,
+          extractedPath: extractDir.path,
+          entryFilePath: entryFile,
+          loadedAt: now,
+          lastOpenedAt: now,
+          manifest: manifest,
+        );
+      }
+    }
+    return null;
+  }
+
   static Future<ScormPackage> extractAndPrepare(
     String zipFilePath, {
     void Function(double progress)? onProgress,
+    String? packageId,
   }) async {
-    final packageId = _uuid.v4();
+    final effectivePackageId = packageId ?? _uuid.v4();
     DebugLogger.fileSystem('Starting extraction for: $zipFilePath');
-    DebugLogger.fileSystem('Package ID: $packageId');
+    DebugLogger.fileSystem('Package ID: $effectivePackageId');
 
     // ── 1. Read ZIP file ────────────────────────────────────────────────────
     final zipFile = File(zipFilePath);
@@ -57,7 +86,7 @@ class ScormExtractorService {
 
     // ── 3. Determine output directory ───────────────────────────────────────
     final appDir = await getApplicationDocumentsDirectory();
-    final extractDir = Directory('${appDir.path}/scorm_packages/$packageId');
+    final extractDir = Directory('${appDir.path}/scorm_packages/$effectivePackageId');
     await extractDir.create(recursive: true);
     DebugLogger.fileSystem('Extraction target: ${extractDir.path}');
 
@@ -103,7 +132,7 @@ class ScormExtractorService {
         zipFilePath.split(Platform.pathSeparator).last.replaceAll('.zip', '');
 
     return ScormPackage(
-      id: packageId,
+      id: effectivePackageId,
       name: packageName,
       zipFilePath: zipFilePath,
       extractedPath: extractDir.path,

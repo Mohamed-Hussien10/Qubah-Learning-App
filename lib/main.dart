@@ -107,8 +107,8 @@ class QubahLearningApp extends StatelessWidget {
             locale: const Locale('ar', ''),
 
             // Themes
-            theme: LightTheme.theme,
-            darkTheme: DarkTheme.theme,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
             themeMode: themeMode,
 
             // Routing

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/error_display.dart';
+import '../../../../core/utils/error_utils.dart';
+import '../../../../core/widgets/shimmer_loading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
@@ -29,15 +32,13 @@ class _StagesScreenState extends State<StagesScreen> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black87,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
-      backgroundColor: Colors.grey.shade50,
       body: BlocBuilder<StagesCubit, StagesState>(
         builder: (context, state) {
           if (state is StagesLoading)
-            return const Center(child: CircularProgressIndicator());
-          if (state is StagesError) return Center(child: Text(state.message));
+            return const ShimmerGrid();
+          if (state is StagesError) return ErrorDisplay(message: ErrorUtils.getFriendlyMessage(state.message));
           if (state is StagesLoaded) {
             if (state.stages.isEmpty) {
               return Center(
