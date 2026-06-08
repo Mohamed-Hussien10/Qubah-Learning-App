@@ -1,4 +1,5 @@
 import 'package:web_dashboard/core/network/api_client.dart';
+import 'package:web_dashboard/core/constants/api_endpoints.dart';
 import 'package:web_dashboard/features/lessons/data/models/lesson_model.dart';
 
 /// Repository handling CRUD operations for lessons within a unit.
@@ -25,16 +26,40 @@ class LessonsRepository {
     return LessonModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<LessonModel> create(LessonModel lesson) async {
+  Future<LessonModel> create(LessonModel lesson, {List<int>? imageBytes, String? imageName}) async {
     final payload = lesson.toJson()..remove('id')..remove('created_at');
-    final response = await _apiClient.post('/lessons', data: payload);
+    
+    if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: imageBytes,
+        fileName: imageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'lessons'},
+      );
+      payload['thumbnail_path'] = uploadRes.data['data']['path'];
+    }
+
+    final response = await _apiClient.post(ApiEndpoints.lessons, data: payload);
     final data = response.data['data'] ?? response.data;
     return LessonModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<LessonModel> update(LessonModel lesson) async {
+  Future<LessonModel> update(LessonModel lesson, {List<int>? imageBytes, String? imageName}) async {
     final payload = lesson.toJson()..remove('created_at');
-    final response = await _apiClient.put('/lessons/${lesson.id}', data: payload);
+
+    if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: imageBytes,
+        fileName: imageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'lessons'},
+      );
+      payload['thumbnail_path'] = uploadRes.data['data']['path'];
+    }
+
+    final response = await _apiClient.put(ApiEndpoints.lesson(int.parse(lesson.id)), data: payload);
     final data = response.data['data'] ?? response.data;
     return LessonModel.fromJson(data as Map<String, dynamic>);
   }

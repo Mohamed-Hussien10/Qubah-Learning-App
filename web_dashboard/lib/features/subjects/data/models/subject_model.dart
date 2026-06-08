@@ -29,8 +29,8 @@ class SubjectModel extends BaseEntity {
       description: json['description'],
       thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
-      order: json['order'] ?? 0,
-      unitsCount: json['units_count'] ?? 0,
+      order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
+      unitsCount: json['units_count'] != null ? int.tryParse(json['units_count'].toString()) ?? 0 : 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -43,8 +43,8 @@ class SubjectModel extends BaseEntity {
       'section_id': sectionId,
       'title': title,
       'description': description,
-      'thumbnail_url': thumbnailUrl,
-      'is_active': isActive,
+      'thumbnail_path': thumbnailUrl,
+      'is_active': isActive ? 1 : 0,
       'order': order,
       'units_count': unitsCount,
       'created_at': createdAt?.toIso8601String(),

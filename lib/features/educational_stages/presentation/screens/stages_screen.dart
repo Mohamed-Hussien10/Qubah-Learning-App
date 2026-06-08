@@ -62,16 +62,20 @@ class _StagesScreenState extends State<StagesScreen> {
                 ),
               );
             }
-            return GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.85,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: state.stages.length,
-              itemBuilder: (context, index) {
+              final itemCount = state.stages.length;
+              final crossAxisCount = itemCount == 1 ? 1 : 2;
+              final childAspectRatio = itemCount == 1 ? 1.5 : 0.85;
+
+              return GridView.builder(
+                padding: const EdgeInsets.all(16),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  childAspectRatio: childAspectRatio,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: itemCount,
+                itemBuilder: (context, index) {
                 final item = state.stages[index];
                 return ChildFriendlyCard(
                   title: item.name,
@@ -84,6 +88,7 @@ class _StagesScreenState extends State<StagesScreen> {
                       '/grades/${item.id}',
                       extra: {
                         'titlePath': [item.name],
+                        'backgroundImageUrl': item.backgroundImageUrl,
                       },
                     );
                   },

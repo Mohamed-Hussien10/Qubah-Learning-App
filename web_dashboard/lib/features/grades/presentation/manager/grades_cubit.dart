@@ -34,18 +34,18 @@ class GradesCubit extends Cubit<GradesState> {
     }
   }
 
-  Future<void> createGrade(GradeModel grade) async {
+  Future<void> createGrade(GradeModel grade, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.create(grade);
+      await _repository.create(grade, imageBytes: imageBytes, imageName: imageName);
       await loadGrades(_stageId);
     } catch (e) {
       emit(GradesError(e.toString()));
     }
   }
 
-  Future<void> updateGrade(GradeModel grade) async {
+  Future<void> updateGrade(GradeModel grade, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.update(grade);
+      await _repository.update(grade, imageBytes: imageBytes, imageName: imageName);
       await loadGrades(_stageId);
     } catch (e) {
       emit(GradesError(e.toString()));

@@ -8,6 +8,7 @@ import '../../../../../core/services/dependency_injection.dart';
 import '../../../../../core/theme/app_theme.dart';
 import '../../../../../core/widgets/qubah_button.dart';
 import '../../../../../core/widgets/qubah_text_field.dart';
+import '../../../../../core/storage/secure_storage.dart';
 import '../../manager/cubit/auth_cubit.dart';
 import '../../manager/state/auth_state.dart';
 
@@ -170,6 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         onPressed: () {
                                           if (_formKey.currentState!
                                               .validate()) {
+                                            sl<SecureStorage>().saveIsGuest(false);
                                             context.read<AuthCubit>().login(
                                               email: _emailController.text
                                                   .trim(),
@@ -178,6 +180,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                             );
                                           }
                                         },
+                                      ),
+                                      const SizedBox(height: 12),
+                                      TextButton(
+                                        onPressed: () async {
+                                          await sl<SecureStorage>().saveIsGuest(true);
+                                          if (context.mounted) {
+                                            context.go('/home');
+                                          }
+                                        },
+                                        child: Text(
+                                          'تجربة مجانية',
+                                          style: GoogleFonts.cairo(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.green,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),

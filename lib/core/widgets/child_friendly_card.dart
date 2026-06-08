@@ -61,7 +61,7 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
           scale: _scaleAnimation.value,
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color: Theme.of(context).cardColor.withValues(alpha: 0.85),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: widget.color.withValues(alpha: 0.2),
@@ -75,7 +75,7 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                 ),
                 // Inner highlight simulation (adapts to theme)
                 BoxShadow(
-                  color: Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.white10,
+                  color: Theme.of(context).brightness == Brightness.light ? Colors.white.withValues(alpha: 0.5) : Colors.white10,
                   blurRadius: 2,
                   offset: const Offset(0, -2),
                 ),
@@ -88,7 +88,7 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                   flex: 3,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: widget.color.withValues(alpha: 0.1),
+                      color: widget.color.withValues(alpha: 0.15),
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(22),
                         topRight: Radius.circular(22),
@@ -103,11 +103,10 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                         bottomLeft: Radius.circular(8),
                         bottomRight: Radius.circular(8),
                       ),
-                      child:
-                          widget.imageUrl != null && widget.imageUrl!.isNotEmpty
+                      child: widget.imageUrl != null && widget.imageUrl!.isNotEmpty
                           ? Image.network(
-                              widget.imageUrl!,
-                              fit: BoxFit.cover,
+                              _resolveImageUrl(widget.imageUrl!),
+                              fit: BoxFit.contain,
                               errorBuilder: (_, __, ___) => Icon(
                                 widget.defaultIcon,
                                 size: 60,
@@ -164,5 +163,23 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
         ),
       ),
     );
+  }
+
+  String _resolveImageUrl(String path) {
+    if (path.startsWith('http')) {
+      if (path.contains('localhost') || path.contains('127.0.0.1')) {
+        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://192.168.1.17:8000');
+      }
+      return path;
+    }
+    // Assuming backend serves storage files or similar
+    const baseUrl = 'http://192.168.1.17:8000'; 
+    if (path.startsWith('/')) {
+      return '$baseUrl$path';
+    } else if (path.startsWith('storage/')) {
+      return '$baseUrl/$path';
+    } else {
+      return '$baseUrl/storage/$path';
+    }
   }
 }

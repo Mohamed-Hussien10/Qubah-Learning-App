@@ -25,9 +25,9 @@ class StagesCubit extends Cubit<StagesState> {
 
   // ── Create ────────────────────────────────────────────────────────────
 
-  Future<void> createStage(StageModel stage) async {
+  Future<void> createStage(StageModel stage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) async {
     try {
-      await _repository.create(stage);
+      await _repository.create(stage, imageBytes: imageBytes, imageName: imageName, bgImageBytes: bgImageBytes, bgImageName: bgImageName);
       await loadStages();
     } catch (e) {
       emit(StagesError(e.toString()));
@@ -36,9 +36,9 @@ class StagesCubit extends Cubit<StagesState> {
 
   // ── Update ────────────────────────────────────────────────────────────
 
-  Future<void> updateStage(StageModel stage) async {
+  Future<void> updateStage(StageModel stage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) async {
     try {
-      await _repository.update(stage);
+      await _repository.update(stage, imageBytes: imageBytes, imageName: imageName, bgImageBytes: bgImageBytes, bgImageName: bgImageName);
       await loadStages();
     } catch (e) {
       emit(StagesError(e.toString()));

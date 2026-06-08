@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -217,12 +218,18 @@ class _SectionsView extends StatelessWidget {
                 DataCell(Row(
                   children: [
                     CircleAvatar(
-                      radius: 18,
-                      backgroundColor:
-                          AppColors.primaryLight.withOpacity(0.2),
-                      child: const Icon(Icons.account_tree,
-                          size: 18, color: AppColors.primary),
-                    ),
+                        radius: 18,
+                        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+                        backgroundImage: (section.thumbnailUrl != null && section.thumbnailUrl!.isNotEmpty)
+                            ? NetworkImage(resolveImageUrl(section.thumbnailUrl!))
+                            : null,
+                        onBackgroundImageError: (section.thumbnailUrl != null && section.thumbnailUrl!.isNotEmpty) 
+                            ? (_, __) {} 
+                            : null,
+                        child: (section.thumbnailUrl == null || section.thumbnailUrl!.isEmpty)
+                            ? const Icon(Icons.account_tree, size: 18, color: AppColors.primary)
+                            : null,
+                      ),
                     const SizedBox(width: 10),
                     Expanded(
                         child: Text(section.title,
@@ -239,29 +246,11 @@ class _SectionsView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _ActionIcon(
-                        icon: Icons.visibility_rounded,
-                        tooltip: 'عرض المواد',
-                        color: AppColors.info,
-                        onTap: () =>
-                            _navigateToSubjects(context, section)),
-                    _ActionIcon(
                         icon: Icons.edit_rounded,
                         tooltip: AppStrings.edit,
                         color: AppColors.warning,
                         onTap: () =>
                             _showForm(context, section: section)),
-                    _ActionIcon(
-                      icon: section.isActive
-                          ? Icons.toggle_on_rounded
-                          : Icons.toggle_off_rounded,
-                      tooltip: section.isActive ? 'تعطيل' : 'تفعيل',
-                      color: section.isActive
-                          ? AppColors.success
-                          : AppColors.textTertiaryLight,
-                      onTap: () => context
-                          .read<SectionsCubit>()
-                          .toggleStatus(section.id),
-                    ),
                     _ActionIcon(
                         icon: Icons.delete_outline_rounded,
                         tooltip: AppStrings.delete,
@@ -359,11 +348,11 @@ class _SectionsView extends StatelessWidget {
       builder: (_) => _SectionFormDialog(
         section: section,
         gradeId: gradeId,
-        onSave: (s) async {
+        onSave: (s, {imageBytes, imageName}) async {
           if (section != null) {
-            await cubit.updateSection(s);
+            await cubit.updateSection(s, imageBytes: imageBytes, imageName: imageName);
           } else {
-            await cubit.createSection(s);
+            await cubit.createSection(s, imageBytes: imageBytes, imageName: imageName);
           }
         },
       ),
@@ -457,7 +446,7 @@ class _ActionIcon extends StatelessWidget {
 class _SectionFormDialog extends StatefulWidget {
   final SectionModel? section;
   final String gradeId;
-  final Future<void> Function(SectionModel) onSave;
+  final Future<void> Function(SectionModel, {List<int>? imageBytes, String? imageName}) onSave;
   const _SectionFormDialog(
       {this.section, required this.gradeId, required this.onSave});
   @override
@@ -471,6 +460,9 @@ class _SectionFormDialogState extends State<_SectionFormDialog> {
   late final TextEditingController _orderCtrl;
   late bool _isActive;
   bool _isSaving = false;
+  String? _selectedFileName;
+  List<int>? _selectedFileBytes;
+  late TextEditingController _thumbCtrl;
   bool get _isEditing => widget.section != null;
 
   @override
@@ -478,6 +470,7 @@ class _SectionFormDialogState extends State<_SectionFormDialog> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.section?.title ?? '');
     _descCtrl = TextEditingController(text: widget.section?.description ?? '');
+    _thumbCtrl = TextEditingController(text: widget.section?.thumbnailUrl ?? '');
     _orderCtrl =
         TextEditingController(text: widget.section?.order.toString() ?? '0');
     _isActive = widget.section?.isActive ?? true;
@@ -487,8 +480,24 @@ class _SectionFormDialogState extends State<_SectionFormDialog> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
+    _thumbCtrl.dispose();
     _orderCtrl.dispose();
     super.dispose();
+  }
+
+  
+  Future<void> _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedFileName = result.files.single.name;
+        _selectedFileBytes = result.files.single.bytes;
+        _thumbCtrl.text = _selectedFileName!;
+      });
+    }
   }
 
   Future<void> _handleSave() async {
@@ -501,12 +510,13 @@ class _SectionFormDialogState extends State<_SectionFormDialog> {
       description:
           _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       isActive: _isActive,
+      thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
       subjectsCount: widget.section?.subjectsCount ?? 0,
       createdAt: widget.section?.createdAt,
     );
     try {
-      await widget.onSave(section);
+      await widget.onSave(section, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -557,7 +567,31 @@ class _SectionFormDialogState extends State<_SectionFormDialog> {
                       (v == null || v.trim().isEmpty) ? 'العنوان مطلوب' : null,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
+                
+                  const Text('صورة الغلاف (اختياري)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _thumbCtrl,
+                          decoration: const InputDecoration(
+                            hintText: 'لم يتم اختيار صورة',
+                            border: OutlineInputBorder(),
+                          ),
+                          readOnly: true,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton.icon(
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.image),
+                        label: const Text('اختيار'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
                   controller: _descCtrl,
                   maxLines: 3,
                   decoration: InputDecoration(
@@ -619,4 +653,17 @@ class _SectionFormDialogState extends State<_SectionFormDialog> {
       ),
     );
   }
+}
+
+String resolveImageUrl(String path) {
+  if (path.isEmpty) return '';
+  if (path.contains('thumbnails/')) {
+    final fileName = path.split('thumbnails/').last;
+    return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
+  }
+  if (path.startsWith('http')) return path;
+  const baseUrl = 'http://127.0.0.1:8000';
+  if (path.startsWith('/')) return '$baseUrl$path';
+  if (path.startsWith('storage/')) return '$baseUrl/$path';
+  return '$baseUrl/storage/$path';
 }

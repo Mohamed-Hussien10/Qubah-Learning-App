@@ -4,12 +4,14 @@ import 'package:web_dashboard/features/shared/models/base_entity.dart';
 class GradeModel extends BaseEntity {
   final String stageId;
   final int sectionsCount;
+  final String? thumbnailUrl;
 
   const GradeModel({
     required super.id,
     required this.stageId,
     required super.title,
     super.description,
+    this.thumbnailUrl,
     super.isActive = true,
     super.order = 0,
     this.sectionsCount = 0,
@@ -17,7 +19,7 @@ class GradeModel extends BaseEntity {
   });
 
   @override
-  List<Object?> get props => [...super.props, stageId, sectionsCount];
+  List<Object?> get props => [...super.props, stageId, sectionsCount, thumbnailUrl];
 
   factory GradeModel.fromJson(Map<String, dynamic> json) {
     return GradeModel(
@@ -25,9 +27,10 @@ class GradeModel extends BaseEntity {
       stageId: json['stage_id']?.toString() ?? '',
       title: json['title'] ?? '',
       description: json['description'],
+      thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
-      order: json['order'] ?? 0,
-      sectionsCount: json['sections_count'] ?? 0,
+      order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
+      sectionsCount: json['sections_count'] != null ? int.tryParse(json['sections_count'].toString()) ?? 0 : 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -40,7 +43,8 @@ class GradeModel extends BaseEntity {
       'stage_id': stageId,
       'title': title,
       'description': description,
-      'is_active': isActive,
+      'thumbnail_path': thumbnailUrl,
+      'is_active': isActive ? 1 : 0,
       'order': order,
       'sections_count': sectionsCount,
       'created_at': createdAt?.toIso8601String(),
@@ -53,6 +57,7 @@ class GradeModel extends BaseEntity {
     String? stageId,
     String? title,
     String? description,
+    String? thumbnailUrl,
     bool? isActive,
     int? order,
     int? sectionsCount,
@@ -63,6 +68,7 @@ class GradeModel extends BaseEntity {
       stageId: stageId ?? this.stageId,
       title: title ?? this.title,
       description: description ?? this.description,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       isActive: isActive ?? this.isActive,
       order: order ?? this.order,
       sectionsCount: sectionsCount ?? this.sectionsCount,

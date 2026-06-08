@@ -49,11 +49,13 @@ class AppSettingsModel extends Equatable {
 
   factory AppSettingsModel.fromJson(Map<String, dynamic> json) {
     return AppSettingsModel(
-      appName: json['app_name'] as String,
+      appName: json['app_name'] as String? ?? '',
       logoUrl: json['logo_url'] as String?,
-      contactEmail: json['contact_email'] as String,
-      contactPhone: json['contact_phone'] as String,
-      socialLinks: Map<String, String>.from(json['social_links'] as Map),
+      contactEmail: json['contact_email'] as String? ?? '',
+      contactPhone: json['contact_phone'] as String? ?? '',
+      socialLinks: json['social_links'] != null
+          ? Map<String, String>.from(json['social_links'] as Map)
+          : {},
       maintenanceMode: json['maintenance_mode'] as bool? ?? false,
       defaultLanguage: json['default_language'] as String? ?? 'ar',
       baseUrl: json['base_url'] as String? ?? '',

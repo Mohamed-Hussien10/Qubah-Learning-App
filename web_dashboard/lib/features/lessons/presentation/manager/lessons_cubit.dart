@@ -37,18 +37,18 @@ class LessonsCubit extends Cubit<LessonsState> {
     }
   }
 
-  Future<void> createLesson(LessonModel lesson) async {
+  Future<void> createLesson(LessonModel lesson, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.create(lesson);
+      await _repository.create(lesson, imageBytes: imageBytes, imageName: imageName);
       await loadLessons(_unitId);
     } catch (e) {
       emit(LessonsError(e.toString()));
     }
   }
 
-  Future<void> updateLesson(LessonModel lesson) async {
+  Future<void> updateLesson(LessonModel lesson, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.update(lesson);
+      await _repository.update(lesson, imageBytes: imageBytes, imageName: imageName);
       await loadLessons(_unitId);
     } catch (e) {
       emit(LessonsError(e.toString()));

@@ -6,16 +6,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/breadcrumb_nav.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
+import '../../../../core/storage/secure_storage.dart';
+import '../../../../core/services/dependency_injection.dart';
 import '../manager/cubit/lessons_cubit.dart';
 import '../manager/state/lessons_state.dart';
 
 class LessonsScreen extends StatefulWidget {
   final String parentId;
   final List<String> titlePath;
+  final String? backgroundImageUrl;
   const LessonsScreen({
     super.key,
     required this.parentId,
     this.titlePath = const [],
+    this.backgroundImageUrl,
   });
 
   @override
@@ -23,10 +27,39 @@ class LessonsScreen extends StatefulWidget {
 }
 
 class _LessonsScreenState extends State<LessonsScreen> {
+  bool _isGuest = false;
+
   @override
   void initState() {
     super.initState();
+    _checkGuestStatus();
     context.read<LessonsCubit>().loadLessons(widget.parentId);
+  }
+
+  Future<void> _checkGuestStatus() async {
+    final isGuest = await sl<SecureStorage>().isGuest();
+    if (mounted) {
+      setState(() {
+        _isGuest = isGuest;
+      });
+    }
+  }
+
+  String _resolveImageUrl(String path) {
+    if (path.startsWith('http')) {
+      if (path.contains('localhost') || path.contains('127.0.0.1')) {
+        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://192.168.1.17:8000');
+      }
+      return path;
+    }
+    const baseUrl = 'http://192.168.1.17:8000'; 
+    if (path.startsWith('/')) {
+      return '$baseUrl$path';
+    } else if (path.startsWith('storage/')) {
+      return '$baseUrl/$path';
+    } else {
+      return '$baseUrl/storage/$path';
+    }
   }
 
   @override
@@ -39,13 +72,23 @@ class _LessonsScreenState extends State<LessonsScreen> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          if (widget.titlePath.isNotEmpty)
-            BreadcrumbNav(pathNames: widget.titlePath),
-          Expanded(
+      body: Container(
+        decoration: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty
+            ? BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(_resolveImageUrl(widget.backgroundImageUrl!)),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(Colors.white.withValues(alpha: 0.15), BlendMode.lighten),
+                ),
+              )
+            : null,
+        child: Column(
+          children: [
+            if (widget.titlePath.isNotEmpty)
+              BreadcrumbNav(pathNames: widget.titlePath),
+            Expanded(
             child: BlocBuilder<LessonsCubit, LessonsState>(
               builder: (context, state) {
                 if (state is LessonsLoading) {
@@ -77,16 +120,20 @@ class _LessonsScreenState extends State<LessonsScreen> {
                       ),
                     );
                   }
+                  final itemCount = _isGuest && state.lessons.isNotEmpty ? 1 : state.lessons.length;
+                  final crossAxisCount = itemCount == 1 ? 1 : 2;
+                  final childAspectRatio = itemCount == 1 ? 1.5 : 0.85;
+
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.85,
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          childAspectRatio: childAspectRatio,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),
-                    itemCount: state.lessons.length,
+                    itemCount: itemCount,
                     itemBuilder: (context, index) {
                       final item = state.lessons[index];
                       return ChildFriendlyCard(
@@ -112,6 +159,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

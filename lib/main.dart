@@ -108,8 +108,7 @@ class QubahLearningApp extends StatelessWidget {
 
             // Themes
             theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeMode,
+            themeMode: ThemeMode.light,
 
             // Routing
             routerConfig: AppRouter.router,

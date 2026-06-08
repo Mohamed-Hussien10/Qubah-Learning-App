@@ -6,6 +6,7 @@ class StageEntity extends Equatable {
   final String name;
   final String? description;
   final String? imageUrl;
+  final String? backgroundImageUrl;
   final int order;
   final int subjectCount;
 
@@ -14,6 +15,7 @@ class StageEntity extends Equatable {
     required this.name,
     this.description,
     this.imageUrl,
+    this.backgroundImageUrl,
     required this.order,
     this.subjectCount = 0,
   });
@@ -24,6 +26,7 @@ class StageEntity extends Equatable {
     name,
     description,
     imageUrl,
+    backgroundImageUrl,
     order,
     subjectCount,
   ];

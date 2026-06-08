@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -217,10 +218,16 @@ class _UnitsView extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 18,
-                      backgroundColor:
-                          AppColors.primaryLight.withValues(alpha: 0.2),
-                      child: const Icon(Icons.folder,
-                          size: 18, color: AppColors.primary),
+                      backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
+                      backgroundImage: (unit.thumbnailUrl != null && unit.thumbnailUrl!.isNotEmpty)
+                          ? NetworkImage(resolveImageUrl(unit.thumbnailUrl!))
+                          : null,
+                      onBackgroundImageError: (unit.thumbnailUrl != null && unit.thumbnailUrl!.isNotEmpty)
+                          ? (_, __) {}
+                          : null,
+                      child: (unit.thumbnailUrl == null || unit.thumbnailUrl!.isEmpty)
+                          ? const Icon(Icons.folder, size: 18, color: AppColors.primary)
+                          : null,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -238,29 +245,11 @@ class _UnitsView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _ActionIcon(
-                        icon: Icons.visibility_rounded,
-                        tooltip: 'عرض الدروس',
-                        color: AppColors.info,
-                        onTap: () =>
-                            _navigateToLessons(context, unit)),
-                    _ActionIcon(
                         icon: Icons.edit_rounded,
                         tooltip: AppStrings.edit,
                         color: AppColors.warning,
                         onTap: () =>
                             _showForm(context, unit: unit)),
-                    _ActionIcon(
-                      icon: unit.isActive
-                          ? Icons.toggle_on_rounded
-                          : Icons.toggle_off_rounded,
-                      tooltip: unit.isActive ? 'تعطيل' : 'تفعيل',
-                      color: unit.isActive
-                          ? AppColors.success
-                          : AppColors.textTertiaryLight,
-                      onTap: () => context
-                          .read<UnitsCubit>()
-                          .toggleStatus(unit.id),
-                    ),
                     _ActionIcon(
                         icon: Icons.delete_outline_rounded,
                         tooltip: AppStrings.delete,
@@ -358,11 +347,11 @@ class _UnitsView extends StatelessWidget {
       builder: (_) => _UnitFormDialog(
         unit: unit,
         subjectId: subjectId,
-        onSave: (u) async {
+        onSave: (u, {imageBytes, imageName}) async {
           if (unit != null) {
-            await cubit.updateUnit(u);
+            await cubit.updateUnit(u, imageBytes: imageBytes, imageName: imageName);
           } else {
-            await cubit.createUnit(u);
+            await cubit.createUnit(u, imageBytes: imageBytes, imageName: imageName);
           }
         },
       ),
@@ -452,7 +441,7 @@ class _ActionIcon extends StatelessWidget {
 class _UnitFormDialog extends StatefulWidget {
   final UnitModel? unit;
   final String subjectId;
-  final Future<void> Function(UnitModel) onSave;
+  final Future<void> Function(UnitModel, {List<int>? imageBytes, String? imageName}) onSave;
   const _UnitFormDialog(
       {this.unit, required this.subjectId, required this.onSave});
   @override
@@ -466,6 +455,9 @@ class _UnitFormDialogState extends State<_UnitFormDialog> {
   late final TextEditingController _orderCtrl;
   late bool _isActive;
   bool _isSaving = false;
+  String? _selectedFileName;
+  List<int>? _selectedFileBytes;
+  late TextEditingController _thumbCtrl;
   bool get _isEditing => widget.unit != null;
 
   @override
@@ -473,6 +465,7 @@ class _UnitFormDialogState extends State<_UnitFormDialog> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.unit?.title ?? '');
     _descCtrl = TextEditingController(text: widget.unit?.description ?? '');
+    _thumbCtrl = TextEditingController(text: widget.unit?.thumbnailUrl ?? '');
     _orderCtrl =
         TextEditingController(text: widget.unit?.order.toString() ?? '0');
     _isActive = widget.unit?.isActive ?? true;
@@ -482,8 +475,24 @@ class _UnitFormDialogState extends State<_UnitFormDialog> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
+    _thumbCtrl.dispose();
     _orderCtrl.dispose();
     super.dispose();
+  }
+
+  
+  Future<void> _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedFileName = result.files.single.name;
+        _selectedFileBytes = result.files.single.bytes;
+        _thumbCtrl.text = _selectedFileName!;
+      });
+    }
   }
 
   Future<void> _handleSave() async {
@@ -496,12 +505,13 @@ class _UnitFormDialogState extends State<_UnitFormDialog> {
       description:
           _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       isActive: _isActive,
+      thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
       lessonsCount: widget.unit?.lessonsCount ?? 0,
       createdAt: widget.unit?.createdAt,
     );
     try {
-      await widget.onSave(unit);
+      await widget.onSave(unit, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -552,7 +562,31 @@ class _UnitFormDialogState extends State<_UnitFormDialog> {
                       (v == null || v.trim().isEmpty) ? 'العنوان مطلوب' : null,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
+                
+                  const Text('صورة الغلاف (اختياري)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _thumbCtrl,
+                          decoration: const InputDecoration(
+                            hintText: 'لم يتم اختيار صورة',
+                            border: OutlineInputBorder(),
+                          ),
+                          readOnly: true,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton.icon(
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.image),
+                        label: const Text('اختيار'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
                   controller: _descCtrl,
                   maxLines: 3,
                   decoration: InputDecoration(
@@ -614,4 +648,17 @@ class _UnitFormDialogState extends State<_UnitFormDialog> {
       ),
     );
   }
+}
+
+String resolveImageUrl(String path) {
+  if (path.isEmpty) return '';
+  if (path.contains('thumbnails/')) {
+    final fileName = path.split('thumbnails/').last;
+    return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
+  }
+  if (path.startsWith('http')) return path;
+  const baseUrl = 'http://127.0.0.1:8000';
+  if (path.startsWith('/')) return '$baseUrl$path';
+  if (path.startsWith('storage/')) return '$baseUrl/$path';
+  return '$baseUrl/storage/$path';
 }

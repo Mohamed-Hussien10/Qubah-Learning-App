@@ -186,8 +186,16 @@ class _StagesView extends StatelessWidget {
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: AppColors.primaryLight.withOpacity(0.2),
-                        child: const Icon(Icons.school,
-                            size: 18, color: AppColors.primary),
+                          backgroundImage: (stage.thumbnailUrl != null &&
+                                  stage.thumbnailUrl!.isNotEmpty)
+                              ? NetworkImage(resolveImageUrl(stage.thumbnailUrl!))
+                              : null,
+                        onBackgroundImageError: (stage.thumbnailUrl != null && stage.thumbnailUrl!.isNotEmpty) 
+                            ? (_, __) {} 
+                            : null,
+                        child: (stage.thumbnailUrl == null || stage.thumbnailUrl!.isEmpty)
+                            ? const Icon(Icons.school, size: 18, color: AppColors.primary)
+                            : null,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -211,29 +219,10 @@ class _StagesView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _ActionIcon(
-                        icon: Icons.visibility_rounded,
-                        tooltip: 'عرض الصفوف',
-                        color: AppColors.info,
-                        onTap: () => _navigateToGrades(context, stage),
-                      ),
-                      _ActionIcon(
                         icon: Icons.edit_rounded,
                         tooltip: AppStrings.edit,
                         color: AppColors.warning,
                         onTap: () => _showForm(context, stage: stage),
-                      ),
-                      _ActionIcon(
-                        icon: stage.isActive
-                            ? Icons.toggle_on_rounded
-                            : Icons.toggle_off_rounded,
-                        tooltip:
-                            stage.isActive ? 'تعطيل' : 'تفعيل',
-                        color: stage.isActive
-                            ? AppColors.success
-                            : AppColors.textTertiaryLight,
-                        onTap: () => context
-                            .read<StagesCubit>()
-                            .toggleStatus(stage.id),
                       ),
                       _ActionIcon(
                         icon: Icons.delete_outline_rounded,
@@ -349,11 +338,11 @@ class _StagesView extends StatelessWidget {
     StageFormDialog.show(
       context,
       stage: stage,
-      onSave: (s) async {
+      onSave: (s, {imageBytes, imageName, bgImageBytes, bgImageName}) async {
         if (stage != null) {
-          await cubit.updateStage(s);
+          await cubit.updateStage(s, imageBytes: imageBytes, imageName: imageName, bgImageBytes: bgImageBytes, bgImageName: bgImageName);
         } else {
-          await cubit.createStage(s);
+          await cubit.createStage(s, imageBytes: imageBytes, imageName: imageName, bgImageBytes: bgImageBytes, bgImageName: bgImageName);
         }
       },
     );
@@ -392,6 +381,19 @@ class _StagesView extends StatelessWidget {
 
   void _navigateToGrades(BuildContext context, StageModel stage) {
     context.go('/grades/${stage.id}');
+  }
+
+  String resolveImageUrl(String path) {
+    if (path.isEmpty) return '';
+    if (path.contains('thumbnails/')) {
+      final fileName = path.split('thumbnails/').last;
+      return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
+    }
+    if (path.startsWith('http')) return path;
+    const baseUrl = 'http://127.0.0.1:8000';
+    if (path.startsWith('/')) return '$baseUrl$path';
+    if (path.startsWith('storage/')) return '$baseUrl/$path';
+    return '$baseUrl/storage/$path';
   }
 }
 

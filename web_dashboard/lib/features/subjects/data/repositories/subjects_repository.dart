@@ -1,4 +1,5 @@
 import 'package:web_dashboard/core/network/api_client.dart';
+import 'package:web_dashboard/core/constants/api_endpoints.dart';
 import 'package:web_dashboard/features/subjects/data/models/subject_model.dart';
 
 /// Repository handling CRUD operations for subjects within a section.
@@ -25,16 +26,40 @@ class SubjectsRepository {
     return SubjectModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<SubjectModel> create(SubjectModel subject) async {
+  Future<SubjectModel> create(SubjectModel subject, {List<int>? imageBytes, String? imageName}) async {
     final payload = subject.toJson()..remove('id')..remove('created_at');
-    final response = await _apiClient.post('/subjects', data: payload);
+    
+    if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: imageBytes,
+        fileName: imageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'subjects'},
+      );
+      payload['thumbnail_path'] = uploadRes.data['data']['path'];
+    }
+
+    final response = await _apiClient.post(ApiEndpoints.subjects, data: payload);
     final data = response.data['data'] ?? response.data;
     return SubjectModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<SubjectModel> update(SubjectModel subject) async {
+  Future<SubjectModel> update(SubjectModel subject, {List<int>? imageBytes, String? imageName}) async {
     final payload = subject.toJson()..remove('created_at');
-    final response = await _apiClient.put('/subjects/${subject.id}', data: payload);
+
+    if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: imageBytes,
+        fileName: imageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'subjects'},
+      );
+      payload['thumbnail_path'] = uploadRes.data['data']['path'];
+    }
+
+    final response = await _apiClient.put(ApiEndpoints.subject(int.parse(subject.id)), data: payload);
     final data = response.data['data'] ?? response.data;
     return SubjectModel.fromJson(data as Map<String, dynamic>);
   }

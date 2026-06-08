@@ -92,7 +92,9 @@ class AppRouter {
               (state.extra as Map<String, dynamic>?)?['titlePath']
                   as List<String>? ??
               [];
-          return GradesScreen(parentId: stageId, titlePath: titlePath);
+          final backgroundImageUrl =
+              (state.extra as Map<String, dynamic>?)?['backgroundImageUrl'] as String?;
+          return GradesScreen(parentId: stageId, titlePath: titlePath, backgroundImageUrl: backgroundImageUrl);
         },
       ),
       GoRoute(
@@ -104,7 +106,9 @@ class AppRouter {
               (state.extra as Map<String, dynamic>?)?['titlePath']
                   as List<String>? ??
               [];
-          return SectionsScreen(parentId: gradeId, titlePath: titlePath);
+          final backgroundImageUrl =
+              (state.extra as Map<String, dynamic>?)?['backgroundImageUrl'] as String?;
+          return SectionsScreen(parentId: gradeId, titlePath: titlePath, backgroundImageUrl: backgroundImageUrl);
         },
       ),
       GoRoute(
@@ -116,7 +120,9 @@ class AppRouter {
               (state.extra as Map<String, dynamic>?)?['titlePath']
                   as List<String>? ??
               [];
-          return SubjectsScreen(parentId: sectionId, titlePath: titlePath);
+          final backgroundImageUrl =
+              (state.extra as Map<String, dynamic>?)?['backgroundImageUrl'] as String?;
+          return SubjectsScreen(parentId: sectionId, titlePath: titlePath, backgroundImageUrl: backgroundImageUrl);
         },
       ),
       GoRoute(
@@ -128,7 +134,9 @@ class AppRouter {
               (state.extra as Map<String, dynamic>?)?['titlePath']
                   as List<String>? ??
               [];
-          return UnitsScreen(parentId: subjectId, titlePath: titlePath);
+          final backgroundImageUrl =
+              (state.extra as Map<String, dynamic>?)?['backgroundImageUrl'] as String?;
+          return UnitsScreen(parentId: subjectId, titlePath: titlePath, backgroundImageUrl: backgroundImageUrl);
         },
       ),
       GoRoute(
@@ -140,7 +148,9 @@ class AppRouter {
               (state.extra as Map<String, dynamic>?)?['titlePath']
                   as List<String>? ??
               [];
-          return LessonsScreen(parentId: unitId, titlePath: titlePath);
+          final backgroundImageUrl =
+              (state.extra as Map<String, dynamic>?)?['backgroundImageUrl'] as String?;
+          return LessonsScreen(parentId: unitId, titlePath: titlePath, backgroundImageUrl: backgroundImageUrl);
         },
       ),
       GoRoute(

@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -217,10 +218,16 @@ class _SubjectsView extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 18,
-                      backgroundColor:
-                          AppColors.primaryLight.withValues(alpha: 0.2),
-                      child: const Icon(Icons.book,
-                          size: 18, color: AppColors.primary),
+                      backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
+                      backgroundImage: (subject.thumbnailUrl != null && subject.thumbnailUrl!.isNotEmpty)
+                          ? NetworkImage(resolveImageUrl(subject.thumbnailUrl!))
+                          : null,
+                      onBackgroundImageError: (subject.thumbnailUrl != null && subject.thumbnailUrl!.isNotEmpty)
+                          ? (_, __) {}
+                          : null,
+                      child: (subject.thumbnailUrl == null || subject.thumbnailUrl!.isEmpty)
+                          ? const Icon(Icons.book, size: 18, color: AppColors.primary)
+                          : null,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -238,29 +245,11 @@ class _SubjectsView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _ActionIcon(
-                        icon: Icons.visibility_rounded,
-                        tooltip: 'عرض الوحدات',
-                        color: AppColors.info,
-                        onTap: () =>
-                            _navigateToUnits(context, subject)),
-                    _ActionIcon(
                         icon: Icons.edit_rounded,
                         tooltip: AppStrings.edit,
                         color: AppColors.warning,
                         onTap: () =>
                             _showForm(context, subject: subject)),
-                    _ActionIcon(
-                      icon: subject.isActive
-                          ? Icons.toggle_on_rounded
-                          : Icons.toggle_off_rounded,
-                      tooltip: subject.isActive ? 'تعطيل' : 'تفعيل',
-                      color: subject.isActive
-                          ? AppColors.success
-                          : AppColors.textTertiaryLight,
-                      onTap: () => context
-                          .read<SubjectsCubit>()
-                          .toggleStatus(subject.id),
-                    ),
                     _ActionIcon(
                         icon: Icons.delete_outline_rounded,
                         tooltip: AppStrings.delete,
@@ -358,11 +347,11 @@ class _SubjectsView extends StatelessWidget {
       builder: (_) => _SubjectFormDialog(
         subject: subject,
         sectionId: sectionId,
-        onSave: (s) async {
+        onSave: (s, {imageBytes, imageName}) async {
           if (subject != null) {
-            await cubit.updateSubject(s);
+            await cubit.updateSubject(s, imageBytes: imageBytes, imageName: imageName);
           } else {
-            await cubit.createSubject(s);
+            await cubit.createSubject(s, imageBytes: imageBytes, imageName: imageName);
           }
         },
       ),
@@ -452,7 +441,7 @@ class _ActionIcon extends StatelessWidget {
 class _SubjectFormDialog extends StatefulWidget {
   final SubjectModel? subject;
   final String sectionId;
-  final Future<void> Function(SubjectModel) onSave;
+  final Future<void> Function(SubjectModel, {List<int>? imageBytes, String? imageName}) onSave;
   const _SubjectFormDialog(
       {this.subject, required this.sectionId, required this.onSave});
   @override
@@ -466,6 +455,9 @@ class _SubjectFormDialogState extends State<_SubjectFormDialog> {
   late final TextEditingController _orderCtrl;
   late bool _isActive;
   bool _isSaving = false;
+  String? _selectedFileName;
+  List<int>? _selectedFileBytes;
+  late TextEditingController _thumbCtrl;
   bool get _isEditing => widget.subject != null;
 
   @override
@@ -473,6 +465,7 @@ class _SubjectFormDialogState extends State<_SubjectFormDialog> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.subject?.title ?? '');
     _descCtrl = TextEditingController(text: widget.subject?.description ?? '');
+    _thumbCtrl = TextEditingController(text: widget.subject?.thumbnailUrl ?? '');
     _orderCtrl =
         TextEditingController(text: widget.subject?.order.toString() ?? '0');
     _isActive = widget.subject?.isActive ?? true;
@@ -482,8 +475,24 @@ class _SubjectFormDialogState extends State<_SubjectFormDialog> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
+    _thumbCtrl.dispose();
     _orderCtrl.dispose();
     super.dispose();
+  }
+
+  
+  Future<void> _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedFileName = result.files.single.name;
+        _selectedFileBytes = result.files.single.bytes;
+        _thumbCtrl.text = _selectedFileName!;
+      });
+    }
   }
 
   Future<void> _handleSave() async {
@@ -496,12 +505,13 @@ class _SubjectFormDialogState extends State<_SubjectFormDialog> {
       description:
           _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       isActive: _isActive,
+      thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
       unitsCount: widget.subject?.unitsCount ?? 0,
       createdAt: widget.subject?.createdAt,
     );
     try {
-      await widget.onSave(subject);
+      await widget.onSave(subject, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -552,7 +562,31 @@ class _SubjectFormDialogState extends State<_SubjectFormDialog> {
                       (v == null || v.trim().isEmpty) ? 'العنوان مطلوب' : null,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
+                
+                  const Text('صورة الغلاف (اختياري)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _thumbCtrl,
+                          decoration: const InputDecoration(
+                            hintText: 'لم يتم اختيار صورة',
+                            border: OutlineInputBorder(),
+                          ),
+                          readOnly: true,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton.icon(
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.image),
+                        label: const Text('اختيار'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
                   controller: _descCtrl,
                   maxLines: 3,
                   decoration: InputDecoration(
@@ -614,4 +648,17 @@ class _SubjectFormDialogState extends State<_SubjectFormDialog> {
       ),
     );
   }
+}
+
+String resolveImageUrl(String path) {
+  if (path.isEmpty) return '';
+  if (path.contains('thumbnails/')) {
+    final fileName = path.split('thumbnails/').last;
+    return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
+  }
+  if (path.startsWith('http')) return path;
+  const baseUrl = 'http://127.0.0.1:8000';
+  if (path.startsWith('/')) return '$baseUrl$path';
+  if (path.startsWith('storage/')) return '$baseUrl/$path';
+  return '$baseUrl/storage/$path';
 }

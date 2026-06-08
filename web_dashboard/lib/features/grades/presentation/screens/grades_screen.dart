@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -229,10 +230,16 @@ class _GradesView extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor:
-                            AppColors.primaryLight.withOpacity(0.2),
-                        child: const Icon(Icons.class_,
-                            size: 18, color: AppColors.primary),
+                        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+                        backgroundImage: (grade.thumbnailUrl != null && grade.thumbnailUrl!.isNotEmpty)
+                            ? NetworkImage(resolveImageUrl(grade.thumbnailUrl!))
+                            : null,
+                        onBackgroundImageError: (grade.thumbnailUrl != null && grade.thumbnailUrl!.isNotEmpty) 
+                            ? (_, __) {} 
+                            : null,
+                        child: (grade.thumbnailUrl == null || grade.thumbnailUrl!.isEmpty)
+                            ? const Icon(Icons.class_, size: 18, color: AppColors.primary)
+                            : null,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -252,27 +259,10 @@ class _GradesView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _ActionIcon(
-                      icon: Icons.visibility_rounded,
-                      tooltip: 'عرض الأقسام',
-                      color: AppColors.info,
-                      onTap: () => _navigateToSections(context, grade),
-                    ),
-                    _ActionIcon(
                       icon: Icons.edit_rounded,
                       tooltip: AppStrings.edit,
                       color: AppColors.warning,
                       onTap: () => _showForm(context, grade: grade),
-                    ),
-                    _ActionIcon(
-                      icon: grade.isActive
-                          ? Icons.toggle_on_rounded
-                          : Icons.toggle_off_rounded,
-                      tooltip: grade.isActive ? 'تعطيل' : 'تفعيل',
-                      color: grade.isActive
-                          ? AppColors.success
-                          : AppColors.textTertiaryLight,
-                      onTap: () =>
-                          context.read<GradesCubit>().toggleStatus(grade.id),
                     ),
                     _ActionIcon(
                       icon: Icons.delete_outline_rounded,
@@ -372,11 +362,11 @@ class _GradesView extends StatelessWidget {
       builder: (_) => _GradeFormDialog(
         grade: grade,
         stageId: stageId,
-        onSave: (g) async {
+        onSave: (g, {imageBytes, imageName}) async {
           if (grade != null) {
-            await cubit.updateGrade(g);
+            await cubit.updateGrade(g, imageBytes: imageBytes, imageName: imageName);
           } else {
-            await cubit.createGrade(g);
+            await cubit.createGrade(g, imageBytes: imageBytes, imageName: imageName);
           }
         },
       ),
@@ -478,7 +468,7 @@ class _ActionIcon extends StatelessWidget {
 class _GradeFormDialog extends StatefulWidget {
   final GradeModel? grade;
   final String stageId;
-  final Future<void> Function(GradeModel) onSave;
+  final Future<void> Function(GradeModel, {List<int>? imageBytes, String? imageName}) onSave;
 
   const _GradeFormDialog({
     this.grade,
@@ -497,6 +487,9 @@ class _GradeFormDialogState extends State<_GradeFormDialog> {
   late final TextEditingController _orderCtrl;
   late bool _isActive;
   bool _isSaving = false;
+  String? _selectedFileName;
+  List<int>? _selectedFileBytes;
+  late TextEditingController _thumbCtrl;
 
   bool get _isEditing => widget.grade != null;
 
@@ -505,6 +498,7 @@ class _GradeFormDialogState extends State<_GradeFormDialog> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.grade?.title ?? '');
     _descCtrl = TextEditingController(text: widget.grade?.description ?? '');
+    _thumbCtrl = TextEditingController(text: widget.grade?.thumbnailUrl ?? '');
     _orderCtrl =
         TextEditingController(text: widget.grade?.order.toString() ?? '0');
     _isActive = widget.grade?.isActive ?? true;
@@ -514,8 +508,24 @@ class _GradeFormDialogState extends State<_GradeFormDialog> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
+    _thumbCtrl.dispose();
     _orderCtrl.dispose();
     super.dispose();
+  }
+
+  
+  Future<void> _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedFileName = result.files.single.name;
+        _selectedFileBytes = result.files.single.bytes;
+        _thumbCtrl.text = _selectedFileName!;
+      });
+    }
   }
 
   Future<void> _handleSave() async {
@@ -528,12 +538,13 @@ class _GradeFormDialogState extends State<_GradeFormDialog> {
       description:
           _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       isActive: _isActive,
+      thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
       sectionsCount: widget.grade?.sectionsCount ?? 0,
       createdAt: widget.grade?.createdAt,
     );
     try {
-      await widget.onSave(grade);
+      await widget.onSave(grade, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -589,7 +600,31 @@ class _GradeFormDialogState extends State<_GradeFormDialog> {
                       (v == null || v.trim().isEmpty) ? 'العنوان مطلوب' : null,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
+                
+                  const Text('صورة الغلاف (اختياري)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _thumbCtrl,
+                          decoration: const InputDecoration(
+                            hintText: 'لم يتم اختيار صورة',
+                            border: OutlineInputBorder(),
+                          ),
+                          readOnly: true,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton.icon(
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.image),
+                        label: const Text('اختيار'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
                   controller: _descCtrl,
                   maxLines: 3,
                   decoration: InputDecoration(
@@ -660,4 +695,17 @@ class _GradeFormDialogState extends State<_GradeFormDialog> {
       ),
     );
   }
+}
+
+String resolveImageUrl(String path) {
+  if (path.isEmpty) return '';
+  if (path.contains('thumbnails/')) {
+    final fileName = path.split('thumbnails/').last;
+    return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
+  }
+  if (path.startsWith('http')) return path;
+  const baseUrl = 'http://127.0.0.1:8000';
+  if (path.startsWith('/')) return '$baseUrl$path';
+  if (path.startsWith('storage/')) return '$baseUrl/$path';
+  return '$baseUrl/storage/$path';
 }

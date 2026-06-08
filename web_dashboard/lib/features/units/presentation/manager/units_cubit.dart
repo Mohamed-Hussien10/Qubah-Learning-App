@@ -37,18 +37,18 @@ class UnitsCubit extends Cubit<UnitsState> {
     }
   }
 
-  Future<void> createUnit(UnitModel unit) async {
+  Future<void> createUnit(UnitModel unit, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.create(unit);
+      await _repository.create(unit, imageBytes: imageBytes, imageName: imageName);
       await loadUnits(_subjectId);
     } catch (e) {
       emit(UnitsError(e.toString()));
     }
   }
 
-  Future<void> updateUnit(UnitModel unit) async {
+  Future<void> updateUnit(UnitModel unit, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.update(unit);
+      await _repository.update(unit, imageBytes: imageBytes, imageName: imageName);
       await loadUnits(_subjectId);
     } catch (e) {
       emit(UnitsError(e.toString()));

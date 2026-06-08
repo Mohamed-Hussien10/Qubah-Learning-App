@@ -38,18 +38,18 @@ class SectionsCubit extends Cubit<SectionsState> {
     }
   }
 
-  Future<void> createSection(SectionModel section) async {
+  Future<void> createSection(SectionModel section, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.create(section);
+      await _repository.create(section, imageBytes: imageBytes, imageName: imageName);
       await loadSections(_gradeId);
     } catch (e) {
       emit(SectionsError(e.toString()));
     }
   }
 
-  Future<void> updateSection(SectionModel section) async {
+  Future<void> updateSection(SectionModel section, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.update(section);
+      await _repository.update(section, imageBytes: imageBytes, imageName: imageName);
       await loadSections(_gradeId);
     } catch (e) {
       emit(SectionsError(e.toString()));

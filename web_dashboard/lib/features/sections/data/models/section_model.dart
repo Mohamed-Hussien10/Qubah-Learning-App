@@ -4,12 +4,14 @@ import 'package:web_dashboard/features/shared/models/base_entity.dart';
 class SectionModel extends BaseEntity {
   final String gradeId;
   final int subjectsCount;
+  final String? thumbnailUrl;
 
   const SectionModel({
     required super.id,
     required this.gradeId,
     required super.title,
     super.description,
+    this.thumbnailUrl,
     super.isActive = true,
     super.order = 0,
     this.subjectsCount = 0,
@@ -17,7 +19,7 @@ class SectionModel extends BaseEntity {
   });
 
   @override
-  List<Object?> get props => [...super.props, gradeId, subjectsCount];
+  List<Object?> get props => [...super.props, gradeId, subjectsCount, thumbnailUrl];
 
   factory SectionModel.fromJson(Map<String, dynamic> json) {
     return SectionModel(
@@ -25,9 +27,10 @@ class SectionModel extends BaseEntity {
       gradeId: json['grade_id']?.toString() ?? '',
       title: json['title'] ?? '',
       description: json['description'],
+      thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
-      order: json['order'] ?? 0,
-      subjectsCount: json['subjects_count'] ?? 0,
+      order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
+      subjectsCount: json['subjects_count'] != null ? int.tryParse(json['subjects_count'].toString()) ?? 0 : 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -40,7 +43,8 @@ class SectionModel extends BaseEntity {
       'grade_id': gradeId,
       'title': title,
       'description': description,
-      'is_active': isActive,
+      'thumbnail_path': thumbnailUrl,
+      'is_active': isActive ? 1 : 0,
       'order': order,
       'subjects_count': subjectsCount,
       'created_at': createdAt?.toIso8601String(),
@@ -53,6 +57,7 @@ class SectionModel extends BaseEntity {
     String? gradeId,
     String? title,
     String? description,
+    String? thumbnailUrl,
     bool? isActive,
     int? order,
     int? subjectsCount,
@@ -63,6 +68,7 @@ class SectionModel extends BaseEntity {
       gradeId: gradeId ?? this.gradeId,
       title: title ?? this.title,
       description: description ?? this.description,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       isActive: isActive ?? this.isActive,
       order: order ?? this.order,
       subjectsCount: subjectsCount ?? this.subjectsCount,

@@ -4,12 +4,14 @@ import 'package:web_dashboard/features/shared/models/base_entity.dart';
 class UnitModel extends BaseEntity {
   final String subjectId;
   final int lessonsCount;
+  final String? thumbnailUrl;
 
   const UnitModel({
     required super.id,
     required this.subjectId,
     required super.title,
     super.description,
+    this.thumbnailUrl,
     super.isActive = true,
     super.order = 0,
     this.lessonsCount = 0,
@@ -17,7 +19,7 @@ class UnitModel extends BaseEntity {
   });
 
   @override
-  List<Object?> get props => [...super.props, subjectId, lessonsCount];
+  List<Object?> get props => [...super.props, subjectId, lessonsCount, thumbnailUrl];
 
   factory UnitModel.fromJson(Map<String, dynamic> json) {
     return UnitModel(
@@ -25,9 +27,10 @@ class UnitModel extends BaseEntity {
       subjectId: json['subject_id']?.toString() ?? '',
       title: json['title'] ?? '',
       description: json['description'],
+      thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
-      order: json['order'] ?? 0,
-      lessonsCount: json['lessons_count'] ?? 0,
+      order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
+      lessonsCount: json['lessons_count'] != null ? int.tryParse(json['lessons_count'].toString()) ?? 0 : 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -40,7 +43,8 @@ class UnitModel extends BaseEntity {
       'subject_id': subjectId,
       'title': title,
       'description': description,
-      'is_active': isActive,
+      'thumbnail_path': thumbnailUrl,
+      'is_active': isActive ? 1 : 0,
       'order': order,
       'lessons_count': lessonsCount,
       'created_at': createdAt?.toIso8601String(),
@@ -53,6 +57,7 @@ class UnitModel extends BaseEntity {
     String? subjectId,
     String? title,
     String? description,
+    String? thumbnailUrl,
     bool? isActive,
     int? order,
     int? lessonsCount,
@@ -63,6 +68,7 @@ class UnitModel extends BaseEntity {
       subjectId: subjectId ?? this.subjectId,
       title: title ?? this.title,
       description: description ?? this.description,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       isActive: isActive ?? this.isActive,
       order: order ?? this.order,
       lessonsCount: lessonsCount ?? this.lessonsCount,

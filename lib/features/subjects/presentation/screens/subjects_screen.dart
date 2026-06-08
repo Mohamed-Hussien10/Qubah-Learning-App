@@ -12,10 +12,12 @@ import '../manager/state/subjects_state.dart';
 class SubjectsScreen extends StatefulWidget {
   final String parentId;
   final List<String> titlePath;
+  final String? backgroundImageUrl;
   const SubjectsScreen({
     super.key,
     required this.parentId,
     this.titlePath = const [],
+    this.backgroundImageUrl,
   });
 
   @override
@@ -29,6 +31,23 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
     context.read<SubjectsCubit>().loadSubjects(widget.parentId);
   }
 
+  String _resolveImageUrl(String path) {
+    if (path.startsWith('http')) {
+      if (path.contains('localhost') || path.contains('127.0.0.1')) {
+        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://192.168.1.17:8000');
+      }
+      return path;
+    }
+    const baseUrl = 'http://192.168.1.17:8000'; 
+    if (path.startsWith('/')) {
+      return '$baseUrl$path';
+    } else if (path.startsWith('storage/')) {
+      return '$baseUrl/$path';
+    } else {
+      return '$baseUrl/storage/$path';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,13 +58,23 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          if (widget.titlePath.isNotEmpty)
-            BreadcrumbNav(pathNames: widget.titlePath),
-          Expanded(
+      body: Container(
+        decoration: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty
+            ? BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(_resolveImageUrl(widget.backgroundImageUrl!)),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(Colors.white.withValues(alpha: 0.15), BlendMode.lighten),
+                ),
+              )
+            : null,
+        child: Column(
+          children: [
+            if (widget.titlePath.isNotEmpty)
+              BreadcrumbNav(pathNames: widget.titlePath),
+            Expanded(
             child: BlocBuilder<SubjectsCubit, SubjectsState>(
               builder: (context, state) {
                 if (state is SubjectsLoading)
@@ -75,16 +104,20 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                       ),
                     );
                   }
+                  final itemCount = state.subjects.length;
+                  final crossAxisCount = itemCount == 1 ? 1 : 2;
+                  final childAspectRatio = itemCount == 1 ? 1.5 : 0.85;
+
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.85,
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          childAspectRatio: childAspectRatio,
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),
-                    itemCount: state.subjects.length,
+                    itemCount: itemCount,
                     itemBuilder: (context, index) {
                       final item = state.subjects[index];
                       return ChildFriendlyCard(
@@ -98,6 +131,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                             '/units/${item.id}',
                             extra: {
                               'titlePath': [...widget.titlePath, item.name],
+                              'backgroundImageUrl': widget.backgroundImageUrl,
                             },
                           );
                         },
@@ -110,6 +144,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:convert';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../core/storage/secure_storage.dart';
 
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/services/dependency_injection.dart';
@@ -68,22 +71,40 @@ class ProfileScreen extends StatelessWidget {
                   ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
                   const SizedBox(height: 24),
                   // Name
-                  Text(
-                    'اسم الطالب',
-                    style: GoogleFonts.cairo(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ).animate().fadeIn(delay: 200.ms),
-                  const SizedBox(height: 4),
-                  Text(
-                    'student@email.com',
-                    style: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.color?.withOpacity(0.6),
-                    ),
-                  ).animate().fadeIn(delay: 300.ms),
+                  FutureBuilder<String?>(
+                    future: sl<SecureStorage>().getUserData(),
+                    builder: (context, snapshot) {
+                      String name = 'اسم الطالب';
+                      String email = 'طالب@مثال.com';
+                      if (snapshot.hasData && snapshot.data != null) {
+                        try {
+                          final data = jsonDecode(snapshot.data!);
+                          name = data['name'] ?? name;
+                          email = data['email'] ?? email;
+                        } catch (_) {}
+                      }
+                      return Column(
+                        children: [
+                          Text(
+                            name,
+                            style: GoogleFonts.cairo(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ).animate().fadeIn(delay: 200.ms),
+                          const SizedBox(height: 4),
+                          Text(
+                            email,
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.color?.withOpacity(0.6),
+                            ),
+                          ).animate().fadeIn(delay: 300.ms),
+                        ],
+                      );
+                    },
+                  ),
                   const SizedBox(height: 40),
                   // Info Cards
                   _ProfileMenuItem(
@@ -99,13 +120,6 @@ class ProfileScreen extends StatelessWidget {
                     subtitle: 'فعال حتى ديسمبر ٢٠٢٦',
                     onTap: () => context.push(AppRoutes.subscription),
                   ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
-                  const SizedBox(height: 12),
-                  _ProfileMenuItem(
-                    icon: Icons.notifications_rounded,
-                    title: 'الإشعارات',
-                    subtitle: 'إدارة التنبيهات',
-                    onTap: () => context.push(AppRoutes.notifications),
-                  ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.1, end: 0),
                   const SizedBox(height: 40),
                   // Logout Button
                   QubahButton(

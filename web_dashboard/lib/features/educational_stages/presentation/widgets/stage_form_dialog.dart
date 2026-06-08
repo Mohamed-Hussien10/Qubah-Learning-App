@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:web_dashboard/core/constants/app_colors.dart';
 import 'package:web_dashboard/features/educational_stages/data/models/stage_model.dart';
@@ -8,7 +9,7 @@ class StageFormDialog extends StatefulWidget {
   final StageModel? stage;
 
   /// Called when the user taps Save with valid data.
-  final Future<void> Function(StageModel stage) onSave;
+  final Future<void> Function(StageModel stage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) onSave;
 
   const StageFormDialog({super.key, this.stage, required this.onSave});
 
@@ -16,7 +17,7 @@ class StageFormDialog extends StatefulWidget {
   static Future<void> show(
     BuildContext context, {
     StageModel? stage,
-    required Future<void> Function(StageModel stage) onSave,
+    required Future<void> Function(StageModel stage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) onSave,
   }) {
     return showDialog(
       context: context,
@@ -34,9 +35,14 @@ class _StageFormDialogState extends State<StageFormDialog> {
   late final TextEditingController _titleCtrl;
   late final TextEditingController _descCtrl;
   late final TextEditingController _thumbCtrl;
+  late final TextEditingController _bgCtrl;
   late final TextEditingController _orderCtrl;
   late bool _isActive;
   bool _isSaving = false;
+  String? _selectedFileName;
+  List<int>? _selectedFileBytes;
+  String? _selectedBgFileName;
+  List<int>? _selectedBgFileBytes;
 
   bool get _isEditing => widget.stage != null;
 
@@ -46,6 +52,7 @@ class _StageFormDialogState extends State<StageFormDialog> {
     _titleCtrl = TextEditingController(text: widget.stage?.title ?? '');
     _descCtrl = TextEditingController(text: widget.stage?.description ?? '');
     _thumbCtrl = TextEditingController(text: widget.stage?.thumbnailUrl ?? '');
+    _bgCtrl = TextEditingController(text: widget.stage?.backgroundImageUrl ?? '');
     _orderCtrl = TextEditingController(
       text: widget.stage?.order.toString() ?? '0',
     );
@@ -57,8 +64,37 @@ class _StageFormDialogState extends State<StageFormDialog> {
     _titleCtrl.dispose();
     _descCtrl.dispose();
     _thumbCtrl.dispose();
+    _bgCtrl.dispose();
     _orderCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true, // Need bytes for web
+    );
+    if (result != null) {
+      setState(() {
+        _selectedFileName = result.files.single.name;
+        _selectedFileBytes = result.files.single.bytes;
+        _thumbCtrl.text = _selectedFileName!;
+      });
+    }
+  }
+
+  Future<void> _pickBgImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedBgFileName = result.files.single.name;
+        _selectedBgFileBytes = result.files.single.bytes;
+        _bgCtrl.text = _selectedBgFileName!;
+      });
+    }
   }
 
   Future<void> _handleSave() async {
@@ -71,6 +107,8 @@ class _StageFormDialogState extends State<StageFormDialog> {
       description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       thumbnailUrl:
           _thumbCtrl.text.trim().isEmpty ? null : _thumbCtrl.text.trim(),
+      backgroundImageUrl:
+          _bgCtrl.text.trim().isEmpty ? null : _bgCtrl.text.trim(),
       isActive: _isActive,
       order: int.tryParse(_orderCtrl.text) ?? 0,
       gradesCount: widget.stage?.gradesCount ?? 0,
@@ -78,7 +116,7 @@ class _StageFormDialogState extends State<StageFormDialog> {
     );
 
     try {
-      await widget.onSave(stage);
+      await widget.onSave(stage, imageBytes: _selectedFileBytes, imageName: _selectedFileName, bgImageBytes: _selectedBgFileBytes, bgImageName: _selectedBgFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -91,7 +129,7 @@ class _StageFormDialogState extends State<StageFormDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 520),
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
@@ -160,17 +198,131 @@ class _StageFormDialogState extends State<StageFormDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // ── Thumbnail URL ───────────────────────────────────
-                TextFormField(
-                  controller: _thumbCtrl,
-                  decoration: InputDecoration(
-                    labelText: 'رابط الصورة المصغرة',
-                    hintText: 'https://...',
-                    prefixIcon: const Icon(Icons.image_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                // ── Thumbnail Picker ───────────────────────────────────
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'الصورة المصغرة',
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: _pickImage,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.surfaceDark
+                              : AppColors.backgroundLight,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.image_outlined,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? AppColors.textTertiaryDark
+                                    : AppColors.textTertiaryLight),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _selectedFileName ??
+                                    (_thumbCtrl.text.isEmpty
+                                        ? 'اختر صورة مصغرة'
+                                        : _thumbCtrl.text),
+                                style: TextStyle(
+                                  color: (_selectedFileName == null &&
+                                          _thumbCtrl.text.isEmpty)
+                                      ? (Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? AppColors.textTertiaryDark
+                                          : AppColors.textTertiaryLight)
+                                      : (Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? AppColors.textPrimaryDark
+                                          : AppColors.textPrimaryLight),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(Icons.upload_file_rounded),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // ── Background Image Picker ──────────────────────────
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'صورة الخلفية للمرحلة',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: _pickBgImage,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? AppColors.borderDark
+                                : AppColors.borderLight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.surfaceDark
+                              : AppColors.backgroundLight,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.wallpaper_rounded,
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? AppColors.textTertiaryDark
+                                    : AppColors.textTertiaryLight),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _selectedBgFileName ??
+                                    (_bgCtrl.text.isEmpty
+                                        ? 'اختر صورة للخلفية'
+                                        : _bgCtrl.text),
+                                style: TextStyle(
+                                  color: (_selectedBgFileName == null &&
+                                          _bgCtrl.text.isEmpty)
+                                      ? (Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? AppColors.textTertiaryDark
+                                          : AppColors.textTertiaryLight)
+                                      : (Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? AppColors.textPrimaryDark
+                                          : AppColors.textPrimaryLight),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(Icons.upload_file_rounded),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 

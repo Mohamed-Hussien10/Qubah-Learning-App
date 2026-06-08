@@ -27,8 +27,33 @@ class StagesRepository {
 
   // ── Create ───────────────────────────────────────────────────────────
 
-  Future<StageModel> create(StageModel stage) async {
+  Future<StageModel> create(StageModel stage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) async {
     final payload = stage.toJson()..remove('id')..remove('created_at');
+    
+    if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: imageBytes,
+        fileName: imageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'stages'},
+      );
+      final path = uploadRes.data['data']['path'];
+      payload['thumbnail_path'] = path;
+    }
+
+    if (bgImageBytes != null && bgImageBytes.isNotEmpty && bgImageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: bgImageBytes,
+        fileName: bgImageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'stages'},
+      );
+      final path = uploadRes.data['data']['path'];
+      payload['background_image_path'] = path;
+    }
+
     final response = await _apiClient.post(ApiEndpoints.stages, data: payload);
     final data = response.data['data'] ?? response.data;
     return StageModel.fromJson(data as Map<String, dynamic>);
@@ -36,8 +61,33 @@ class StagesRepository {
 
   // ── Update ───────────────────────────────────────────────────────────
 
-  Future<StageModel> update(StageModel stage) async {
+  Future<StageModel> update(StageModel stage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) async {
     final payload = stage.toJson()..remove('created_at');
+
+    if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: imageBytes,
+        fileName: imageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'stages'},
+      );
+      final path = uploadRes.data['data']['path'];
+      payload['thumbnail_path'] = path;
+    }
+
+    if (bgImageBytes != null && bgImageBytes.isNotEmpty && bgImageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: bgImageBytes,
+        fileName: bgImageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'stages'},
+      );
+      final path = uploadRes.data['data']['path'];
+      payload['background_image_path'] = path;
+    }
+
     final response = await _apiClient.put(ApiEndpoints.stage(int.parse(stage.id)), data: payload);
     final data = response.data['data'] ?? response.data;
     return StageModel.fromJson(data as Map<String, dynamic>);

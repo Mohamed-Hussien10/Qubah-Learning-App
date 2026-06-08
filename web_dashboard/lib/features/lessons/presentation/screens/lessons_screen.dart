@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -217,10 +218,16 @@ class _LessonsView extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 18,
-                      backgroundColor:
-                          AppColors.primaryLight.withValues(alpha: 0.2),
-                      child: const Icon(Icons.play_circle_outline,
-                          size: 18, color: AppColors.primary),
+                      backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
+                      backgroundImage: (lesson.thumbnailUrl != null && lesson.thumbnailUrl!.isNotEmpty)
+                          ? NetworkImage(resolveImageUrl(lesson.thumbnailUrl!))
+                          : null,
+                      onBackgroundImageError: (lesson.thumbnailUrl != null && lesson.thumbnailUrl!.isNotEmpty)
+                          ? (_, __) {}
+                          : null,
+                      child: (lesson.thumbnailUrl == null || lesson.thumbnailUrl!.isEmpty)
+                          ? const Icon(Icons.play_circle_outline, size: 18, color: AppColors.primary)
+                          : null,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -238,29 +245,11 @@ class _LessonsView extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _ActionIcon(
-                        icon: Icons.visibility_rounded,
-                        tooltip: 'عرض ملفات الدرس',
-                        color: AppColors.info,
-                        onTap: () =>
-                            _navigateToFiles(context, lesson)),
-                    _ActionIcon(
                         icon: Icons.edit_rounded,
                         tooltip: AppStrings.edit,
                         color: AppColors.warning,
                         onTap: () =>
                             _showForm(context, lesson: lesson)),
-                    _ActionIcon(
-                      icon: lesson.isPublished
-                          ? Icons.cloud_done_rounded
-                          : Icons.cloud_upload_rounded,
-                      tooltip: lesson.isPublished ? 'إلغاء النشر' : 'نشر',
-                      color: lesson.isPublished
-                          ? AppColors.primary
-                          : AppColors.textTertiaryLight,
-                      onTap: () => context
-                          .read<LessonsCubit>()
-                          .togglePublishStatus(lesson.id),
-                    ),
                     _ActionIcon(
                         icon: Icons.delete_outline_rounded,
                         tooltip: AppStrings.delete,
@@ -358,11 +347,11 @@ class _LessonsView extends StatelessWidget {
       builder: (_) => _LessonFormDialog(
         lesson: lesson,
         unitId: unitId,
-        onSave: (l) async {
+        onSave: (l, {imageBytes, imageName}) async {
           if (lesson != null) {
-            await cubit.updateLesson(l);
+            await cubit.updateLesson(l, imageBytes: imageBytes, imageName: imageName);
           } else {
-            await cubit.createLesson(l);
+            await cubit.createLesson(l, imageBytes: imageBytes, imageName: imageName);
           }
         },
       ),
@@ -474,7 +463,7 @@ class _ActionIcon extends StatelessWidget {
 class _LessonFormDialog extends StatefulWidget {
   final LessonModel? lesson;
   final String unitId;
-  final Future<void> Function(LessonModel) onSave;
+  final Future<void> Function(LessonModel, {List<int>? imageBytes, String? imageName}) onSave;
   const _LessonFormDialog(
       {this.lesson, required this.unitId, required this.onSave});
   @override
@@ -490,6 +479,9 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
   late bool _isActive;
   late bool _isPublished;
   bool _isSaving = false;
+  String? _selectedFileName;
+  List<int>? _selectedFileBytes;
+  late TextEditingController _thumbCtrl;
   bool get _isEditing => widget.lesson != null;
 
   @override
@@ -497,6 +489,7 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.lesson?.title ?? '');
     _descCtrl = TextEditingController(text: widget.lesson?.description ?? '');
+    _thumbCtrl = TextEditingController(text: widget.lesson?.thumbnailUrl ?? '');
     _durationCtrl = TextEditingController(text: widget.lesson?.duration ?? '10:00');
     _orderCtrl =
         TextEditingController(text: widget.lesson?.order.toString() ?? '0');
@@ -508,9 +501,25 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
+    _thumbCtrl.dispose();
     _durationCtrl.dispose();
     _orderCtrl.dispose();
     super.dispose();
+  }
+
+  
+  Future<void> _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withData: true,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedFileName = result.files.single.name;
+        _selectedFileBytes = result.files.single.bytes;
+        _thumbCtrl.text = _selectedFileName!;
+      });
+    }
   }
 
   Future<void> _handleSave() async {
@@ -523,15 +532,15 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
       description:
           _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       duration: _durationCtrl.text.trim(),
-      thumbnailUrl: widget.lesson?.thumbnailUrl,
       isActive: _isActive,
+      thumbnailUrl: _thumbCtrl.text,
       isPublished: _isPublished,
       order: int.tryParse(_orderCtrl.text) ?? 0,
       filesCount: widget.lesson?.filesCount ?? 0,
       createdAt: widget.lesson?.createdAt,
     );
     try {
-      await widget.onSave(lesson);
+      await widget.onSave(lesson, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -582,7 +591,31 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
                       (v == null || v.trim().isEmpty) ? 'العنوان مطلوب' : null,
                 ),
                 const SizedBox(height: 16),
-                TextFormField(
+                
+                  const Text('صورة الغلاف (اختياري)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _thumbCtrl,
+                          decoration: const InputDecoration(
+                            hintText: 'لم يتم اختيار صورة',
+                            border: OutlineInputBorder(),
+                          ),
+                          readOnly: true,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton.icon(
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.image),
+                        label: const Text('اختيار'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
                   controller: _descCtrl,
                   maxLines: 3,
                   decoration: InputDecoration(
@@ -672,4 +705,17 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
       ),
     );
   }
+}
+
+String resolveImageUrl(String path) {
+  if (path.isEmpty) return '';
+  if (path.contains('thumbnails/')) {
+    final fileName = path.split('thumbnails/').last;
+    return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
+  }
+  if (path.startsWith('http')) return path;
+  const baseUrl = 'http://127.0.0.1:8000';
+  if (path.startsWith('/')) return '$baseUrl$path';
+  if (path.startsWith('storage/')) return '$baseUrl/$path';
+  return '$baseUrl/storage/$path';
 }

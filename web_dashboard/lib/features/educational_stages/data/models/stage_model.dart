@@ -3,6 +3,7 @@ import 'package:web_dashboard/features/shared/models/base_entity.dart';
 /// Model representing an educational stage (e.g. Primary, Middle, Secondary).
 class StageModel extends BaseEntity {
   final String? thumbnailUrl;
+  final String? backgroundImageUrl;
   final int gradesCount;
 
   const StageModel({
@@ -10,6 +11,7 @@ class StageModel extends BaseEntity {
     required super.title,
     super.description,
     this.thumbnailUrl,
+    this.backgroundImageUrl,
     super.isActive = true,
     super.order = 0,
     this.gradesCount = 0,
@@ -17,7 +19,7 @@ class StageModel extends BaseEntity {
   });
 
   @override
-  List<Object?> get props => [...super.props, thumbnailUrl, gradesCount];
+  List<Object?> get props => [...super.props, thumbnailUrl, backgroundImageUrl, gradesCount];
 
   factory StageModel.fromJson(Map<String, dynamic> json) {
     return StageModel(
@@ -25,9 +27,10 @@ class StageModel extends BaseEntity {
       title: json['title'] ?? '',
       description: json['description'],
       thumbnailUrl: json['thumbnail_url'],
+      backgroundImageUrl: json['background_image_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
-      order: json['order'] ?? 0,
-      gradesCount: json['grades_count'] ?? 0,
+      order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
+      gradesCount: json['grades_count'] != null ? int.tryParse(json['grades_count'].toString()) ?? 0 : 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -39,8 +42,9 @@ class StageModel extends BaseEntity {
       'id': id,
       'title': title,
       'description': description,
-      'thumbnail_url': thumbnailUrl,
-      'is_active': isActive,
+      'thumbnail_path': thumbnailUrl,
+      'background_image_path': backgroundImageUrl,
+      'is_active': isActive ? 1 : 0,
       'order': order,
       'grades_count': gradesCount,
       'created_at': createdAt?.toIso8601String(),
@@ -53,6 +57,7 @@ class StageModel extends BaseEntity {
     String? title,
     String? description,
     String? thumbnailUrl,
+    String? backgroundImageUrl,
     bool? isActive,
     int? order,
     int? gradesCount,

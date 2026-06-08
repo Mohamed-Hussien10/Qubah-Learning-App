@@ -1,4 +1,5 @@
 import 'package:web_dashboard/core/network/api_client.dart';
+import 'package:web_dashboard/core/constants/api_endpoints.dart';
 import 'package:web_dashboard/features/grades/data/models/grade_model.dart';
 
 /// Repository handling CRUD operations for grades within a stage.
@@ -25,16 +26,40 @@ class GradesRepository {
     return GradeModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<GradeModel> create(GradeModel grade) async {
+  Future<GradeModel> create(GradeModel grade, {List<int>? imageBytes, String? imageName}) async {
     final payload = grade.toJson()..remove('id')..remove('created_at');
-    final response = await _apiClient.post('/grades', data: payload);
+    
+    if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: imageBytes,
+        fileName: imageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'grades'},
+      );
+      payload['thumbnail_path'] = uploadRes.data['data']['path'];
+    }
+
+    final response = await _apiClient.post(ApiEndpoints.grades, data: payload);
     final data = response.data['data'] ?? response.data;
     return GradeModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<GradeModel> update(GradeModel grade) async {
+  Future<GradeModel> update(GradeModel grade, {List<int>? imageBytes, String? imageName}) async {
     final payload = grade.toJson()..remove('created_at');
-    final response = await _apiClient.put('/grades/${grade.id}', data: payload);
+
+    if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
+      final uploadRes = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: imageBytes,
+        fileName: imageName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'grades'},
+      );
+      payload['thumbnail_path'] = uploadRes.data['data']['path'];
+    }
+
+    final response = await _apiClient.put(ApiEndpoints.grade(int.parse(grade.id)), data: payload);
     final data = response.data['data'] ?? response.data;
     return GradeModel.fromJson(data as Map<String, dynamic>);
   }

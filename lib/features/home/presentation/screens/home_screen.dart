@@ -1,16 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:qubah_learning_app/features/theme/presentation/manager/cubit/theme_cubit.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
+import '../../../../core/storage/secure_storage.dart';
+import '../../../../core/services/dependency_injection.dart';
 
 /// Main home screen with navigation to educational stages, profile, settings.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _isGuest = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkGuestStatus();
+  }
+
+  Future<void> _checkGuestStatus() async {
+    final isGuest = await sl<SecureStorage>().isGuest();
+    if (mounted) {
+      setState(() {
+        _isGuest = isGuest;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,32 +78,21 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // Theme Toggle, Profile & Notification
-                    IconButton(
-                      onPressed: () => context.read<ThemeCubit>().toggleTheme(),
-                      icon: Icon(
-                        isDark
-                            ? Icons.light_mode_rounded
-                            : Icons.dark_mode_rounded,
-                        size: 28,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => context.push(AppRoutes.notifications),
-                      icon: const Icon(Icons.notifications_outlined, size: 28),
-                    ),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () => context.push(AppRoutes.profile),
-                      child: CircleAvatar(
-                        radius: 22,
-                        backgroundColor: AppColors.primary.withOpacity(0.2),
-                        child: const Icon(
-                          Icons.person_rounded,
-                          color: AppColors.primary,
+                    // Profile Avatar
+                    if (!_isGuest) ...[
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: () => context.push(AppRoutes.profile),
+                        child: CircleAvatar(
+                          radius: 22,
+                          backgroundColor: AppColors.primary.withOpacity(0.2),
+                          child: const Icon(
+                            Icons.person_rounded,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ).animate().fadeIn(duration: 400.ms),
 

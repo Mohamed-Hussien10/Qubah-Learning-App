@@ -37,18 +37,18 @@ class SubjectsCubit extends Cubit<SubjectsState> {
     }
   }
 
-  Future<void> createSubject(SubjectModel subject) async {
+  Future<void> createSubject(SubjectModel subject, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.create(subject);
+      await _repository.create(subject, imageBytes: imageBytes, imageName: imageName);
       await loadSubjects(_sectionId);
     } catch (e) {
       emit(SubjectsError(e.toString()));
     }
   }
 
-  Future<void> updateSubject(SubjectModel subject) async {
+  Future<void> updateSubject(SubjectModel subject, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.update(subject);
+      await _repository.update(subject, imageBytes: imageBytes, imageName: imageName);
       await loadSubjects(_sectionId);
     } catch (e) {
       emit(SubjectsError(e.toString()));

@@ -36,8 +36,8 @@ class LessonModel extends BaseEntity {
       duration: json['duration']?.toString() ?? '00:00',
       isPublished: json['is_published'] == 1 || json['is_published'] == true,
       isActive: json['is_active'] == 1 || json['is_active'] == true,
-      order: json['order'] ?? 0,
-      filesCount: json['files_count'] ?? 0,
+      order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
+      filesCount: json['files_count'] != null ? int.tryParse(json['files_count'].toString()) ?? 0 : 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -50,10 +50,10 @@ class LessonModel extends BaseEntity {
       'unit_id': unitId,
       'title': title,
       'description': description,
-      'thumbnail_url': thumbnailUrl,
+      'thumbnail_path': thumbnailUrl,
       'duration': duration,
       'is_published': isPublished,
-      'is_active': isActive,
+      'is_active': isActive ? 1 : 0,
       'order': order,
       'files_count': filesCount,
       'created_at': createdAt?.toIso8601String(),
