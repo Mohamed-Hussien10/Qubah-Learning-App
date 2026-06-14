@@ -31,7 +31,7 @@ class SubscriptionExpiredScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'يرجى تجديد الاشتراك للاستمرار في الوصول إلى محتوى التطبيق.',
+                'يرجى التواصل مع إدارة التطبيق لتجديد اشتراكك والتمتع بكافة المحتويات التعليمية.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.cairo(
                   fontSize: 16,
@@ -39,19 +39,20 @@ class SubscriptionExpiredScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              FilledButton(
+              FilledButton.icon(
                 onPressed: () {
                   // Logout to force re-authentication or go to a renewal page
                   context.read<AuthCubit>().logout();
                 },
+                icon: const Icon(Icons.logout_rounded),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: AppColors.error,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Text(
+                label: Text(
                   'تسجيل الخروج',
                   style: GoogleFonts.cairo(
                     fontWeight: FontWeight.bold,

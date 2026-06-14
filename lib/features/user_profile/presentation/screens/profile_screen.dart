@@ -4,9 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:convert';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../core/storage/secure_storage.dart';
-
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -129,12 +127,33 @@ class ProfileScreen extends StatelessWidget {
                             onTap: () {},
                           ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
                           const SizedBox(height: 12),
-                          _ProfileMenuItem(
-                            icon: Icons.subscriptions_rounded,
-                            title: 'الاشتراك',
-                            subtitle: subscription,
-                            onTap: () => context.push(AppRoutes.subscription),
-                          ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
+                          subscription != 'غير فعال أو منتهي' 
+                            ? _ProfileMenuItem(
+                                icon: Icons.subscriptions_rounded,
+                                title: 'الاشتراك',
+                                subtitle: subscription,
+                                onTap: () => context.push(AppRoutes.subscription),
+                              ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0)
+                            : _ProfileMenuItem(
+                                icon: Icons.support_agent_rounded,
+                                title: 'تجديد الاشتراك',
+                                subtitle: 'تواصل مع الإدارة للتجديد',
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: Text('تواصل مع الإدارة', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                                      content: Text('عزيزي الطالب، يرجى التواصل مع إدارة التطبيق لتجديد اشتراكك.', style: GoogleFonts.cairo()),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(ctx),
+                                          child: Text('حسناً', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
                         ],
                       );
                     },
