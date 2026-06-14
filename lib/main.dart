@@ -1,17 +1,17 @@
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
 import 'core/routing/app_router.dart';
 import 'core/services/dependency_injection.dart';
 import 'core/services/logger_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/app_bloc_observer.dart';
+import 'features/authentication/presentation/manager/cubit/auth_cubit.dart';
+import 'features/authentication/presentation/manager/state/auth_state.dart';
 import 'features/theme/presentation/manager/cubit/theme_cubit.dart';
 import 'features/educational_stages/presentation/manager/cubit/stages_cubit.dart';
 import 'features/grades/presentation/manager/cubit/grades_cubit.dart';
@@ -82,6 +82,7 @@ class QubahLearningApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => sl<AuthCubit>()),
         BlocProvider(create: (_) => sl<ThemeCubit>()),
         BlocProvider(create: (_) => sl<StagesCubit>()),
         BlocProvider(create: (_) => sl<GradesCubit>()),
@@ -93,25 +94,34 @@ class QubahLearningApp extends StatelessWidget {
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
-          return MaterialApp.router(
-            title: 'Qubah Learning',
-            debugShowCheckedModeBanner: false,
+          return BlocListener<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state is AuthSubscriptionExpired) {
+                AppRouter.router.go(AppRoutes.subscriptionExpired);
+              } else if (state is AuthUnauthenticated) {
+                AppRouter.router.go(AppRoutes.login);
+              }
+            },
+            child: MaterialApp.router(
+              title: 'Qubah Learning',
+              debugShowCheckedModeBanner: false,
 
-            // Localization
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [Locale('ar', '')],
-            locale: const Locale('ar', ''),
+              // Localization
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [Locale('ar', '')],
+              locale: const Locale('ar', ''),
 
-            // Themes
-            theme: AppTheme.lightTheme,
-            themeMode: ThemeMode.light,
+              // Themes
+              theme: AppTheme.lightTheme,
+              themeMode: ThemeMode.light,
 
-            // Routing
-            routerConfig: AppRouter.router,
+              // Routing
+              routerConfig: AppRouter.router,
+            ),
           );
         },
       ),

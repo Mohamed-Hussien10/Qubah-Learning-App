@@ -28,6 +28,12 @@ class UserModel {
   final String? phone;
   @JsonKey(name: 'stage_id', fromJson: _parseStringNullable)
   final String? stageId;
+  final String? stageName;
+  @JsonKey(name: 'grade_id', fromJson: _parseStringNullable)
+  final String? gradeId;
+  final String? gradeName;
+  @JsonKey(name: 'subscription_status', fromJson: _parseStringNullable)
+  final String? subscriptionStatus;
   @JsonKey(name: 'subscription_expiry', fromJson: _parseStringNullable)
   final String? subscriptionExpiry;
   @JsonKey(name: 'is_active', fromJson: _parseBool)
@@ -42,13 +48,46 @@ class UserModel {
     this.avatarUrl,
     this.phone,
     this.stageId,
+    this.stageName,
+    this.gradeId,
+    this.gradeName,
+    this.subscriptionStatus,
     this.subscriptionExpiry,
     this.isActive = true,
     required this.createdAt,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    // Custom handling to extract nested stage and grade titles
+    final model = _$UserModelFromJson(json);
+    
+    String? sName;
+    if (json['stage'] != null && json['stage']['title'] != null) {
+      sName = json['stage']['title'].toString();
+    }
+    
+    String? gName;
+    if (json['grade'] != null && json['grade']['title'] != null) {
+      gName = json['grade']['title'].toString();
+    }
+
+    return UserModel(
+      id: model.id,
+      name: model.name,
+      email: model.email,
+      avatarUrl: model.avatarUrl,
+      phone: model.phone,
+      stageId: model.stageId,
+      stageName: sName,
+      gradeId: model.gradeId,
+      gradeName: gName,
+      subscriptionStatus: model.subscriptionStatus,
+      subscriptionExpiry: model.subscriptionExpiry,
+      isActive: model.isActive,
+      createdAt: model.createdAt,
+    );
+  }
+
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   /// Converts data model to domain entity.
@@ -60,6 +99,10 @@ class UserModel {
       avatarUrl: avatarUrl,
       phone: phone,
       stageId: stageId,
+      stageName: stageName,
+      gradeId: gradeId,
+      gradeName: gradeName,
+      subscriptionStatus: subscriptionStatus,
       subscriptionExpiry: subscriptionExpiry != null
           ? DateTime.tryParse(subscriptionExpiry!)
           : null,
@@ -77,6 +120,10 @@ class UserModel {
       avatarUrl: entity.avatarUrl,
       phone: entity.phone,
       stageId: entity.stageId,
+      stageName: entity.stageName,
+      gradeId: entity.gradeId,
+      gradeName: entity.gradeName,
+      subscriptionStatus: entity.subscriptionStatus,
       subscriptionExpiry: entity.subscriptionExpiry?.toIso8601String(),
       isActive: entity.isActive,
       createdAt: entity.createdAt.toIso8601String(),

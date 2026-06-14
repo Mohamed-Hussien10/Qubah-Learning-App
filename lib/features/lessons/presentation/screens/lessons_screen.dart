@@ -48,11 +48,11 @@ class _LessonsScreenState extends State<LessonsScreen> {
   String _resolveImageUrl(String path) {
     if (path.startsWith('http')) {
       if (path.contains('localhost') || path.contains('127.0.0.1')) {
-        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://192.168.1.17:8000');
+        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://192.168.1.8:8000');
       }
       return path;
     }
-    const baseUrl = 'http://192.168.1.17:8000'; 
+    const baseUrl = 'http://192.168.1.8:8000'; 
     if (path.startsWith('/')) {
       return '$baseUrl$path';
     } else if (path.startsWith('storage/')) {
@@ -65,16 +65,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'الدروس',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-      ),
-      body: Container(
+
+      body: SafeArea(
+        child: Container(
         decoration: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty
             ? BoxDecoration(
                 image: DecorationImage(
@@ -159,6 +152,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
             ),
           ),
         ],
+      ),
       ),
       ),
     );

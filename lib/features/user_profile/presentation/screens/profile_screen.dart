@@ -76,11 +76,30 @@ class ProfileScreen extends StatelessWidget {
                     builder: (context, snapshot) {
                       String name = 'اسم الطالب';
                       String email = 'طالب@مثال.com';
+                      String stage = 'غير محدد';
+                      String grade = 'غير محدد';
+                      String subscription = 'غير فعال';
+
                       if (snapshot.hasData && snapshot.data != null) {
                         try {
                           final data = jsonDecode(snapshot.data!);
                           name = data['name'] ?? name;
                           email = data['email'] ?? email;
+                          stage = data['stageName'] ?? data['stage_name'] ?? (data['stage'] != null ? data['stage']['title'] : null) ?? stage;
+                          grade = data['gradeName'] ?? data['grade_name'] ?? (data['grade'] != null ? data['grade']['title'] : null) ?? grade;
+                          
+                          final expString = data['subscription_expiry'];
+                          DateTime? exp;
+                          if (expString != null) {
+                            exp = DateTime.tryParse(expString);
+                          }
+                          
+                          if (exp != null && exp.isAfter(DateTime.now())) {
+                             subscription = 'فعال';
+                             subscription += ' حتى ${exp.toString().split(" ").first.split("T").first}';
+                          } else {
+                             subscription = 'غير فعال أو منتهي';
+                          }
                         } catch (_) {}
                       }
                       return Column(
@@ -101,25 +120,25 @@ class ProfileScreen extends StatelessWidget {
                               ).textTheme.bodySmall?.color?.withOpacity(0.6),
                             ),
                           ).animate().fadeIn(delay: 300.ms),
+                          const SizedBox(height: 40),
+                          // Info Cards
+                          _ProfileMenuItem(
+                            icon: Icons.school_rounded,
+                            title: 'المرحلة والصف',
+                            subtitle: '$stage - $grade',
+                            onTap: () {},
+                          ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
+                          const SizedBox(height: 12),
+                          _ProfileMenuItem(
+                            icon: Icons.subscriptions_rounded,
+                            title: 'الاشتراك',
+                            subtitle: subscription,
+                            onTap: () => context.push(AppRoutes.subscription),
+                          ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
                         ],
                       );
                     },
                   ),
-                  const SizedBox(height: 40),
-                  // Info Cards
-                  _ProfileMenuItem(
-                    icon: Icons.school_rounded,
-                    title: 'المرحلة الدراسية',
-                    subtitle: 'الصف الثالث',
-                    onTap: () {},
-                  ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
-                  const SizedBox(height: 12),
-                  _ProfileMenuItem(
-                    icon: Icons.subscriptions_rounded,
-                    title: 'الاشتراك',
-                    subtitle: 'فعال حتى ديسمبر ٢٠٢٦',
-                    onTap: () => context.push(AppRoutes.subscription),
-                  ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
                   const SizedBox(height: 40),
                   // Logout Button
                   QubahButton(

@@ -205,15 +205,7 @@ class _DashboardViewState extends State<_DashboardView> {
         changeText: '${stats.userGrowthPercent >= 0 ? "+" : ""}${stats.userGrowthPercent.toStringAsFixed(1)}%',
         isPositiveTrend: stats.userGrowthPercent >= 0,
       ),
-      StatCard(
-        title: AppStrings.activeSubscriptions,
-        value: _formatNumber(stats.activeSubscriptions),
-        icon: Icons.card_membership_rounded,
-        iconColor: AppColors.accent,
-        iconBackgroundColor: const Color(0xFFD1FAE5),
-        changeText: '+5.2%',
-        isPositiveTrend: true,
-      ),
+
       StatCard(
         title: AppStrings.totalLessons,
         value: _formatNumber(stats.totalLessons),
@@ -380,7 +372,7 @@ class _DashboardViewState extends State<_DashboardView> {
               mainAxisSpacing: 16,
               childAspectRatio: 1.6,
               children: List.generate(
-                4,
+                3,
                 (_) => Container(
                   decoration: BoxDecoration(
                     color: Colors.white,

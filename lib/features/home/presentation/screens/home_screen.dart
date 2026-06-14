@@ -130,14 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               defaultIcon: Icons.school_rounded,
                               onTap: () => context.push(AppRoutes.stages),
                             ),
-                            ChildFriendlyCard(
-                              title: 'الاشتراك',
-                              subtitle: 'إدارة الباقات',
-                              imageUrl: null,
-                              color: AppColors.orange,
-                              defaultIcon: Icons.subscriptions_rounded,
-                              onTap: () => context.push(AppRoutes.subscription),
-                            ),
+
                             ChildFriendlyCard(
                               title: 'الإعدادات',
                               subtitle: 'تخصيص التطبيق',

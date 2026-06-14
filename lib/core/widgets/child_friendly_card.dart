@@ -168,12 +168,12 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
   String _resolveImageUrl(String path) {
     if (path.startsWith('http')) {
       if (path.contains('localhost') || path.contains('127.0.0.1')) {
-        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://192.168.1.17:8000');
+        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://192.168.1.8:8000');
       }
       return path;
     }
     // Assuming backend serves storage files or similar
-    const baseUrl = 'http://192.168.1.17:8000'; 
+    const baseUrl = 'http://192.168.1.8:8000'; 
     if (path.startsWith('/')) {
       return '$baseUrl$path';
     } else if (path.startsWith('storage/')) {

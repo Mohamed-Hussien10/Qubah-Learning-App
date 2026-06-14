@@ -31,6 +31,9 @@ class UsersRepository {
     required String password,
     required UserRole role,
     bool isActive = true,
+    int? stageId,
+    int? gradeId,
+    DateTime? subscriptionExpiry,
   }) async {
     final payload = {
       'name': name,
@@ -38,6 +41,9 @@ class UsersRepository {
       'password': password,
       'role': role.name,
       'is_active': isActive,
+      if (stageId != null) 'stage_id': stageId,
+      if (gradeId != null) 'grade_id': gradeId,
+      if (subscriptionExpiry != null) 'subscription_expiry': subscriptionExpiry.toIso8601String(),
     };
     final response = await _apiClient.post('/users', data: payload);
     final data = response.data['data'] ?? response.data;

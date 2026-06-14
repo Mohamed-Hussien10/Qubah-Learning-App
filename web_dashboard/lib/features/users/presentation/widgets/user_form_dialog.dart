@@ -3,13 +3,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:web_dashboard/core/constants/app_colors.dart';
 import 'package:web_dashboard/core/constants/app_strings.dart';
+import 'package:web_dashboard/core/services/dependency_injection.dart';
 import 'package:web_dashboard/features/users/data/models/user_model.dart';
 import 'package:web_dashboard/features/users/presentation/manager/users_cubit.dart';
+import 'package:web_dashboard/features/educational_stages/data/models/stage_model.dart';
+import 'package:web_dashboard/features/educational_stages/data/repositories/stages_repository.dart';
+import 'package:web_dashboard/features/grades/data/models/grade_model.dart';
+import 'package:web_dashboard/features/grades/data/repositories/grades_repository.dart';
 
 class UserFormDialog extends StatefulWidget {
   final UserModel? user;
+  final List<StageModel> initialStages;
+  final List<GradeModel> initialGrades;
 
-  const UserFormDialog({super.key, this.user});
+  const UserFormDialog({
+    super.key,
+    this.user,
+    this.initialStages = const [],
+    this.initialGrades = const [],
+  });
 
   @override
   State<UserFormDialog> createState() => _UserFormDialogState();
@@ -22,6 +34,14 @@ class _UserFormDialogState extends State<UserFormDialog> {
   late final TextEditingController _passwordController;
   late UserRole _selectedRole;
   late bool _isActive;
+  String? _selectedStageId;
+  String? _selectedGradeId;
+  DateTime? _subscriptionExpiry;
+  
+  List<StageModel> _stages = [];
+  List<GradeModel> _grades = [];
+  bool _isLoadingStages = true;
+  bool _isLoadingGrades = false;
 
   bool get isEditing => widget.user != null;
 
@@ -33,6 +53,61 @@ class _UserFormDialogState extends State<UserFormDialog> {
     _passwordController = TextEditingController();
     _selectedRole = widget.user?.role ?? UserRole.student;
     _isActive = widget.user?.isActive ?? true;
+    _selectedStageId = widget.user?.stageId?.toString();
+    _selectedGradeId = widget.user?.gradeId?.toString();
+    _subscriptionExpiry = widget.user?.subscriptionExpiry;
+
+    _stages = widget.initialStages;
+    _grades = widget.initialGrades;
+    _isLoadingStages = _stages.isEmpty;
+    _isLoadingGrades = _selectedStageId != null && _grades.isEmpty;
+
+    if (_isLoadingStages) {
+      _loadStages();
+    } else if (_isLoadingGrades) {
+      _loadGrades(_selectedStageId!);
+    }
+  }
+
+  Future<void> _loadStages() async {
+    try {
+      final stages = await sl<StagesRepository>().getAll();
+      if (mounted) {
+        setState(() {
+          _stages = stages;
+          _isLoadingStages = false;
+        });
+        if (_selectedStageId != null && _grades.isEmpty) {
+          setState(() => _isLoadingGrades = true);
+          _loadGrades(_selectedStageId!);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoadingStages = false);
+      }
+    }
+  }
+
+  Future<void> _loadGrades(String stageId) async {
+    setState(() => _isLoadingGrades = true);
+    try {
+      final grades = await sl<GradesRepository>().getByStageId(stageId);
+      if (mounted) {
+        setState(() {
+          _grades = grades;
+          _isLoadingGrades = false;
+          // Validate selected grade id exists
+          if (_selectedGradeId != null && !grades.any((g) => g.id == _selectedGradeId)) {
+            _selectedGradeId = null;
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoadingGrades = false);
+      }
+    }
   }
 
   @override
@@ -192,6 +267,142 @@ class _UserFormDialogState extends State<UserFormDialog> {
                 ),
                 const SizedBox(height: 16),
 
+                // ── Student Only Fields ───────────────────
+                if (_selectedRole == UserRole.student) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'المرحلة',
+                              style: GoogleFonts.cairo(
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            _isLoadingStages
+                                ? const CircularProgressIndicator()
+                                : DropdownButtonFormField<String>(
+                                    value: _selectedStageId,
+                                    style: GoogleFonts.cairo(
+                                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                    ),
+                                    decoration: _inputDecoration('اختر المرحلة', isDark),
+                                    dropdownColor: isDark ? AppColors.cardDark : AppColors.cardLight,
+                                    items: _stages.map((s) {
+                                      return DropdownMenuItem(
+                                        value: s.id,
+                                        child: Text(s.title),
+                                      );
+                                    }).toList(),
+                                    onChanged: (v) {
+                                      if (v != null) {
+                                        setState(() {
+                                          _selectedStageId = v;
+                                          _selectedGradeId = null; // reset grade
+                                        });
+                                        _loadGrades(v);
+                                      }
+                                    },
+                                    validator: (v) => v == null ? 'مطلوب' : null,
+                                  ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'الصف',
+                              style: GoogleFonts.cairo(
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            _isLoadingGrades
+                                ? const CircularProgressIndicator()
+                                : DropdownButtonFormField<String>(
+                                    value: _selectedGradeId,
+                                    style: GoogleFonts.cairo(
+                                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                    ),
+                                    decoration: _inputDecoration('اختر الصف', isDark),
+                                    dropdownColor: isDark ? AppColors.cardDark : AppColors.cardLight,
+                                    items: _grades.map((g) {
+                                      return DropdownMenuItem(
+                                        value: g.id,
+                                        child: Text(g.title),
+                                      );
+                                    }).toList(),
+                                    onChanged: (v) {
+                                      if (v != null) setState(() => _selectedGradeId = v);
+                                    },
+                                    validator: (v) => v == null ? 'مطلوب' : null,
+                                  ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'تاريخ انتهاء الاشتراك',
+                    style: GoogleFonts.cairo(
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: _subscriptionExpiry ?? DateTime.now().add(const Duration(days: 30)),
+                        firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                        lastDate: DateTime.now().add(const Duration(days: 3650)),
+                      );
+                      if (picked != null) {
+                        setState(() => _subscriptionExpiry = picked);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.surfaceDark : AppColors.backgroundLight,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _subscriptionExpiry != null
+                                ? '${_subscriptionExpiry!.year}-${_subscriptionExpiry!.month.toString().padLeft(2, '0')}-${_subscriptionExpiry!.day.toString().padLeft(2, '0')}'
+                                : 'اختر التاريخ',
+                            style: GoogleFonts.cairo(
+                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                            ),
+                          ),
+                          Icon(
+                            Icons.calendar_today,
+                            color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
                 // ── Status ────────────────────────────────
                 Row(
                   children: [
@@ -313,6 +524,9 @@ class _UserFormDialogState extends State<UserFormDialog> {
         email: _emailController.text.trim(),
         role: _selectedRole,
         isActive: _isActive,
+        stageId: _selectedRole == UserRole.student && _selectedStageId != null ? int.tryParse(_selectedStageId!) : null,
+        gradeId: _selectedRole == UserRole.student && _selectedGradeId != null ? int.tryParse(_selectedGradeId!) : null,
+        subscriptionExpiry: _selectedRole == UserRole.student ? _subscriptionExpiry : null,
       ));
     } else {
       cubit.createUser(
@@ -321,6 +535,9 @@ class _UserFormDialogState extends State<UserFormDialog> {
         password: _passwordController.text.trim(),
         role: _selectedRole,
         isActive: _isActive,
+        stageId: _selectedRole == UserRole.student && _selectedStageId != null ? int.tryParse(_selectedStageId!) : null,
+        gradeId: _selectedRole == UserRole.student && _selectedGradeId != null ? int.tryParse(_selectedGradeId!) : null,
+        subscriptionExpiry: _selectedRole == UserRole.student ? _subscriptionExpiry : null,
       );
     }
 

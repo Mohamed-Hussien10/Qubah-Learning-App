@@ -65,16 +65,9 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'الملفات',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      ),
-      body: Column(
+
+      body: SafeArea(
+        child: Column(
         children: [
           if (widget.titlePath.isNotEmpty)
             BreadcrumbNav(pathNames: widget.titlePath),
@@ -157,6 +150,7 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

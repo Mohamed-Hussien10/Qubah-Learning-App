@@ -100,30 +100,12 @@ final List<SidebarSection> sidebarSections = [
         activeIcon: Icons.people_rounded,
         route: '/users',
       ),
-      SidebarItem(
-        label: AppStrings.subscriptions,
-        icon: Icons.card_membership_outlined,
-        activeIcon: Icons.card_membership_rounded,
-        route: '/subscriptions',
-      ),
-      SidebarItem(
-        label: AppStrings.notifications,
-        icon: Icons.notifications_outlined,
-        activeIcon: Icons.notifications_rounded,
-        route: '/notifications',
-      ),
     ],
   ),
   // Reports & Settings
   const SidebarSection(
     label: 'التقارير والإعدادات',
     items: [
-      SidebarItem(
-        label: AppStrings.analytics,
-        icon: Icons.analytics_outlined,
-        activeIcon: Icons.analytics_rounded,
-        route: '/analytics',
-      ),
       SidebarItem(
         label: AppStrings.settings,
         icon: Icons.settings_outlined,

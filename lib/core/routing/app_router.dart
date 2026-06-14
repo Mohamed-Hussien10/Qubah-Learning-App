@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/authentication/presentation/screens/login/login_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
@@ -22,6 +21,7 @@ import '../../features/notifications/presentation/screens/notifications_screen.d
 import '../../features/parent_lock/presentation/screens/parent_lock_screen.dart';
 import '../../features/parent_lock/presentation/screens/parent_settings_screen.dart';
 import '../../features/parent_lock/presentation/screens/change_pin_screen.dart';
+import '../../features/subscription/presentation/screens/subscription_expired_screen.dart';
 
 /// Route name constants.
 class AppRoutes {
@@ -42,6 +42,7 @@ class AppRoutes {
   static const String interactiveViewer = '/player/interactive';
   static const String profile = '/profile';
   static const String subscription = '/subscription';
+  static const String subscriptionExpired = '/subscription-expired';
   static const String settings = '/settings';
   static const String notifications = '/notifications';
   static const String parentLock = '/parent-lock';
@@ -219,6 +220,11 @@ class AppRouter {
         path: AppRoutes.subscription,
         name: 'subscription',
         builder: (context, state) => const SubscriptionScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.subscriptionExpired,
+        name: 'subscriptionExpired',
+        builder: (context, state) => const SubscriptionExpiredScreen(),
       ),
       GoRoute(
         path: AppRoutes.settings,

@@ -8,6 +8,10 @@ class UserEntity extends Equatable {
   final String? avatarUrl;
   final String? phone;
   final String? stageId;
+  final String? stageName;
+  final String? gradeId;
+  final String? gradeName;
+  final String? subscriptionStatus;
   final DateTime? subscriptionExpiry;
   final bool isActive;
   final DateTime createdAt;
@@ -19,13 +23,18 @@ class UserEntity extends Equatable {
     this.avatarUrl,
     this.phone,
     this.stageId,
+    this.stageName,
+    this.gradeId,
+    this.gradeName,
+    this.subscriptionStatus,
     this.subscriptionExpiry,
     this.isActive = true,
     required this.createdAt,
   });
 
   bool get isSubscriptionValid =>
-      subscriptionExpiry != null && subscriptionExpiry!.isAfter(DateTime.now());
+      subscriptionExpiry != null && 
+      subscriptionExpiry!.isAfter(DateTime.now());
 
   @override
   List<Object?> get props => [
@@ -35,6 +44,10 @@ class UserEntity extends Equatable {
     avatarUrl,
     phone,
     stageId,
+    stageName,
+    gradeId,
+    gradeName,
+    subscriptionStatus,
     subscriptionExpiry,
     isActive,
     createdAt,

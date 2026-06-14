@@ -1,131 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../theme/presentation/manager/cubit/theme_cubit.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Scaffold(
-      appBar: AppBar(
+  void _showChangePasswordDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'الإعدادات',
-          style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          'تغيير كلمة المرور',
+          style: GoogleFonts.cairo(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+          ),
+          textAlign: TextAlign.center,
         ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildSectionHeader(context, 'المظهر'),
-          const SizedBox(height: 8),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListTile(
-              leading: Icon(
-                isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                color: AppColors.primary,
-              ),
-              title: const Text(
-                'الوضع الليلي',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Text(
-                isDark ? 'مفعل' : 'غير مفعل',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
-              ),
-              trailing: Switch(
-                value: isDark,
-                onChanged: (value) {
-                  context.read<ThemeCubit>().toggleTheme();
-                },
-                activeThumbColor: AppColors.primary,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'كلمة المرور الحالية',
+                prefixIcon: const Icon(Icons.lock_outline),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
+            const SizedBox(height: 16),
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'كلمة المرور الجديدة',
+                prefixIcon: const Icon(Icons.lock),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'تأكيد كلمة المرور',
+                prefixIcon: const Icon(Icons.lock_reset),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('إلغاء', style: GoogleFonts.cairo(color: Colors.grey)),
           ),
-          const SizedBox(height: 24),
-          _buildSectionHeader(context, 'الحساب'),
-          const SizedBox(height: 8),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('تم تغيير كلمة المرور بنجاح!'),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(
-                    Icons.person_outline_rounded,
-                    color: AppColors.primary,
-                  ),
-                  title: const Text('تعديل الملف الشخصي'),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: Colors.grey,
-                  ),
-                  onTap: () {},
-                ),
-                const Divider(height: 1, indent: 56),
-                ListTile(
-                  leading: const Icon(
-                    Icons.lock_outline_rounded,
-                    color: AppColors.primary,
-                  ),
-                  title: const Text('تغيير كلمة المرور'),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: Colors.grey,
-                  ),
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildSectionHeader(context, 'الدعم'),
-          const SizedBox(height: 8),
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(
-                    Icons.help_outline_rounded,
-                    color: AppColors.primary,
-                  ),
-                  title: const Text('مركز المساعدة'),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: Colors.grey,
-                  ),
-                  onTap: () {},
-                ),
-                const Divider(height: 1, indent: 56),
-                ListTile(
-                  leading: const Icon(
-                    Icons.privacy_tip_outlined,
-                    color: AppColors.primary,
-                  ),
-                  title: const Text('سياسة الخصوصية'),
-                  trailing: const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: Colors.grey,
-                  ),
-                  onTap: () {},
-                ),
-              ],
+            child: Text(
+              'حفظ',
+              style: GoogleFonts.cairo(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -133,17 +90,130 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(
+        title: Text(
+          'الإعدادات',
+          style: GoogleFonts.cairo(
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.black87),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        children: [
+          _buildSectionHeader(context, 'الحساب'),
+          const SizedBox(height: 12),
+          _buildSettingsCard([
+            _buildSettingsTile(
+              icon: Icons.person_outline_rounded,
+              title: 'تعديل الملف الشخصي',
+              onTap: () {},
+            ),
+            const Divider(height: 1, indent: 56),
+            _buildSettingsTile(
+              icon: Icons.lock_outline_rounded,
+              title: 'تغيير كلمة المرور',
+              onTap: () => _showChangePasswordDialog(context),
+            ),
+          ]),
+          const SizedBox(height: 32),
+          _buildSectionHeader(context, 'الأمان'),
+          const SizedBox(height: 12),
+          _buildSettingsCard([
+            _buildSettingsTile(
+              icon: Icons.admin_panel_settings_outlined,
+              title: 'إعدادات الرقابة الأبوية',
+              onTap: () {
+                context.push('/parent-lock');
+              },
+            ),
+          ]),
+          const SizedBox(height: 32),
+          _buildSectionHeader(context, 'الدعم'),
+          const SizedBox(height: 12),
+          _buildSettingsCard([
+            _buildSettingsTile(
+              icon: Icons.help_outline_rounded,
+              title: 'مركز المساعدة',
+              onTap: () {},
+            ),
+            const Divider(height: 1, indent: 56),
+            _buildSettingsTile(
+              icon: Icons.privacy_tip_outlined,
+              title: 'سياسة الخصوصية',
+              onTap: () {},
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(
         title,
         style: GoogleFonts.cairo(
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: FontWeight.bold,
           color: AppColors.primary,
         ),
       ),
+    );
+  }
+
+  Widget _buildSettingsCard(List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildSettingsTile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: AppColors.primary, size: 24),
+      ),
+      title: Text(
+        title,
+        style: GoogleFonts.cairo(fontWeight: FontWeight.w600, fontSize: 15),
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 16,
+        color: Colors.grey,
+      ),
+      onTap: onTap,
     );
   }
 }

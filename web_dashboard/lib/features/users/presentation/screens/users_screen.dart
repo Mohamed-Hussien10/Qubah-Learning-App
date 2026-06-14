@@ -11,6 +11,8 @@ import 'package:web_dashboard/features/users/data/models/user_model.dart';
 import 'package:web_dashboard/features/users/presentation/manager/users_cubit.dart';
 import 'package:web_dashboard/features/users/presentation/manager/users_state.dart';
 import 'package:web_dashboard/core/services/dependency_injection.dart';
+import 'package:web_dashboard/features/educational_stages/data/models/stage_model.dart';
+import 'package:web_dashboard/features/educational_stages/data/repositories/stages_repository.dart';
 import 'package:web_dashboard/features/users/presentation/widgets/user_form_dialog.dart';
 
 class UsersScreen extends StatelessWidget {
@@ -25,8 +27,30 @@ class UsersScreen extends StatelessWidget {
   }
 }
 
-class _UsersScreenBody extends StatelessWidget {
+class _UsersScreenBody extends StatefulWidget {
   const _UsersScreenBody();
+
+  @override
+  State<_UsersScreenBody> createState() => _UsersScreenBodyState();
+}
+
+class _UsersScreenBodyState extends State<_UsersScreenBody> {
+  List<StageModel> _stages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _preloadData();
+  }
+
+  Future<void> _preloadData() async {
+    try {
+      final stages = await sl<StagesRepository>().getAll();
+      if (mounted) {
+        setState(() => _stages = stages);
+      }
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -675,7 +699,11 @@ class _UsersScreenBody extends StatelessWidget {
       context: context,
       builder: (_) => BlocProvider.value(
         value: context.read<UsersCubit>(),
-        child: UserFormDialog(user: user),
+        child: UserFormDialog(
+          user: user,
+          initialStages: _stages,
+          initialGrades: const [],
+        ),
       ),
     );
   }

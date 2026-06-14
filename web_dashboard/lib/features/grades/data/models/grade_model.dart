@@ -24,7 +24,7 @@ class GradeModel extends BaseEntity {
   factory GradeModel.fromJson(Map<String, dynamic> json) {
     return GradeModel(
       id: json['id']?.toString() ?? '',
-      stageId: json['stage_id']?.toString() ?? '',
+      stageId: json['educational_stage_id']?.toString() ?? json['stage_id']?.toString() ?? '',
       title: json['title'] ?? '',
       description: json['description'],
       thumbnailUrl: json['thumbnail_url'],
@@ -40,7 +40,7 @@ class GradeModel extends BaseEntity {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'stage_id': stageId,
+      'educational_stage_id': stageId,
       'title': title,
       'description': description,
       'thumbnail_path': thumbnailUrl,
