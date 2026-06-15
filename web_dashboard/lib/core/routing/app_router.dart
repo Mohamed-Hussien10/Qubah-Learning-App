@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:web_dashboard/core/services/dependency_injection.dart';
 import 'package:web_dashboard/features/authentication/data/repositories/auth_repository.dart';
 import 'package:web_dashboard/features/authentication/presentation/screens/login_screen.dart';
-import 'package:web_dashboard/features/dashboard/presentation/screens/dashboard_screen.dart';
+
 import 'package:web_dashboard/features/educational_stages/presentation/screens/stages_screen.dart';
 import 'package:web_dashboard/features/grades/presentation/screens/grades_screen.dart';
 import 'package:web_dashboard/features/sections/presentation/screens/sections_screen.dart';
@@ -53,10 +53,7 @@ final GoRouter appRouter = GoRouter(
     ShellRoute(
       builder: (context, state, child) => DashboardShell(child: child),
       routes: [
-        GoRoute(
-          path: '/dashboard',
-          builder: (context, state) => const DashboardScreen(),
-        ),
+
         GoRoute(
           path: '/stages',
           builder: (context, state) => const StagesScreen(),

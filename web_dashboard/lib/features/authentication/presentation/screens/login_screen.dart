@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          context.go('/dashboard');
+          context.go('/stages');
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

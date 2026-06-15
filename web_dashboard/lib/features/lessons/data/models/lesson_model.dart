@@ -4,7 +4,6 @@ import 'package:web_dashboard/features/shared/models/base_entity.dart';
 class LessonModel extends BaseEntity {
   final String unitId;
   final String? thumbnailUrl;
-  final String duration;
   final int filesCount;
 
   const LessonModel({
@@ -13,7 +12,6 @@ class LessonModel extends BaseEntity {
     required super.title,
     super.description,
     this.thumbnailUrl,
-    required this.duration,
     super.isActive = true,
     super.order = 0,
     this.filesCount = 0,
@@ -22,7 +20,7 @@ class LessonModel extends BaseEntity {
 
   @override
   List<Object?> get props =>
-      [...super.props, unitId, thumbnailUrl, duration, filesCount];
+      [...super.props, unitId, thumbnailUrl, filesCount];
 
   factory LessonModel.fromJson(Map<String, dynamic> json) {
     return LessonModel(
@@ -31,10 +29,9 @@ class LessonModel extends BaseEntity {
       title: json['title'] ?? '',
       description: json['description'],
       thumbnailUrl: json['thumbnail_url'],
-      duration: json['duration']?.toString() ?? '00:00',
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
-      filesCount: int.tryParse(json['files_count']?.toString() ?? json['attachments_count']?.toString() ?? '') ?? (json['files'] as List?)?.length ?? (json['attachments'] as List?)?.length ?? 0,
+      filesCount: int.tryParse(json['lesson_files_count']?.toString() ?? json['files_count']?.toString() ?? json['attachments_count']?.toString() ?? '') ?? (json['lesson_files'] as List?)?.length ?? (json['files'] as List?)?.length ?? (json['attachments'] as List?)?.length ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -48,7 +45,6 @@ class LessonModel extends BaseEntity {
       'title': title,
       'description': description,
       'thumbnail_path': thumbnailUrl,
-      'duration': duration,
       'is_active': isActive ? 1 : 0,
       'order': order,
       'files_count': filesCount,
@@ -63,7 +59,6 @@ class LessonModel extends BaseEntity {
     String? title,
     String? description,
     String? thumbnailUrl,
-    String? duration,
     bool? isActive,
     int? order,
     int? filesCount,
@@ -75,7 +70,6 @@ class LessonModel extends BaseEntity {
       title: title ?? this.title,
       description: description ?? this.description,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
-      duration: duration ?? this.duration,
       isActive: isActive ?? this.isActive,
       order: order ?? this.order,
       filesCount: filesCount ?? this.filesCount,
@@ -92,7 +86,6 @@ class LessonModel extends BaseEntity {
             title: 'الدرس الأول: مدخل إلى الأعداد الحقيقية',
             description: 'التعريف بالأعداد الحقيقية وخصائصها ومجموعات الأعداد الأخرى',
             thumbnailUrl: 'https://via.placeholder.com/150/6C5CE7/FFFFFF?text=درس-1',
-            duration: '12:45',
             isActive: true,
             order: 1,
             filesCount: 2,
@@ -104,7 +97,6 @@ class LessonModel extends BaseEntity {
             title: 'الدرس الثاني: المقارنة والترتيب',
             description: 'شرح كيفية ترتيب الأعداد الحقيقية والمقارنة بينها بيانيا وحسابيا',
             thumbnailUrl: 'https://via.placeholder.com/150/00D2D3/FFFFFF?text=درس-2',
-            duration: '15:20',
             isActive: true,
             order: 2,
             filesCount: 1,
@@ -115,7 +107,6 @@ class LessonModel extends BaseEntity {
             unitId: 'unit-1',
             title: 'الدرس الثالث: القيمة المطلقة',
             description: 'دراسة مفهوم القيمة المطلقة وخصائصها وتطبيقاتها الرياضية',
-            duration: '18:10',
             isActive: true,
             order: 3,
             filesCount: 0,
@@ -128,7 +119,6 @@ class LessonModel extends BaseEntity {
             unitId: 'unit-2',
             title: 'الدرس الأول: جمع وطرح الحدود الجبرية',
             description: 'طريقة التعامل مع الحدود المتشابهة والمختلفة في الجمع والطرح',
-            duration: '14:30',
             isActive: true,
             order: 1,
             filesCount: 1,
@@ -139,7 +129,6 @@ class LessonModel extends BaseEntity {
             unitId: 'unit-2',
             title: 'الدرس الثاني: ضرب وقسمة المقادير الجبرية',
             description: 'توزيع الضرب على الجمع واختصار المقادير الجبرية الكسرية',
-            duration: '22:15',
             isActive: true,
             order: 2,
             filesCount: 2,

@@ -223,7 +223,6 @@ class _LessonsView extends StatelessWidget {
           columns: const [
             DataColumn2(label: Text(AppStrings.order), fixedWidth: 70),
             DataColumn2(label: Text(AppStrings.title), size: ColumnSize.L),
-            DataColumn2(label: Text('المدة'), fixedWidth: 90),
             DataColumn2(label: Text(AppStrings.status), fixedWidth: 100),
             DataColumn2(label: Text('الملفات'), fixedWidth: 90),
             DataColumn2(label: Text(AppStrings.actions), fixedWidth: 200),
@@ -277,7 +276,6 @@ class _LessonsView extends StatelessWidget {
                         ],
                       ),
                     ),
-                    DataCell(Text(lesson.duration)),
                     DataCell(_StatusBadge(isActive: lesson.isActive)),
                     DataCell(Text('${lesson.filesCount}')),
                     DataCell(
@@ -532,7 +530,6 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _titleCtrl;
   late final TextEditingController _descCtrl;
-  late final TextEditingController _durationCtrl;
   late final TextEditingController _orderCtrl;
   late bool _isActive;
   bool _isSaving = false;
@@ -547,9 +544,6 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
     _titleCtrl = TextEditingController(text: widget.lesson?.title ?? '');
     _descCtrl = TextEditingController(text: widget.lesson?.description ?? '');
     _thumbCtrl = TextEditingController(text: widget.lesson?.thumbnailUrl ?? '');
-    _durationCtrl = TextEditingController(
-      text: widget.lesson?.duration ?? '10:00',
-    );
     _orderCtrl = TextEditingController(
       text: widget.lesson?.order.toString() ?? '0',
     );
@@ -561,7 +555,6 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
     _titleCtrl.dispose();
     _descCtrl.dispose();
     _thumbCtrl.dispose();
-    _durationCtrl.dispose();
     _orderCtrl.dispose();
     super.dispose();
   }
@@ -588,7 +581,6 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
       unitId: widget.unitId,
       title: _titleCtrl.text.trim(),
       description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
-      duration: _durationCtrl.text.trim(),
       isActive: _isActive,
       thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
@@ -701,24 +693,6 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _durationCtrl,
-                        decoration: InputDecoration(
-                          labelText: 'المدة (مثال: 15:00) *',
-                          prefixIcon: const Icon(Icons.timer_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        validator:
-                            (v) =>
-                                (v == null || v.trim().isEmpty)
-                                    ? 'المدة مطلوبة'
-                                    : null,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
                     Expanded(
                       child: TextFormField(
                         controller: _orderCtrl,

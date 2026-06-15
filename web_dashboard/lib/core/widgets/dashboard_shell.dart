@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/core/constants/app_colors.dart';
 import 'package:web_dashboard/core/widgets/responsive_layout.dart';
 import 'package:web_dashboard/core/widgets/sidebar.dart';
 import 'package:web_dashboard/core/widgets/top_navbar.dart';
 import 'package:web_dashboard/features/authentication/presentation/manager/auth_cubit.dart';
+import 'package:web_dashboard/features/authentication/presentation/manager/auth_state.dart';
 
 /// Main dashboard shell used as the [ShellRoute] builder.
 ///
@@ -63,41 +65,48 @@ class _DashboardShellState extends State<DashboardShell> {
             )
           : null,
 
-      body: Row(
-        children: [
-          // ── Sidebar (desktop & tablet) ─────────────────────────────
-          if (!isMobile)
-            Sidebar(
-              isCollapsed: _isSidebarCollapsed,
-              onToggleCollapse: _toggleSidebar,
-              onLogout: _handleLogout,
-            ),
+      body: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthInitial) {
+            context.go('/login');
+          }
+        },
+        child: Row(
+          children: [
+            // ── Sidebar (desktop & tablet) ─────────────────────────────
+            if (!isMobile)
+              Sidebar(
+                isCollapsed: _isSidebarCollapsed,
+                onToggleCollapse: _toggleSidebar,
+                onLogout: _handleLogout,
+              ),
 
-          // ── Main Content Area ──────────────────────────────────────
-          Expanded(
-            child: Column(
-              children: [
-                // Top Navbar
-                TopNavbar(
-                  onMenuTap: isMobile
-                      ? () => _scaffoldKey.currentState?.openDrawer()
-                      : null,
-                  onLogout: _handleLogout,
-                ),
-
-                // Content
-                Expanded(
-                  child: Container(
-                    color: isDark
-                        ? AppColors.backgroundDark
-                        : AppColors.backgroundLight,
-                    child: widget.child,
+            // ── Main Content Area ──────────────────────────────────────
+            Expanded(
+              child: Column(
+                children: [
+                  // Top Navbar
+                  TopNavbar(
+                    onMenuTap: isMobile
+                        ? () => _scaffoldKey.currentState?.openDrawer()
+                        : null,
+                    onLogout: _handleLogout,
                   ),
-                ),
-              ],
+
+                  // Content
+                  Expanded(
+                    child: Container(
+                      color: isDark
+                          ? AppColors.backgroundDark
+                          : AppColors.backgroundLight,
+                      child: widget.child,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
