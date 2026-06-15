@@ -19,8 +19,17 @@ import 'package:web_dashboard/features/settings/presentation/screens/settings_sc
 import 'package:web_dashboard/features/user_profile/presentation/screens/profile_screen.dart';
 import 'package:web_dashboard/core/widgets/dashboard_shell.dart';
 
+class NavigationState {
+  static String? lastStageId;
+  static String? lastGradeId;
+  static String? lastSectionId;
+  static String? lastSubjectId;
+  static String? lastUnitId;
+  static String? lastLessonId;
+}
+
 final GoRouter appRouter = GoRouter(
-  initialLocation: '/dashboard',
+  initialLocation: '/stages',
   redirect: (BuildContext context, GoRouterState state) async {
     final authRepo = sl<AuthRepository>();
     final loggedIn = await authRepo.isLoggedIn();
@@ -31,7 +40,7 @@ final GoRouter appRouter = GoRouter(
     }
 
     if (loggedIn && isLoggingIn) {
-      return '/dashboard';
+      return '/stages';
     }
 
     return null;
@@ -54,67 +63,73 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: '/grades',
-          redirect: (context, state) => '/stages',
+          redirect: (context, state) => NavigationState.lastStageId != null ? '/grades/${NavigationState.lastStageId}' : '/stages',
         ),
         GoRoute(
           path: '/grades/:stageId',
           builder: (context, state) {
             final stageId = state.pathParameters['stageId']!;
+            NavigationState.lastStageId = stageId;
             return GradesScreen(stageId: stageId);
           },
         ),
         GoRoute(
           path: '/sections',
-          redirect: (context, state) => '/stages',
+          redirect: (context, state) => NavigationState.lastGradeId != null ? '/sections/${NavigationState.lastGradeId}' : '/stages',
         ),
         GoRoute(
           path: '/sections/:gradeId',
           builder: (context, state) {
             final gradeId = state.pathParameters['gradeId']!;
+            NavigationState.lastGradeId = gradeId;
             return SectionsScreen(gradeId: gradeId);
           },
         ),
         GoRoute(
           path: '/subjects',
-          redirect: (context, state) => '/stages',
+          redirect: (context, state) => NavigationState.lastSectionId != null ? '/subjects/${NavigationState.lastSectionId}' : '/stages',
         ),
         GoRoute(
           path: '/subjects/:sectionId',
           builder: (context, state) {
             final sectionId = state.pathParameters['sectionId']!;
+            NavigationState.lastSectionId = sectionId;
             return SubjectsScreen(sectionId: sectionId);
           },
         ),
         GoRoute(
           path: '/units',
-          redirect: (context, state) => '/stages',
+          redirect: (context, state) => NavigationState.lastSubjectId != null ? '/units/${NavigationState.lastSubjectId}' : '/stages',
         ),
         GoRoute(
           path: '/units/:subjectId',
           builder: (context, state) {
             final subjectId = state.pathParameters['subjectId']!;
+            NavigationState.lastSubjectId = subjectId;
             return UnitsScreen(subjectId: subjectId);
           },
         ),
         GoRoute(
           path: '/lessons',
-          redirect: (context, state) => '/stages',
+          redirect: (context, state) => NavigationState.lastUnitId != null ? '/lessons/${NavigationState.lastUnitId}' : '/stages',
         ),
         GoRoute(
           path: '/lessons/:unitId',
           builder: (context, state) {
             final unitId = state.pathParameters['unitId']!;
+            NavigationState.lastUnitId = unitId;
             return LessonsScreen(unitId: unitId);
           },
         ),
         GoRoute(
           path: '/lesson-files',
-          redirect: (context, state) => '/stages',
+          redirect: (context, state) => NavigationState.lastLessonId != null ? '/lesson-files/${NavigationState.lastLessonId}' : '/stages',
         ),
         GoRoute(
           path: '/lesson-files/:lessonId',
           builder: (context, state) {
             final lessonId = state.pathParameters['lessonId']!;
+            NavigationState.lastLessonId = lessonId;
             return LessonFilesScreen(lessonId: lessonId);
           },
         ),

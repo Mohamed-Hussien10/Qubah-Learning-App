@@ -95,7 +95,7 @@ class _LessonFilesView extends StatelessWidget {
     return Row(
       children: [
         InkWell(
-          onTap: () => context.go('/stages'),
+          onTap: () => context.pop(),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

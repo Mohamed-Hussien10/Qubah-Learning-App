@@ -405,7 +405,7 @@ class _GradesView extends StatelessWidget {
   }
 
   void _navigateToSections(BuildContext context, GradeModel grade) {
-    context.go('/sections/${grade.id}');
+    context.push('/sections/${grade.id}');
   }
 }
 

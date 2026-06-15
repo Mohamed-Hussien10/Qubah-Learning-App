@@ -30,7 +30,7 @@ class UnitModel extends BaseEntity {
       thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
-      lessonsCount: json['lessons_count'] != null ? int.tryParse(json['lessons_count'].toString()) ?? 0 : 0,
+      lessonsCount: int.tryParse(json['lessons_count']?.toString() ?? json['contents_count']?.toString() ?? '') ?? (json['lessons'] as List?)?.length ?? (json['contents'] as List?)?.length ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,

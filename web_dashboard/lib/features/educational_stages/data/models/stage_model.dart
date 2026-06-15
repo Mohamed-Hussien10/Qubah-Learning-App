@@ -30,7 +30,7 @@ class StageModel extends BaseEntity {
       backgroundImageUrl: json['background_image_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
-      gradesCount: json['grades_count'] != null ? int.tryParse(json['grades_count'].toString()) ?? 0 : 0,
+      gradesCount: int.tryParse(json['grades_count']?.toString() ?? json['levels_count']?.toString() ?? '') ?? (json['grades'] as List?)?.length ?? (json['levels'] as List?)?.length ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,

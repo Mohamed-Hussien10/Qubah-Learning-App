@@ -68,7 +68,7 @@ class _UnitsView extends StatelessWidget {
     return Row(
       children: [
         InkWell(
-          onTap: () => context.go('/stages'),
+          onTap: () => context.pop(),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -388,7 +388,7 @@ class _UnitsView extends StatelessWidget {
   }
 
   void _navigateToLessons(BuildContext context, UnitModel unit) {
-    context.go('/lessons/${unit.id}');
+    context.push('/lessons/${unit.id}');
   }
 }
 

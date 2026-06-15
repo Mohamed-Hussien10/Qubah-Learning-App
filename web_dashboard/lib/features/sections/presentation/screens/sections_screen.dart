@@ -389,7 +389,7 @@ class _SectionsView extends StatelessWidget {
   }
 
   void _navigateToSubjects(BuildContext context, SectionModel section) {
-    context.go('/subjects/${section.id}');
+    context.push('/subjects/${section.id}');
   }
 }
 

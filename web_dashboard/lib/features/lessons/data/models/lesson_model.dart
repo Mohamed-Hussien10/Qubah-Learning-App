@@ -5,7 +5,6 @@ class LessonModel extends BaseEntity {
   final String unitId;
   final String? thumbnailUrl;
   final String duration;
-  final bool isPublished;
   final int filesCount;
 
   const LessonModel({
@@ -15,7 +14,6 @@ class LessonModel extends BaseEntity {
     super.description,
     this.thumbnailUrl,
     required this.duration,
-    this.isPublished = true,
     super.isActive = true,
     super.order = 0,
     this.filesCount = 0,
@@ -24,7 +22,7 @@ class LessonModel extends BaseEntity {
 
   @override
   List<Object?> get props =>
-      [...super.props, unitId, thumbnailUrl, duration, isPublished, filesCount];
+      [...super.props, unitId, thumbnailUrl, duration, filesCount];
 
   factory LessonModel.fromJson(Map<String, dynamic> json) {
     return LessonModel(
@@ -34,10 +32,9 @@ class LessonModel extends BaseEntity {
       description: json['description'],
       thumbnailUrl: json['thumbnail_url'],
       duration: json['duration']?.toString() ?? '00:00',
-      isPublished: json['is_published'] == 1 || json['is_published'] == true,
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
-      filesCount: json['files_count'] != null ? int.tryParse(json['files_count'].toString()) ?? 0 : 0,
+      filesCount: int.tryParse(json['files_count']?.toString() ?? json['attachments_count']?.toString() ?? '') ?? (json['files'] as List?)?.length ?? (json['attachments'] as List?)?.length ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
@@ -52,7 +49,6 @@ class LessonModel extends BaseEntity {
       'description': description,
       'thumbnail_path': thumbnailUrl,
       'duration': duration,
-      'is_published': isPublished,
       'is_active': isActive ? 1 : 0,
       'order': order,
       'files_count': filesCount,
@@ -68,7 +64,6 @@ class LessonModel extends BaseEntity {
     String? description,
     String? thumbnailUrl,
     String? duration,
-    bool? isPublished,
     bool? isActive,
     int? order,
     int? filesCount,
@@ -81,7 +76,6 @@ class LessonModel extends BaseEntity {
       description: description ?? this.description,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       duration: duration ?? this.duration,
-      isPublished: isPublished ?? this.isPublished,
       isActive: isActive ?? this.isActive,
       order: order ?? this.order,
       filesCount: filesCount ?? this.filesCount,
@@ -99,7 +93,6 @@ class LessonModel extends BaseEntity {
             description: 'التعريف بالأعداد الحقيقية وخصائصها ومجموعات الأعداد الأخرى',
             thumbnailUrl: 'https://via.placeholder.com/150/6C5CE7/FFFFFF?text=درس-1',
             duration: '12:45',
-            isPublished: true,
             isActive: true,
             order: 1,
             filesCount: 2,
@@ -112,7 +105,6 @@ class LessonModel extends BaseEntity {
             description: 'شرح كيفية ترتيب الأعداد الحقيقية والمقارنة بينها بيانيا وحسابيا',
             thumbnailUrl: 'https://via.placeholder.com/150/00D2D3/FFFFFF?text=درس-2',
             duration: '15:20',
-            isPublished: true,
             isActive: true,
             order: 2,
             filesCount: 1,
@@ -124,7 +116,6 @@ class LessonModel extends BaseEntity {
             title: 'الدرس الثالث: القيمة المطلقة',
             description: 'دراسة مفهوم القيمة المطلقة وخصائصها وتطبيقاتها الرياضية',
             duration: '18:10',
-            isPublished: false,
             isActive: true,
             order: 3,
             filesCount: 0,
@@ -138,7 +129,6 @@ class LessonModel extends BaseEntity {
             title: 'الدرس الأول: جمع وطرح الحدود الجبرية',
             description: 'طريقة التعامل مع الحدود المتشابهة والمختلفة في الجمع والطرح',
             duration: '14:30',
-            isPublished: true,
             isActive: true,
             order: 1,
             filesCount: 1,
@@ -150,7 +140,6 @@ class LessonModel extends BaseEntity {
             title: 'الدرس الثاني: ضرب وقسمة المقادير الجبرية',
             description: 'توزيع الضرب على الجمع واختصار المقادير الجبرية الكسرية',
             duration: '22:15',
-            isPublished: true,
             isActive: true,
             order: 2,
             filesCount: 2,

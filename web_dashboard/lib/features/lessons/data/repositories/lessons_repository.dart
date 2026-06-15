@@ -74,10 +74,4 @@ class LessonsRepository {
     final updated = lesson.copyWith(isActive: !lesson.isActive);
     return update(updated);
   }
-
-  Future<LessonModel> togglePublishStatus(String unitId, String id) async {
-    final lesson = await getById(id);
-    final updated = lesson.copyWith(isPublished: !lesson.isPublished);
-    return update(updated);
-  }
 }

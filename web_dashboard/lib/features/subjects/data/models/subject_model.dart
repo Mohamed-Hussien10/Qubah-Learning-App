@@ -30,7 +30,7 @@ class SubjectModel extends BaseEntity {
       thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
-      unitsCount: json['units_count'] != null ? int.tryParse(json['units_count'].toString()) ?? 0 : 0,
+      unitsCount: int.tryParse(json['units_count']?.toString() ?? json['topics_count']?.toString() ?? '') ?? (json['units'] as List?)?.length ?? (json['topics'] as List?)?.length ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,

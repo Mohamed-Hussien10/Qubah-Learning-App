@@ -30,7 +30,7 @@ class GradeModel extends BaseEntity {
       thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
-      sectionsCount: json['sections_count'] != null ? int.tryParse(json['sections_count'].toString()) ?? 0 : 0,
+      sectionsCount: int.tryParse(json['sections_count']?.toString() ?? '') ?? (json['sections'] as List?)?.length ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,

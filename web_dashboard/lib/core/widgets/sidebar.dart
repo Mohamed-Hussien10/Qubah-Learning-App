@@ -31,17 +31,6 @@ class SidebarSection {
 
 /// Sidebar navigation items definition.
 final List<SidebarSection> sidebarSections = [
-  // Main
-  const SidebarSection(
-    items: [
-      SidebarItem(
-        label: AppStrings.dashboard,
-        icon: Icons.dashboard_outlined,
-        activeIcon: Icons.dashboard_rounded,
-        route: '/dashboard',
-      ),
-    ],
-  ),
   // Educational Management
   const SidebarSection(
     label: 'الإدارة التعليمية',

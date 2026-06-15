@@ -73,14 +73,7 @@ class LessonsCubit extends Cubit<LessonsState> {
     }
   }
 
-  Future<void> togglePublishStatus(String id) async {
-    try {
-      await _repository.togglePublishStatus(_unitId, id);
-      await loadLessons(_unitId);
-    } catch (e) {
-      emit(LessonsError(e.toString()));
-    }
-  }
+
 
   void search(String query) {
     final currentState = state;

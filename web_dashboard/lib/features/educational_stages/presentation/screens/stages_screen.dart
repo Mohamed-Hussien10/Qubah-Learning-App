@@ -380,7 +380,7 @@ class _StagesView extends StatelessWidget {
   }
 
   void _navigateToGrades(BuildContext context, StageModel stage) {
-    context.go('/grades/${stage.id}');
+    context.push('/grades/${stage.id}');
   }
 
   String resolveImageUrl(String path) {

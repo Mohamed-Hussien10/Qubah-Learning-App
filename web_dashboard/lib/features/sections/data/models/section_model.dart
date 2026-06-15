@@ -30,7 +30,7 @@ class SectionModel extends BaseEntity {
       thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] != null ? int.tryParse(json['order'].toString()) ?? 0 : 0,
-      subjectsCount: json['subjects_count'] != null ? int.tryParse(json['subjects_count'].toString()) ?? 0 : 0,
+      subjectsCount: int.tryParse(json['subjects_count']?.toString() ?? '') ?? (json['subjects'] as List?)?.length ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'])
           : null,
