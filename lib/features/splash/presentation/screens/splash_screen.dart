@@ -8,8 +8,8 @@ import '../../../../core/routing/app_router.dart';
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/storage/secure_storage.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/qubah_button.dart';
 
-/// Splash screen with animated logo and auto-navigation.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -18,22 +18,21 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
       ),
     );
-    _navigateAfterDelay();
+    _checkAuth();
   }
 
-  Future<void> _navigateAfterDelay() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
-
+  Future<void> _checkAuth() async {
     final secureStorage = sl<SecureStorage>();
     final isAuthenticated = await secureStorage.isAuthenticated();
 
@@ -42,98 +41,132 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isAuthenticated) {
       context.go(AppRoutes.appEntryLock);
     } else {
-      context.go(AppRoutes.login);
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.hessaBackground,
+        body: Center(child: CircularProgressIndicator(color: AppColors.hessaBrown)),
+      );
+    }
+
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration:  BoxDecoration(gradient: AppColors.heroGradient),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo icon
-              Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.3),
-                        width: 2,
-                      ),
+      backgroundColor: AppColors.hessaBackground,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Placeholder for the 4 grid images
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(child: _buildPlaceholder(AppColors.hessaGreen.withValues(alpha: 0.15))),
+                              const SizedBox(width: 8),
+                              Expanded(child: _buildPlaceholder(AppColors.hessaBrown.withValues(alpha: 0.15))),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Expanded(child: _buildPlaceholder(AppColors.primary.withValues(alpha: 0.15))),
+                              const SizedBox(width: 8),
+                              Expanded(child: _buildPlaceholder(AppColors.orange.withValues(alpha: 0.15))),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(28),
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 90,
-                        height: 90,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 600.ms)
-                  .scale(
-                    begin: const Offset(0.5, 0.5),
-                    end: const Offset(1, 1),
-                    duration: 600.ms,
-                    curve: Curves.elasticOut,
                   ),
-              const SizedBox(height: 32),
-              // App name
-              Text(
-                    'تطبيق قُبَة',
-                    style: GoogleFonts.cairo(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  // Logo Overlay
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.95),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 15,
+                        )
+                      ],
                     ),
-                  )
-                  .animate()
-                  .fadeIn(delay: 300.ms, duration: 600.ms)
-                  .slideY(begin: 0.3, end: 0),
-              const SizedBox(height: 4),
-              Text(
-                    'التعليمي',
-                    style: GoogleFonts.cairo(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white.withOpacity(0.9),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      height: 80,
+                      fit: BoxFit.contain,
                     ),
-                  )
-                  .animate()
-                  .fadeIn(delay: 500.ms, duration: 600.ms)
-                  .slideY(begin: 0.3, end: 0),
-              const SizedBox(height: 16),
-              Text(
-                'تعلم، العب، وانمو!',
-                style: GoogleFonts.cairo(
-                  fontSize: 16,
-                  color: Colors.white.withOpacity(0.7),
-                  fontWeight: FontWeight.w700,
-                ),
-              ).animate().fadeIn(delay: 700.ms, duration: 600.ms),
-              const SizedBox(height: 64),
-              // Loading indicator
-              SizedBox(
-                width: 32,
-                height: 32,
-                child: CircularProgressIndicator(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  strokeWidth: 2.5,
-                ),
-              ).animate().fadeIn(delay: 1000.ms, duration: 400.ms),
-            ],
-          ),
+                  ).animate().scale(delay: 200.ms, duration: 500.ms, curve: Curves.easeOutBack),
+                ],
+              ),
+            ),
+            
+            // Bottom Buttons
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  QubahButton(
+                    text: 'دخول',
+                    gradient: const LinearGradient(colors: [AppColors.hessaBrown, AppColors.hessaBrown]),
+                    onPressed: () => context.push(AppRoutes.login),
+                  ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
+                  
+                  const SizedBox(height: 20),
+                  Text(
+                    '!ليس لديك حساب بعد؟ احصل على اشتراك الآن',
+                    style: GoogleFonts.cairo(
+                      color: AppColors.hessaTextBrown.withValues(alpha: 0.7),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ).animate().fadeIn(delay: 500.ms),
+                  const SizedBox(height: 20),
+                  
+                  QubahButton(
+                    text: 'تجربة مجانية',
+                    gradient: const LinearGradient(colors: [AppColors.hessaGreen, AppColors.hessaGreen]),
+                    onPressed: () async {
+                      await sl<SecureStorage>().saveIsGuest(true);
+                      if (context.mounted) {
+                        context.go(AppRoutes.home);
+                      }
+                    },
+                  ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder(Color color) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: Icon(Icons.image_outlined, color: AppColors.hessaBrown.withValues(alpha: 0.3), size: 48),
       ),
     );
   }

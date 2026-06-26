@@ -36,6 +36,15 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocProvider(
       create: (_) => sl<AuthCubit>(),
       child: Scaffold(
+        backgroundColor: AppColors.hessaBackground,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.hessaBrown),
+            onPressed: () => context.pop(),
+          ),
+        ),
         body: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthAuthenticated) {
@@ -50,163 +59,154 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           },
           builder: (context, state) {
-            return Container(
-              decoration:  BoxDecoration(gradient: AppColors.heroGradient),
-              child: SafeArea(
-                child: Center(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 420),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Logo
-                          Container(
-                                width: 90,
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                child: const Icon(
-                                  Icons.school_rounded,
-                                  size: 48,
-                                  color: Colors.white,
-                                ),
-                              )
-                              .animate()
-                              .fadeIn(duration: 500.ms)
-                              .scale(begin: const Offset(0.8, 0.8)),
-                          const SizedBox(height: 20),
-                          Text(
-                            'مرحباً بعودتك!',
-                            style: GoogleFonts.cairo(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+            return SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Logo
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/logo.png',
+                              height: 100,
+                              fit: BoxFit.contain,
                             ),
-                          ).animate().fadeIn(delay: 200.ms),
-                          const SizedBox(height: 8),
-                          Text(
-                            'سجل الدخول لمتابعة التعلم',
-                            style: GoogleFonts.cairo(
-                              fontSize: 15,
-                              color: Colors.white.withOpacity(0.8),
-                            ),
-                          ).animate().fadeIn(delay: 300.ms),
-                          const SizedBox(height: 40),
-                          // Form card
-                          Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).scaffoldBackgroundColor,
+                            const SizedBox(height: 24),
+                            Text(
+                              'قم بتسجيل الدخول',
+                              style: GoogleFonts.cairo(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.hessaTextBrown,
+                              ),
+                            ).animate().fadeIn(delay: 200.ms),
+                          ],
+                        ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.8, 0.8)),
+                        
+                        const SizedBox(height: 32),
+                        
+                        // Form card
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: AppColors.hessaBrown, width: 1.5),
+                          ),
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                              inputDecorationTheme: InputDecorationTheme(
+                                filled: true,
+                                fillColor: AppColors.hessaInputBg,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                                border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 24,
-                                      offset: const Offset(0, 8),
+                                  borderSide: BorderSide.none,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                  borderSide: const BorderSide(color: AppColors.hessaBrown, width: 1.5),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                  borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+                                ),
+                                hintStyle: GoogleFonts.cairo(color: AppColors.hessaBrown.withValues(alpha: 0.5)),
+                              ),
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Text(
+                                    'اسم المستخدم',
+                                    style: GoogleFonts.cairo(
+                                      color: AppColors.hessaTextBrown,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
-                                  ],
-                                ),
-                                child: Form(
-                                  key: _formKey,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      QubahTextField(
-                                        controller: _emailController,
-                                        hintText: 'البريد الإلكتروني',
-                                        prefixIcon: Icons.email_outlined,
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                        validator: (v) => v == null || v.isEmpty
-                                            ? 'يرجى إدخال البريد الإلكتروني'
-                                            : null,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      QubahTextField(
-                                        controller: _passwordController,
-                                        hintText: 'كلمة المرور',
-                                        prefixIcon: Icons.lock_outline_rounded,
-                                        obscureText: _obscurePassword,
-                                        suffixIcon: IconButton(
-                                          icon: Icon(
-                                            _obscurePassword
-                                                ? Icons.visibility_off_outlined
-                                                : Icons.visibility_outlined,
-                                            size: 20,
-                                          ),
-                                          onPressed: () => setState(
-                                            () => _obscurePassword =
-                                                !_obscurePassword,
-                                          ),
-                                        ),
-                                        validator: (v) => v == null || v.isEmpty
-                                            ? 'يرجى إدخال كلمة المرور'
-                                            : null,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: TextButton(
-                                          onPressed: () {},
-                                          child: Text(
-                                            'نسيت كلمة المرور؟',
-                                            style: GoogleFonts.cairo(
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      QubahButton(
-                                        text: 'تسجيل الدخول',
-                                        isLoading: state is AuthLoading,
-                                        icon: Icons.login_rounded,
-                                        onPressed: () {
-                                          if (_formKey.currentState!
-                                              .validate()) {
-                                            sl<SecureStorage>().saveIsGuest(false);
-                                            context.read<AuthCubit>().login(
-                                              email: _emailController.text
-                                                  .trim(),
-                                              password:
-                                                  _passwordController.text,
-                                            );
-                                          }
-                                        },
-                                      ),
-                                      const SizedBox(height: 12),
-                                      TextButton(
-                                        onPressed: () async {
-                                          await sl<SecureStorage>().saveIsGuest(true);
-                                          if (context.mounted) {
-                                            context.go('/home');
-                                          }
-                                        },
-                                        child: Text(
-                                          'تجربة مجانية',
-                                          style: GoogleFonts.cairo(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.green,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                ),
-                              )
-                              .animate()
-                              .fadeIn(delay: 400.ms)
-                              .slideY(begin: 0.15, end: 0),
-                        ],
-                      ),
+                                  const SizedBox(height: 8),
+                                  QubahTextField(
+                                    controller: _emailController,
+                                    hintText: 'اسم المستخدم',
+                                    prefixIcon: Icons.person_outline,
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: (v) => v == null || v.isEmpty
+                                        ? 'يرجى إدخال البريد الإلكتروني'
+                                        : null,
+                                  ),
+                                  
+                                  const SizedBox(height: 24),
+                                  
+                                  Text(
+                                    'كلمة المرور',
+                                    style: GoogleFonts.cairo(
+                                      color: AppColors.hessaTextBrown,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  QubahTextField(
+                                    controller: _passwordController,
+                                    hintText: 'كلمة المرور',
+                                    prefixIcon: Icons.visibility_off_outlined,
+                                    obscureText: _obscurePassword,
+                                    validator: (v) => v == null || v.isEmpty
+                                        ? 'يرجى إدخال كلمة المرور'
+                                        : null,
+                                  ),
+                                  
+                                  const SizedBox(height: 12),
+                                  
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: TextButton(
+                                      onPressed: () {},
+                                      child: Text(
+                                        'نسيت كلمة المرور؟',
+                                        style: GoogleFonts.cairo(
+                                          fontSize: 14,
+                                          color: AppColors.hessaTextBrown,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  
+                                  const SizedBox(height: 16),
+                                  
+                                  QubahButton(
+                                    text: 'دخول',
+                                    isLoading: state is AuthLoading,
+                                    gradient: const LinearGradient(colors: [AppColors.hessaBrown, AppColors.hessaBrown]),
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        sl<SecureStorage>().saveIsGuest(false);
+                                        context.read<AuthCubit>().login(
+                                          email: _emailController.text.trim(),
+                                          password: _passwordController.text,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.15, end: 0),
+                      ],
                     ),
                   ),
                 ),

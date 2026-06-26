@@ -26,6 +26,13 @@ class AppColors {
   static const Color pink = Color(0xFFFD79A8);
   static const Color green = Color(0xFF00B894);
 
+  // ── Hessa App Specific Colors ───────────────────────────────────────────
+  static const Color hessaBackground = Color(0xFFFDF6E9); // Cream bg
+  static const Color hessaBrown = Color(0xFFB86846); // Buttons, logo
+  static const Color hessaGreen = Color(0xFF5BA75B); // Free trial button
+  static const Color hessaInputBg = Color(0xFFF8E7D1); // Input fields bg
+  static const Color hessaTextBrown = Color(0xFF614E3F); // Labels, hints
+
   // ── Semantic & Status Colors ────────────────────────────────────────────
   static const Color success = Color(0xFF2ECC71); // Vibrant green
   static const Color error = Color(0xFFFF4757);   // Friendly red
