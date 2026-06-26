@@ -73,9 +73,19 @@ class _SplashScreenState extends State<SplashScreen> {
                         Expanded(
                           child: Row(
                             children: [
-                              Expanded(child: _buildPlaceholder(AppColors.hessaGreen.withValues(alpha: 0.15))),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.asset('assets/images/login_1.png', fit: BoxFit.cover),
+                                ),
+                              ),
                               const SizedBox(width: 8),
-                              Expanded(child: _buildPlaceholder(AppColors.hessaBrown.withValues(alpha: 0.15))),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.asset('assets/images/login_2.png', fit: BoxFit.cover),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -83,9 +93,19 @@ class _SplashScreenState extends State<SplashScreen> {
                         Expanded(
                           child: Row(
                             children: [
-                              Expanded(child: _buildPlaceholder(AppColors.primary.withValues(alpha: 0.15))),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.asset('assets/images/login_3.png', fit: BoxFit.cover),
+                                ),
+                              ),
                               const SizedBox(width: 8),
-                              Expanded(child: _buildPlaceholder(AppColors.orange.withValues(alpha: 0.15))),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.asset('assets/images/login_4.png', fit: BoxFit.cover),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -155,18 +175,6 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholder(Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Center(
-        child: Icon(Icons.image_outlined, color: AppColors.hessaBrown.withValues(alpha: 0.3), size: 48),
       ),
     );
   }
