@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        _isGuest 
+                        _isGuest
                             ? 'اشترك عبر موقعنا لفتح جميع الدروس والمميزات'
                             : 'استكشف المواد، شاهد الفيديوهات، والعب!',
                         style: TextStyle(
@@ -239,14 +239,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
+                            horizontal: 20,
                             vertical: 12,
                           ),
                         ),
                         child: Text(
-                          _isGuest ? 'اشترك عبر الموقع' : 'استكشف الآن',
+                          _isGuest ? 'اشترك الآن' : 'استكشف الآن',
                           style: GoogleFonts.cairo(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -6,89 +6,6 @@ import '../../../../core/theme/app_theme.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  void _showChangePasswordDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'تغيير كلمة المرور',
-          style: GoogleFonts.cairo(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'كلمة المرور الحالية',
-                prefixIcon: const Icon(Icons.lock_outline),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'كلمة المرور الجديدة',
-                prefixIcon: const Icon(Icons.lock),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'تأكيد كلمة المرور',
-                prefixIcon: const Icon(Icons.lock_reset),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء', style: GoogleFonts.cairo(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم تغيير كلمة المرور بنجاح!'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'حفظ',
-              style: GoogleFonts.cairo(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,14 +32,10 @@ class SettingsScreen extends StatelessWidget {
           _buildSettingsCard([
             _buildSettingsTile(
               icon: Icons.person_outline_rounded,
-              title: 'تعديل الملف الشخصي',
-              onTap: () {},
-            ),
-            const Divider(height: 1, indent: 56),
-            _buildSettingsTile(
-              icon: Icons.lock_outline_rounded,
-              title: 'تغيير كلمة المرور',
-              onTap: () => _showChangePasswordDialog(context),
+              title: 'الملف الشخصي',
+              onTap: () {
+                context.push('/profile');
+              },
             ),
           ]),
           const SizedBox(height: 32),
@@ -144,13 +57,13 @@ class SettingsScreen extends StatelessWidget {
             _buildSettingsTile(
               icon: Icons.help_outline_rounded,
               title: 'مركز المساعدة',
-              onTap: () {},
+              onTap: () => context.push('/support'),
             ),
             const Divider(height: 1, indent: 56),
             _buildSettingsTile(
               icon: Icons.privacy_tip_outlined,
               title: 'سياسة الخصوصية',
-              onTap: () {},
+              onTap: () => context.push('/privacy'),
             ),
           ]),
         ],

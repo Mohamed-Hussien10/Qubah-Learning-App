@@ -22,6 +22,8 @@ import '../../features/parent_lock/presentation/screens/parent_lock_screen.dart'
 import '../../features/parent_lock/presentation/screens/parent_settings_screen.dart';
 import '../../features/parent_lock/presentation/screens/change_pin_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_expired_screen.dart';
+import '../../features/settings/presentation/screens/support_screen.dart';
+import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
 
 /// Route name constants.
 class AppRoutes {
@@ -50,6 +52,8 @@ class AppRoutes {
   static const String changePin = '/change-pin';
   static const String appEntryLock = '/app-entry-lock';
   static const String appExitLock = '/app-exit-lock';
+  static const String support = '/support';
+  static const String privacy = '/privacy';
 }
 
 /// Application router configuration using GoRouter.
@@ -260,6 +264,16 @@ class AppRouter {
         path: AppRoutes.appExitLock,
         name: 'appExitLock',
         builder: (context, state) => const ParentLockScreen(isAppExit: true),
+      ),
+      GoRoute(
+        path: AppRoutes.support,
+        name: 'support',
+        builder: (context, state) => const SupportScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.privacy,
+        name: 'privacy',
+        builder: (context, state) => const PrivacyPolicyScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
