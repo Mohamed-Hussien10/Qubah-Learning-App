@@ -35,24 +35,30 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<AuthCubit>(),
-      child: Scaffold(
-        backgroundColor: AppColors.hessaBackground,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new,
-              color: AppColors.hessaBrown,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          context.go(AppRoutes.splash);
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.hessaBackground,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: AppColors.hessaBrown,
+              ),
+              onPressed: () => context.go(AppRoutes.splash),
             ),
-            onPressed: () => context.pop(),
           ),
-        ),
-        body: BlocConsumer<AuthCubit, AuthState>(
-          listener: (context, state) {
-            if (state is AuthAuthenticated) {
-              context.go(AppRoutes.appEntryLock);
-            } else if (state is AuthError) {
+          body: BlocConsumer<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state is AuthAuthenticated) {
+                context.go(AppRoutes.appEntryLock);
+              } else if (state is AuthError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
@@ -249,6 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           },
         ),
+      ),
       ),
     );
   }
