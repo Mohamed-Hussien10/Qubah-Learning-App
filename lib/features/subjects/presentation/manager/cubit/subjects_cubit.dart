@@ -15,7 +15,7 @@ class SubjectsCubit extends Cubit<SubjectsState> {
       final subjects = await _getSubjectsUseCase(stageId);
       emit(SubjectsLoaded(subjects));
     } catch (e) {
-      emit(SubjectsError(e.toString()));
+      emit(SubjectsError(e.toString().split('Error: ').last.trim()));
     }
   }
 }

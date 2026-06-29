@@ -15,7 +15,7 @@ class LessonsCubit extends Cubit<LessonsState> {
       final lessons = await _getLessonsUseCase(subjectId);
       emit(LessonsLoaded(lessons));
     } catch (e) {
-      emit(LessonsError(e.toString()));
+      emit(LessonsError(e.toString().split('Error: ').last.trim()));
     }
   }
 }

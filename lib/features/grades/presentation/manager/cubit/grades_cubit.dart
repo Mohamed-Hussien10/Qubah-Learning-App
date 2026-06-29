@@ -15,7 +15,7 @@ class GradesCubit extends Cubit<GradesState> {
       final data = await _getGradesUseCase(parentId);
       emit(GradesLoaded(data));
     } catch (e) {
-      emit(GradesError(e.toString()));
+      emit(GradesError(e.toString().split('Error: ').last.trim()));
     }
   }
 }

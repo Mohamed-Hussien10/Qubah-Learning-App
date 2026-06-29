@@ -15,7 +15,7 @@ class SectionsCubit extends Cubit<SectionsState> {
       final data = await _getSectionsUseCase(parentId);
       emit(SectionsLoaded(data));
     } catch (e) {
-      emit(SectionsError(e.toString()));
+      emit(SectionsError(e.toString().split('Error: ').last.trim()));
     }
   }
 }

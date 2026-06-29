@@ -14,76 +14,75 @@ class ServerException implements Exception {
   const ServerException({required this.message, this.statusCode});
 
   @override
-  String toString() =>
-      'ServerException(message: $message, statusCode: $statusCode)';
+  String toString() => message;
 }
 
 /// Thrown when there is no internet connection.
 class NetworkException implements Exception {
   final String message;
 
-  const NetworkException({this.message = 'No internet connection'});
+  const NetworkException({this.message = 'لا يوجد اتصال بالإنترنت.'});
 
   @override
-  String toString() => 'NetworkException(message: $message)';
+  String toString() => message;
 }
 
 /// Thrown when local cache operations fail.
 class CacheException implements Exception {
   final String message;
 
-  const CacheException({this.message = 'Cache operation failed'});
+  const CacheException({this.message = 'فشلت عملية التخزين المؤقت.'});
 
   @override
-  String toString() => 'CacheException(message: $message)';
+  String toString() => message;
 }
 
 /// Thrown when authentication fails or token is invalid/expired.
 class AuthenticationException implements Exception {
   final String message;
 
-  const AuthenticationException({this.message = 'Authentication failed'});
+  const AuthenticationException({this.message = 'فشلت عملية المصادقة.'});
 
   @override
-  String toString() => 'AuthenticationException(message: $message)';
+  String toString() => message;
 }
 
 /// Thrown when the activation code is invalid or expired.
 class ActivationException implements Exception {
   final String message;
 
-  const ActivationException({this.message = 'Activation code invalid'});
+  const ActivationException({this.message = 'رمز التفعيل غير صالح.'});
 
   @override
-  String toString() => 'ActivationException(message: $message)';
+  String toString() => message;
 }
 
 /// Thrown when the subscription has expired.
 class SubscriptionExpiredException implements Exception {
   final String message;
 
-  const SubscriptionExpiredException({this.message = 'Subscription expired'});
+  const SubscriptionExpiredException({this.message = 'انتهت صلاحية الاشتراك.'});
 
   @override
-  String toString() => 'SubscriptionExpiredException(message: $message)';
+  String toString() => message;
 }
 
 /// Thrown when a file operation fails (read, write, extract).
 class FileOperationException implements Exception {
   final String message;
 
-  const FileOperationException({this.message = 'File operation failed'});
+  const FileOperationException({this.message = 'فشلت عملية الملف.'});
 
   @override
-  String toString() => 'FileOperationException(message: $message)';
+  String toString() => message;
 }
 
 /// Thrown when an unexpected error occurs.
 class UnexpectedException implements Exception {
   final String message;
 
-  const UnexpectedException({this.message = 'An unexpected error occurred'});
+  const UnexpectedException({this.message = 'حدث خطأ غير متوقع.'});
 
   @override
-  String toString() => 'UnexpectedException(message: $message)';
+  String toString() => message;
 }

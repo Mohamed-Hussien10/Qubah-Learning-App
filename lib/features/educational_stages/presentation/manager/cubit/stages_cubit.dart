@@ -16,7 +16,7 @@ class StagesCubit extends Cubit<StagesState> {
       final stages = await _getStagesUseCase(NoParams());
       emit(StagesLoaded(stages));
     } catch (e) {
-      emit(StagesError(e.toString()));
+      emit(StagesError(e.toString().split('Error: ').last.trim()));
     }
   }
 }

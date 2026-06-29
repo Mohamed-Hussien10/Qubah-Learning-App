@@ -29,7 +29,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthAuthenticated(user));
       }
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(e.toString().split('Error: ').last.trim()));
     }
   }
 
@@ -40,7 +40,7 @@ class AuthCubit extends Cubit<AuthState> {
       await _logoutUseCase(NoParams());
       emit(AuthUnauthenticated());
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(e.toString().split('Error: ').last.trim()));
     }
   }
 }

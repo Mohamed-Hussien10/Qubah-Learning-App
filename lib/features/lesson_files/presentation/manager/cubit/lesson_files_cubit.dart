@@ -15,7 +15,7 @@ class LessonFilesCubit extends Cubit<LessonFilesState> {
       final data = await _getLessonFilesUseCase(parentId);
       emit(LessonFilesLoaded(data));
     } catch (e) {
-      emit(LessonFilesError(e.toString()));
+      emit(LessonFilesError(e.toString().split('Error: ').last.trim()));
     }
   }
 }

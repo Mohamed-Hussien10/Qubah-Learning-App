@@ -31,7 +31,7 @@ class AuthApiService {
           e is NetworkException ||
           e is AuthenticationException)
         rethrow;
-      throw ServerException(message: e.toString());
+      throw ServerException(message: e.toString().split('Error: ').last.trim());
     }
   }
 

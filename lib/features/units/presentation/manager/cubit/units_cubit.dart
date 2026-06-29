@@ -15,7 +15,7 @@ class UnitsCubit extends Cubit<UnitsState> {
       final data = await _getUnitsUseCase(parentId);
       emit(UnitsLoaded(data));
     } catch (e) {
-      emit(UnitsError(e.toString()));
+      emit(UnitsError(e.toString().split('Error: ').last.trim()));
     }
   }
 }
