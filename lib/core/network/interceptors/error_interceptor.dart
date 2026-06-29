@@ -24,18 +24,18 @@ class ErrorInterceptor extends Interceptor {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
         throw const NetworkException(
-          message: 'Connection timed out. Please try again.',
+          message: 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.',
         );
 
       case DioExceptionType.connectionError:
         throw const NetworkException(
           message:
-              'Unable to connect to server. Check your internet connection.',
+              'تعذر الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.',
         );
 
       case DioExceptionType.badCertificate:
         throw const ServerException(
-          message: 'SSL certificate verification failed.',
+          message: 'فشل التحقق من شهادة الأمان.',
           statusCode: 495,
         );
 
@@ -44,14 +44,14 @@ class ErrorInterceptor extends Interceptor {
         break;
 
       case DioExceptionType.cancel:
-        throw const ServerException(message: 'Request was cancelled.');
+        throw const ServerException(message: 'تم إلغاء الطلب.');
 
       case DioExceptionType.unknown:
         if (err.error is SocketException) {
-          throw const NetworkException(message: 'No internet connection.');
+          throw const NetworkException(message: 'لا يوجد اتصال بالإنترنت.');
         }
         throw ServerException(
-          message: err.message ?? 'An unexpected error occurred.',
+          message: err.message ?? 'حدث خطأ غير متوقع. يرجى المحاولة لاحقاً.',
         );
     }
 
@@ -64,10 +64,15 @@ class ErrorInterceptor extends Interceptor {
     final data = err.response?.data;
 
     // Try to extract error message from the response body
-    String message = 'Server error occurred.';
+    String message = 'حدث خطأ في الخادم.';
     if (data is Map<String, dynamic>) {
       message =
           data['message'] as String? ?? data['error'] as String? ?? message;
+    }
+
+    // Map specific backend messages to user-friendly Arabic
+    if (message == 'The provided credentials are incorrect.') {
+      message = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
     }
 
     switch (statusCode) {
@@ -77,12 +82,12 @@ class ErrorInterceptor extends Interceptor {
         throw AuthenticationException(message: message);
       case 403:
         throw const ServerException(
-          message: 'Access denied. You do not have permission.',
+          message: 'غير مصرح لك بالوصول.',
           statusCode: 403,
         );
       case 404:
         throw const ServerException(
-          message: 'The requested resource was not found.',
+          message: 'عذراً، لم يتم العثور على طلبك.',
           statusCode: 404,
         );
       case 409:
@@ -91,14 +96,14 @@ class ErrorInterceptor extends Interceptor {
         throw ServerException(message: message, statusCode: 422);
       case 429:
         throw const ServerException(
-          message: 'Too many requests. Please wait a moment.',
+          message: 'الكثير من الطلبات. يرجى الانتظار قليلاً.',
           statusCode: 429,
         );
       case 500:
       case 502:
       case 503:
         throw const ServerException(
-          message: 'Server is temporarily unavailable. Please try again later.',
+          message: 'الخادم غير متوفر حالياً. يرجى المحاولة مرة أخرى لاحقاً.',
           statusCode: 500,
         );
       default:

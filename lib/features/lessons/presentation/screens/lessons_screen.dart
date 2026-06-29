@@ -48,11 +48,11 @@ class _LessonsScreenState extends State<LessonsScreen> {
   String _resolveImageUrl(String path) {
     if (path.startsWith('http')) {
       if (path.contains('localhost') || path.contains('127.0.0.1')) {
-        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://10.246.87.168:8000');
+        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'https://qubahom.com');
       }
       return path;
     }
-    const baseUrl = 'http://10.246.87.168:8000'; 
+    const baseUrl = 'https://qubahom.com'; 
     if (path.startsWith('/')) {
       return '$baseUrl$path';
     } else if (path.startsWith('storage/')) {

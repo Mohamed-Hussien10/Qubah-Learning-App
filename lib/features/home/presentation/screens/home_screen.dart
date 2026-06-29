@@ -40,9 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          context.push(AppRoutes.appExitLock);
-        }
+        // Prevent back navigation completely
       },
       child: Scaffold(
         body: SafeArea(
@@ -205,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ابدأ التعلم',
+                        _isGuest ? 'اشترك الآن!' : 'ابدأ التعلم',
                         style: GoogleFonts.cairo(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
@@ -215,7 +213,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'استكشف المواد، شاهد الفيديوهات، والعب!',
+                        _isGuest 
+                            ? 'اشترك عبر موقعنا لفتح جميع الدروس والمميزات'
+                            : 'استكشف المواد، شاهد الفيديوهات، والعب!',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 14,
@@ -223,7 +223,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () => context.push(AppRoutes.stages),
+                        onPressed: () {
+                          if (_isGuest) {
+                            context.go(AppRoutes.splash);
+                          } else {
+                            context.push(AppRoutes.stages);
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: AppColors.primary,
@@ -238,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         child: Text(
-                          'استكشف الآن',
+                          _isGuest ? 'اشترك عبر الموقع' : 'استكشف الآن',
                           style: GoogleFonts.cairo(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

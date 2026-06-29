@@ -8,7 +8,7 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   // ── Base Configuration ──────────────────────────────────────────────────
-  static String baseUrl = 'http://10.246.87.168:8000/api/v1'; // Local backend
+  static String baseUrl = 'https://qubahom.com/api/v1'; // Production backend
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 

@@ -50,9 +50,56 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.hessaBackground,
-        body: Center(child: CircularProgressIndicator(color: AppColors.hessaBrown)),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.hessaBrown.withOpacity(0.15),
+                      blurRadius: 50,
+                      spreadRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 140,
+                ),
+              )
+                  .animate(onPlay: (controller) => controller.repeat(reverse: true))
+                  .scaleXY(begin: 0.95, end: 1.05, duration: 1500.ms, curve: Curves.easeInOut)
+                  .shimmer(duration: 2000.ms, color: Colors.white.withOpacity(0.6)),
+              const SizedBox(height: 50),
+              SizedBox(
+                width: 140,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: const LinearProgressIndicator(
+                    color: AppColors.hessaBrown,
+                    backgroundColor: Colors.white,
+                    minHeight: 6,
+                  ),
+                ),
+              ).animate().fadeIn(delay: 500.ms),
+              const SizedBox(height: 16),
+              Text(
+                'جاري التحميل...',
+                style: GoogleFonts.cairo(
+                  color: AppColors.hessaTextBrown.withOpacity(0.8),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
+              ).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(begin: 0.4, end: 1.0, duration: 1200.ms),
+            ],
+          ),
+        ),
       );
     }
 
