@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:web_dashboard/features/dashboard/data/repositories/dashboard_repository.dart';
 import 'package:web_dashboard/features/dashboard/presentation/manager/dashboard_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 /// Cubit managing dashboard home screen state.
 class DashboardCubit extends Cubit<DashboardState> {
@@ -35,7 +36,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     } catch (e) {
       if (!isClosed) {
         emit(DashboardError(
-          message: e.toString().replaceAll('Exception: ', ''),
+          message: ErrorHandler.handle(e),
         ));
       }
     }

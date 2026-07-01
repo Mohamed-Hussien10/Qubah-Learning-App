@@ -28,6 +28,7 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
   final _pinController = TextEditingController();
   String _correctPin = '1234'; 
   bool _isLockEnabled = false;
+  bool _isChecking = true;
 
   @override
   void initState() {
@@ -46,7 +47,22 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
         } else {
           _isLockEnabled = false;
         }
+        _isChecking = false;
       });
+
+      if (!_isLockEnabled && (widget.isAppEntry || widget.isAppExit)) {
+        _handleAutoUnlock();
+      }
+    }
+  }
+
+  void _handleAutoUnlock() {
+    if (widget.isAppExit) {
+      SystemNavigator.pop();
+    } else if (widget.isAppEntry) {
+      context.go(AppRoutes.home);
+    } else {
+      Navigator.pop(context, true);
     }
   }
 
@@ -93,13 +109,7 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
         ),
       );
 
-      if (widget.isAppExit) {
-        SystemNavigator.pop();
-      } else if (widget.isAppEntry) {
-        context.go(AppRoutes.home);
-      } else {
-        Navigator.pop(context, true);
-      }
+      _handleAutoUnlock();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -114,6 +124,13 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
   @override
   Widget build(BuildContext context) {
     final isSettingsMode = !widget.isAppEntry && !widget.isAppExit;
+
+    if (_isChecking || (!isSettingsMode && !_isLockEnabled)) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: SizedBox.shrink(),
+      );
+    }
 
     return PopScope(
       canPop: isSettingsMode,
@@ -177,7 +194,8 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
                           ),
                           value: _isLockEnabled,
                           onChanged: (val) => _toggleLock(),
-                          activeColor: AppColors.primary,
+                          activeTrackColor: AppColors.primary.withOpacity(0.5),
+                          activeThumbColor: AppColors.primary,
                         ),
                       ).animate().fadeIn(delay: 300.ms),
                       const SizedBox(height: 40),

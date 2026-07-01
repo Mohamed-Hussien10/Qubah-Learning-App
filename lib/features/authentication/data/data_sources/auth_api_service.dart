@@ -2,6 +2,7 @@ import '../../../../core/network/dio_client.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../models/user_model.dart';
+import 'package:qubah_learning_app/core/errors/error_handler.dart';
 
 /// Remote data source for authentication API calls.
 class AuthApiService {
@@ -31,7 +32,7 @@ class AuthApiService {
           e is NetworkException ||
           e is AuthenticationException)
         rethrow;
-      throw ServerException(message: e.toString().split('Error: ').last.trim());
+      throw ServerException(message: ErrorHandler.handle(e));
     }
   }
 

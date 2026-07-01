@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/users/data/models/user_model.dart';
 import 'package:web_dashboard/features/users/data/repositories/users_repository.dart';
 import 'package:web_dashboard/features/users/presentation/manager/users_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class UsersCubit extends Cubit<UsersState> {
   final UsersRepository _repository;
@@ -20,7 +21,7 @@ class UsersCubit extends Cubit<UsersState> {
     } catch (e) {
       safeEmit(state.copyWith(
         status: UsersStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -51,7 +52,7 @@ class UsersCubit extends Cubit<UsersState> {
     } catch (e) {
       safeEmit(state.copyWith(
         status: UsersStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -64,7 +65,7 @@ class UsersCubit extends Cubit<UsersState> {
     } catch (e) {
       safeEmit(state.copyWith(
         status: UsersStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -79,7 +80,7 @@ class UsersCubit extends Cubit<UsersState> {
     } catch (e) {
       safeEmit(state.copyWith(
         status: UsersStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -95,7 +96,7 @@ class UsersCubit extends Cubit<UsersState> {
     } catch (e) {
       safeEmit(state.copyWith(
         status: UsersStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -108,7 +109,7 @@ class UsersCubit extends Cubit<UsersState> {
     } catch (e) {
       safeEmit(state.copyWith(
         status: UsersStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }

@@ -3,6 +3,7 @@ import 'package:web_dashboard/features/subjects/data/models/subject_model.dart';
 import 'package:web_dashboard/features/units/data/models/unit_model.dart';
 import 'package:web_dashboard/features/units/data/repositories/units_repository.dart';
 import 'package:web_dashboard/features/units/presentation/manager/units_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class UnitsCubit extends Cubit<UnitsState> {
   final UnitsRepository _repository;
@@ -33,7 +34,7 @@ class UnitsCubit extends Cubit<UnitsState> {
         subjectName: subjectName,
       ));
     } catch (e) {
-      emit(UnitsError(e.toString()));
+      emit(UnitsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -42,7 +43,7 @@ class UnitsCubit extends Cubit<UnitsState> {
       await _repository.create(unit, imageBytes: imageBytes, imageName: imageName);
       await loadUnits(_subjectId);
     } catch (e) {
-      emit(UnitsError(e.toString()));
+      emit(UnitsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -51,7 +52,7 @@ class UnitsCubit extends Cubit<UnitsState> {
       await _repository.update(unit, imageBytes: imageBytes, imageName: imageName);
       await loadUnits(_subjectId);
     } catch (e) {
-      emit(UnitsError(e.toString()));
+      emit(UnitsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -60,7 +61,7 @@ class UnitsCubit extends Cubit<UnitsState> {
       await _repository.delete(_subjectId, id);
       await loadUnits(_subjectId);
     } catch (e) {
-      emit(UnitsError(e.toString()));
+      emit(UnitsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -69,7 +70,7 @@ class UnitsCubit extends Cubit<UnitsState> {
       await _repository.toggleStatus(_subjectId, id);
       await loadUnits(_subjectId);
     } catch (e) {
-      emit(UnitsError(e.toString()));
+      emit(UnitsError(ErrorHandler.handle(e)));
     }
   }
 

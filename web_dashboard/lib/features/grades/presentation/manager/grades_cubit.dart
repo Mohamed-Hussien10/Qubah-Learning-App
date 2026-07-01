@@ -3,6 +3,7 @@ import 'package:web_dashboard/features/educational_stages/data/models/stage_mode
 import 'package:web_dashboard/features/grades/data/models/grade_model.dart';
 import 'package:web_dashboard/features/grades/data/repositories/grades_repository.dart';
 import 'package:web_dashboard/features/grades/presentation/manager/grades_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class GradesCubit extends Cubit<GradesState> {
   final GradesRepository _repository;
@@ -30,7 +31,7 @@ class GradesCubit extends Cubit<GradesState> {
         stageName: stageName,
       ));
     } catch (e) {
-      emit(GradesError(e.toString()));
+      emit(GradesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -39,7 +40,7 @@ class GradesCubit extends Cubit<GradesState> {
       await _repository.create(grade, imageBytes: imageBytes, imageName: imageName);
       await loadGrades(_stageId);
     } catch (e) {
-      emit(GradesError(e.toString()));
+      emit(GradesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -48,7 +49,7 @@ class GradesCubit extends Cubit<GradesState> {
       await _repository.update(grade, imageBytes: imageBytes, imageName: imageName);
       await loadGrades(_stageId);
     } catch (e) {
-      emit(GradesError(e.toString()));
+      emit(GradesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -57,7 +58,7 @@ class GradesCubit extends Cubit<GradesState> {
       await _repository.delete(_stageId, id);
       await loadGrades(_stageId);
     } catch (e) {
-      emit(GradesError(e.toString()));
+      emit(GradesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -66,7 +67,7 @@ class GradesCubit extends Cubit<GradesState> {
       await _repository.toggleStatus(_stageId, id);
       await loadGrades(_stageId);
     } catch (e) {
-      emit(GradesError(e.toString()));
+      emit(GradesError(ErrorHandler.handle(e)));
     }
   }
 

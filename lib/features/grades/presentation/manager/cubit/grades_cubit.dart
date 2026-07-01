@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/usecases/get_grades_usecase.dart';
 import '../state/grades_state.dart';
+import 'package:qubah_learning_app/core/errors/error_handler.dart';
 
 class GradesCubit extends Cubit<GradesState> {
   final GetGradesUseCase _getGradesUseCase;
@@ -15,7 +16,7 @@ class GradesCubit extends Cubit<GradesState> {
       final data = await _getGradesUseCase(parentId);
       emit(GradesLoaded(data));
     } catch (e) {
-      emit(GradesError(e.toString().split('Error: ').last.trim()));
+      emit(GradesError(ErrorHandler.handle(e)));
     }
   }
 }

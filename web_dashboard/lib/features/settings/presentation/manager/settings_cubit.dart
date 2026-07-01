@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/settings/data/models/app_settings_model.dart';
 import 'package:web_dashboard/features/settings/data/repositories/settings_repository.dart';
 import 'package:web_dashboard/features/settings/presentation/manager/settings_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
   final SettingsRepository _repository;
@@ -19,7 +20,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SettingsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -36,7 +37,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SettingsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -48,7 +49,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SettingsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -75,7 +76,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SettingsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -92,7 +93,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SettingsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }

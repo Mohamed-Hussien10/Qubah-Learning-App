@@ -3,6 +3,7 @@ import 'package:web_dashboard/features/sections/data/models/section_model.dart';
 import 'package:web_dashboard/features/subjects/data/models/subject_model.dart';
 import 'package:web_dashboard/features/subjects/data/repositories/subjects_repository.dart';
 import 'package:web_dashboard/features/subjects/presentation/manager/subjects_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class SubjectsCubit extends Cubit<SubjectsState> {
   final SubjectsRepository _repository;
@@ -33,7 +34,7 @@ class SubjectsCubit extends Cubit<SubjectsState> {
         sectionName: sectionName,
       ));
     } catch (e) {
-      emit(SubjectsError(e.toString()));
+      emit(SubjectsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -42,7 +43,7 @@ class SubjectsCubit extends Cubit<SubjectsState> {
       await _repository.create(subject, imageBytes: imageBytes, imageName: imageName);
       await loadSubjects(_sectionId);
     } catch (e) {
-      emit(SubjectsError(e.toString()));
+      emit(SubjectsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -51,7 +52,7 @@ class SubjectsCubit extends Cubit<SubjectsState> {
       await _repository.update(subject, imageBytes: imageBytes, imageName: imageName);
       await loadSubjects(_sectionId);
     } catch (e) {
-      emit(SubjectsError(e.toString()));
+      emit(SubjectsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -60,7 +61,7 @@ class SubjectsCubit extends Cubit<SubjectsState> {
       await _repository.delete(_sectionId, id);
       await loadSubjects(_sectionId);
     } catch (e) {
-      emit(SubjectsError(e.toString()));
+      emit(SubjectsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -69,7 +70,7 @@ class SubjectsCubit extends Cubit<SubjectsState> {
       await _repository.toggleStatus(_sectionId, id);
       await loadSubjects(_sectionId);
     } catch (e) {
-      emit(SubjectsError(e.toString()));
+      emit(SubjectsError(ErrorHandler.handle(e)));
     }
   }
 

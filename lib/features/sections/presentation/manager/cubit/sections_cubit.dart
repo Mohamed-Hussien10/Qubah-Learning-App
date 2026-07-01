@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/usecases/get_sections_usecase.dart';
 import '../state/sections_state.dart';
+import 'package:qubah_learning_app/core/errors/error_handler.dart';
 
 class SectionsCubit extends Cubit<SectionsState> {
   final GetSectionsUseCase _getSectionsUseCase;
@@ -15,7 +16,7 @@ class SectionsCubit extends Cubit<SectionsState> {
       final data = await _getSectionsUseCase(parentId);
       emit(SectionsLoaded(data));
     } catch (e) {
-      emit(SectionsError(e.toString().split('Error: ').last.trim()));
+      emit(SectionsError(ErrorHandler.handle(e)));
     }
   }
 }

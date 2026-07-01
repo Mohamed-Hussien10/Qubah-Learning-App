@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/analytics/data/repositories/analytics_repository.dart';
 import 'package:web_dashboard/features/analytics/presentation/manager/analytics_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class AnalyticsCubit extends Cubit<AnalyticsState> {
   final AnalyticsRepository _repository;
@@ -25,7 +26,7 @@ class AnalyticsCubit extends Cubit<AnalyticsState> {
     } catch (e) {
       emit(state.copyWith(
         status: AnalyticsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }

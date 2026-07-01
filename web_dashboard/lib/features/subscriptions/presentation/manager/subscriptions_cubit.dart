@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/subscriptions/data/models/plan_model.dart';
 import 'package:web_dashboard/features/subscriptions/data/repositories/subscriptions_repository.dart';
 import 'package:web_dashboard/features/subscriptions/presentation/manager/subscriptions_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class SubscriptionsCubit extends Cubit<SubscriptionsState> {
   final SubscriptionsRepository _repository;
@@ -21,7 +22,7 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SubscriptionsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -37,7 +38,7 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SubscriptionsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -49,7 +50,7 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SubscriptionsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -61,7 +62,7 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SubscriptionsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -87,7 +88,7 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SubscriptionsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -99,7 +100,7 @@ class SubscriptionsCubit extends Cubit<SubscriptionsState> {
     } catch (e) {
       emit(state.copyWith(
         status: SubscriptionsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }

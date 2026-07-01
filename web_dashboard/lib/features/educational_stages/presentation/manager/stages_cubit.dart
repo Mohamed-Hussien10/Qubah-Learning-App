@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/educational_stages/data/models/stage_model.dart';
 import 'package:web_dashboard/features/educational_stages/data/repositories/stages_repository.dart';
 import 'package:web_dashboard/features/educational_stages/presentation/manager/stages_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 /// Cubit that manages the stages list, CRUD, search & filtering.
 class StagesCubit extends Cubit<StagesState> {
@@ -19,7 +20,7 @@ class StagesCubit extends Cubit<StagesState> {
       final stages = await _repository.getAll();
       emit(StagesLoaded(stages: stages, filteredStages: stages));
     } catch (e) {
-      emit(StagesError(e.toString()));
+      emit(StagesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -30,7 +31,7 @@ class StagesCubit extends Cubit<StagesState> {
       await _repository.create(stage, imageBytes: imageBytes, imageName: imageName, bgImageBytes: bgImageBytes, bgImageName: bgImageName);
       await loadStages();
     } catch (e) {
-      emit(StagesError(e.toString()));
+      emit(StagesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -41,7 +42,7 @@ class StagesCubit extends Cubit<StagesState> {
       await _repository.update(stage, imageBytes: imageBytes, imageName: imageName, bgImageBytes: bgImageBytes, bgImageName: bgImageName);
       await loadStages();
     } catch (e) {
-      emit(StagesError(e.toString()));
+      emit(StagesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -52,7 +53,7 @@ class StagesCubit extends Cubit<StagesState> {
       await _repository.delete(id);
       await loadStages();
     } catch (e) {
-      emit(StagesError(e.toString()));
+      emit(StagesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -63,7 +64,7 @@ class StagesCubit extends Cubit<StagesState> {
       await _repository.toggleStatus(id);
       await loadStages();
     } catch (e) {
-      emit(StagesError(e.toString()));
+      emit(StagesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -74,7 +75,7 @@ class StagesCubit extends Cubit<StagesState> {
       await _repository.reorder(orderedIds);
       await loadStages();
     } catch (e) {
-      emit(StagesError(e.toString()));
+      emit(StagesError(ErrorHandler.handle(e)));
     }
   }
 

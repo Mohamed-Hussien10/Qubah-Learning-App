@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:web_dashboard/features/authentication/data/repositories/auth_repository.dart';
 import 'package:web_dashboard/features/authentication/presentation/manager/auth_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 /// Cubit managing authentication state.
 class AuthCubit extends Cubit<AuthState> {
@@ -38,7 +39,7 @@ class AuthCubit extends Cubit<AuthState> {
       final admin = await _authRepository.login(email, password);
       emit(AuthAuthenticated(admin: admin));
     } catch (e) {
-      emit(AuthError(message: e.toString().replaceAll('Exception: ', '')));
+      emit(AuthError(message: ErrorHandler.handle(e)));
     }
   }
 
@@ -50,7 +51,7 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.logout();
       emit(const AuthInitial());
     } catch (e) {
-      emit(AuthError(message: e.toString().replaceAll('Exception: ', '')));
+      emit(AuthError(message: ErrorHandler.handle(e)));
     }
   }
 }

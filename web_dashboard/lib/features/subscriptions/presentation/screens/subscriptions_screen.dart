@@ -12,7 +12,6 @@ import 'package:web_dashboard/features/subscriptions/data/models/plan_model.dart
 import 'package:web_dashboard/features/subscriptions/presentation/manager/subscriptions_cubit.dart';
 import 'package:web_dashboard/core/services/dependency_injection.dart';
 import 'package:web_dashboard/features/subscriptions/presentation/manager/subscriptions_state.dart';
-
 class SubscriptionsScreen extends StatelessWidget {
   const SubscriptionsScreen({super.key});
 

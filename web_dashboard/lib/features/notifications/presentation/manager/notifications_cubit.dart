@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/notifications/data/models/notification_model.dart';
 import 'package:web_dashboard/features/notifications/data/repositories/notifications_repository.dart';
 import 'package:web_dashboard/features/notifications/presentation/manager/notifications_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class NotificationsCubit extends Cubit<NotificationsState> {
   final NotificationsRepository _repository;
@@ -19,7 +20,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -49,7 +50,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -74,7 +75,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -97,7 +98,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }
@@ -109,7 +110,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     } catch (e) {
       emit(state.copyWith(
         status: NotificationsStatus.error,
-        errorMessage: e.toString(),
+        errorMessage: ErrorHandler.handle(e),
       ));
     }
   }

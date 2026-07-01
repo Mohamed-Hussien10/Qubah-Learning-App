@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/usecases/get_units_usecase.dart';
 import '../state/units_state.dart';
+import 'package:qubah_learning_app/core/errors/error_handler.dart';
 
 class UnitsCubit extends Cubit<UnitsState> {
   final GetUnitsUseCase _getUnitsUseCase;
@@ -15,7 +16,7 @@ class UnitsCubit extends Cubit<UnitsState> {
       final data = await _getUnitsUseCase(parentId);
       emit(UnitsLoaded(data));
     } catch (e) {
-      emit(UnitsError(e.toString().split('Error: ').last.trim()));
+      emit(UnitsError(ErrorHandler.handle(e)));
     }
   }
 }

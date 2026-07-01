@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/lessons/data/models/lesson_model.dart';
 import 'package:web_dashboard/features/lesson_files/data/repositories/lesson_files_repository.dart';
 import 'package:web_dashboard/features/lesson_files/presentation/manager/lesson_files_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class LessonFilesCubit extends Cubit<LessonFilesState> {
   final LessonFilesRepository _repository;
@@ -31,7 +32,7 @@ class LessonFilesCubit extends Cubit<LessonFilesState> {
         lessonName: lessonName,
       ));
     } catch (e) {
-      emit(LessonFilesError(e.toString()));
+      emit(LessonFilesError(ErrorHandler.handle(e)));
     }
   }
 
@@ -42,7 +43,7 @@ class LessonFilesCubit extends Cubit<LessonFilesState> {
         await _repository.delete(_lessonId, id);
         await loadFiles(_lessonId);
       } catch (e) {
-        emit(LessonFilesError(e.toString()));
+        emit(LessonFilesError(ErrorHandler.handle(e)));
       }
     }
   }
@@ -80,7 +81,7 @@ class LessonFilesCubit extends Cubit<LessonFilesState> {
           uploadProgress: null,
         ));
       } catch (e) {
-        emit(LessonFilesError(e.toString()));
+        emit(LessonFilesError(ErrorHandler.handle(e)));
       }
     }
   }

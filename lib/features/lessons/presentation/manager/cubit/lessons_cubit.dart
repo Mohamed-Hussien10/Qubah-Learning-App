@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/usecases/get_lessons_usecase.dart';
 import '../state/lessons_state.dart';
+import 'package:qubah_learning_app/core/errors/error_handler.dart';
 
 class LessonsCubit extends Cubit<LessonsState> {
   final GetLessonsUseCase _getLessonsUseCase;
@@ -15,7 +16,7 @@ class LessonsCubit extends Cubit<LessonsState> {
       final lessons = await _getLessonsUseCase(subjectId);
       emit(LessonsLoaded(lessons));
     } catch (e) {
-      emit(LessonsError(e.toString().split('Error: ').last.trim()));
+      emit(LessonsError(ErrorHandler.handle(e)));
     }
   }
 }

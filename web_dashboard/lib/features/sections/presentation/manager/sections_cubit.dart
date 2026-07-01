@@ -3,6 +3,7 @@ import 'package:web_dashboard/features/grades/data/models/grade_model.dart';
 import 'package:web_dashboard/features/sections/data/models/section_model.dart';
 import 'package:web_dashboard/features/sections/data/repositories/sections_repository.dart';
 import 'package:web_dashboard/features/sections/presentation/manager/sections_state.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 
 class SectionsCubit extends Cubit<SectionsState> {
   final SectionsRepository _repository;
@@ -34,7 +35,7 @@ class SectionsCubit extends Cubit<SectionsState> {
         gradeName: gradeName,
       ));
     } catch (e) {
-      emit(SectionsError(e.toString()));
+      emit(SectionsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -43,7 +44,7 @@ class SectionsCubit extends Cubit<SectionsState> {
       await _repository.create(section, imageBytes: imageBytes, imageName: imageName);
       await loadSections(_gradeId);
     } catch (e) {
-      emit(SectionsError(e.toString()));
+      emit(SectionsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -52,7 +53,7 @@ class SectionsCubit extends Cubit<SectionsState> {
       await _repository.update(section, imageBytes: imageBytes, imageName: imageName);
       await loadSections(_gradeId);
     } catch (e) {
-      emit(SectionsError(e.toString()));
+      emit(SectionsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -61,7 +62,7 @@ class SectionsCubit extends Cubit<SectionsState> {
       await _repository.delete(_gradeId, id);
       await loadSections(_gradeId);
     } catch (e) {
-      emit(SectionsError(e.toString()));
+      emit(SectionsError(ErrorHandler.handle(e)));
     }
   }
 
@@ -70,7 +71,7 @@ class SectionsCubit extends Cubit<SectionsState> {
       await _repository.toggleStatus(_gradeId, id);
       await loadSections(_gradeId);
     } catch (e) {
-      emit(SectionsError(e.toString()));
+      emit(SectionsError(ErrorHandler.handle(e)));
     }
   }
 

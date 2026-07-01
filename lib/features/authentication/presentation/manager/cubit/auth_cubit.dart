@@ -3,6 +3,7 @@ import 'package:qubah_learning_app/core/utils/usecase.dart';
 import '../../../domain/usecases/login_usecase.dart';
 import '../../../domain/usecases/logout_usecase.dart';
 import '../state/auth_state.dart';
+import 'package:qubah_learning_app/core/errors/error_handler.dart';
 
 /// Cubit managing authentication state.
 class AuthCubit extends Cubit<AuthState> {
@@ -29,7 +30,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthAuthenticated(user));
       }
     } catch (e) {
-      emit(AuthError(e.toString().split('Error: ').last.trim()));
+      emit(AuthError(ErrorHandler.handle(e)));
     }
   }
 
@@ -40,7 +41,7 @@ class AuthCubit extends Cubit<AuthState> {
       await _logoutUseCase(NoParams());
       emit(AuthUnauthenticated());
     } catch (e) {
-      emit(AuthError(e.toString().split('Error: ').last.trim()));
+      emit(AuthError(ErrorHandler.handle(e)));
     }
   }
 }
