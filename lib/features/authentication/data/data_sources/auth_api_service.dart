@@ -14,11 +14,13 @@ class AuthApiService {
     required String email,
     required String password,
   }) async {
+    print('DEBUG: Attempting login with email: $email');
     try {
       final response = await _dioClient.post(
         ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );
+      print('DEBUG: Login response data: ${response.data}');
       final data = response.data as Map<String, dynamic>;
       return {
         'user': UserModel.fromJson(
@@ -28,6 +30,7 @@ class AuthApiService {
         'refresh_token': data['data']['refresh_token'] as String,
       };
     } catch (e) {
+      print('DEBUG: Login ERROR: $e');
       if (e is ServerException ||
           e is NetworkException ||
           e is AuthenticationException)

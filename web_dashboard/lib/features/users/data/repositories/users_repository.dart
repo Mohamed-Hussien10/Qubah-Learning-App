@@ -39,15 +39,26 @@ class UsersRepository {
       'name': name,
       'email': email,
       'password': password,
+      'password_confirmation': password,
       'role': role.name,
-      'is_active': isActive,
+      'is_active': isActive ? 1 : 0,
       if (stageId != null) 'stage_id': stageId,
       if (gradeId != null) 'grade_id': gradeId,
       if (subscriptionExpiry != null) 'subscription_expiry': subscriptionExpiry.toIso8601String(),
     };
-    final response = await _apiClient.post('/users', data: payload);
-    final data = response.data['data'] ?? response.data;
-    return UserModel.fromJson(data as Map<String, dynamic>);
+    
+    print('DEBUG: Creating user with payload: $payload');
+    
+    try {
+      final response = await _apiClient.post('/users', data: payload);
+      print('DEBUG: Create user response data: ${response.data}');
+      
+      final data = response.data['data'] ?? response.data;
+      return UserModel.fromJson(data as Map<String, dynamic>);
+    } catch (e) {
+      print('DEBUG: Create user ERROR: $e');
+      rethrow;
+    }
   }
 
   Future<UserModel> update(UserModel user) async {

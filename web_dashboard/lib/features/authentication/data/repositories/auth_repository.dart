@@ -16,22 +16,29 @@ class AuthRepository {
   /// Returns an [AdminModel] on success.
   /// Throws an [Exception] on failure.
   Future<AdminModel> login(String email, String password) async {
-    final response = await _apiClient.post(
-      '/auth/login',
-      data: {
-        'email': email,
-        'password': password,
-      },
-    );
+    print('DEBUG: Web Dashboard login attempt for $email');
+    try {
+      final response = await _apiClient.post(
+        '/auth/login',
+        data: {
+          'email': email,
+          'password': password,
+        },
+      );
+      print('DEBUG: Web Dashboard login response: ${response.data}');
 
-    final data = response.data['data'] ?? response.data;
-    final userMap = Map<String, dynamic>.from(data['user'] ?? data);
-    final token = (data['access_token'] ?? data['token'] ?? '') as String;
-    
-    userMap['token'] = token;
-    final admin = AdminModel.fromJson(userMap);
-    await _saveSession(admin);
-    return admin;
+      final data = response.data['data'] ?? response.data;
+      final userMap = Map<String, dynamic>.from(data['user'] ?? data);
+      final token = (data['access_token'] ?? data['token'] ?? '') as String;
+      
+      userMap['token'] = token;
+      final admin = AdminModel.fromJson(userMap);
+      await _saveSession(admin);
+      return admin;
+    } catch (e) {
+      print('DEBUG: Web Dashboard login ERROR: $e');
+      rethrow;
+    }
   }
 
   /// Clear the stored session and log out.
