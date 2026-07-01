@@ -170,4 +170,27 @@ class AppHelpers {
         return const Color(0xFF74B9FF);
     }
   }
+
+  /// Resolves partial or localhost media URLs to full production URLs.
+  static String resolveMediaUrl(String path) {
+    if (path.isEmpty) return '';
+    if (path.startsWith('http')) {
+      if (path.contains('localhost') || path.contains('127.0.0.1')) {
+        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'https://qubahom.com');
+      }
+      return path;
+    }
+    if (path.contains('thumbnails/')) {
+      final fileName = path.split('thumbnails/').last;
+      return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+    }
+    const baseUrl = 'https://qubahom.com'; 
+    if (path.startsWith('/')) {
+      return '$baseUrl$path';
+    } else if (path.startsWith('storage/')) {
+      return '$baseUrl/$path';
+    } else {
+      return '$baseUrl/storage/$path';
+    }
+  }
 }

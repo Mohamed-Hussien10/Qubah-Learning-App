@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/error_display.dart';
 import '../../../../core/utils/error_utils.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
@@ -31,22 +32,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
     context.read<UnitsCubit>().loadUnits(widget.parentId);
   }
 
-  String _resolveImageUrl(String path) {
-    if (path.startsWith('http')) {
-      if (path.contains('localhost') || path.contains('127.0.0.1')) {
-        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'https://qubahom.com');
-      }
-      return path;
-    }
-    const baseUrl = 'https://qubahom.com'; 
-    if (path.startsWith('/')) {
-      return '$baseUrl$path';
-    } else if (path.startsWith('storage/')) {
-      return '$baseUrl/$path';
-    } else {
-      return '$baseUrl/storage/$path';
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +43,7 @@ class _UnitsScreenState extends State<UnitsScreen> {
         decoration: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty
             ? BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(_resolveImageUrl(widget.backgroundImageUrl!)),
+                  image: NetworkImage(AppHelpers.resolveMediaUrl(widget.backgroundImageUrl!)),
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(Colors.white.withValues(alpha: 0.15), BlendMode.lighten),
                 ),

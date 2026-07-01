@@ -37,44 +37,44 @@ final List<SidebarSection> sidebarSections = [
     items: [
       SidebarItem(
         label: AppStrings.stages,
-        icon: Icons.school_outlined,
-        activeIcon: Icons.school_rounded,
+        icon: Icons.account_balance_outlined,
+        activeIcon: Icons.account_balance_rounded,
         route: '/stages',
       ),
       SidebarItem(
         label: AppStrings.grades,
-        icon: Icons.grade_outlined,
-        activeIcon: Icons.grade_rounded,
+        icon: Icons.layers_outlined,
+        activeIcon: Icons.layers_rounded,
         route: '/grades',
       ),
       SidebarItem(
         label: AppStrings.sections,
-        icon: Icons.category_outlined,
-        activeIcon: Icons.category_rounded,
+        icon: Icons.grid_view_outlined,
+        activeIcon: Icons.grid_view_rounded,
         route: '/sections',
       ),
       SidebarItem(
         label: AppStrings.subjects,
-        icon: Icons.menu_book_outlined,
-        activeIcon: Icons.menu_book_rounded,
+        icon: Icons.library_books_outlined,
+        activeIcon: Icons.library_books_rounded,
         route: '/subjects',
       ),
       SidebarItem(
         label: AppStrings.units,
-        icon: Icons.folder_outlined,
-        activeIcon: Icons.folder_rounded,
+        icon: Icons.view_module_outlined,
+        activeIcon: Icons.view_module_rounded,
         route: '/units',
       ),
       SidebarItem(
         label: AppStrings.lessons,
-        icon: Icons.play_lesson_outlined,
-        activeIcon: Icons.play_lesson_rounded,
+        icon: Icons.smart_display_outlined,
+        activeIcon: Icons.smart_display_rounded,
         route: '/lessons',
       ),
       SidebarItem(
         label: AppStrings.lessonFiles,
-        icon: Icons.attach_file_outlined,
-        activeIcon: Icons.attach_file_rounded,
+        icon: Icons.snippet_folder_outlined,
+        activeIcon: Icons.snippet_folder_rounded,
         route: '/lesson-files',
       ),
     ],
@@ -85,8 +85,8 @@ final List<SidebarSection> sidebarSections = [
     items: [
       SidebarItem(
         label: AppStrings.users,
-        icon: Icons.people_outline_rounded,
-        activeIcon: Icons.people_rounded,
+        icon: Icons.groups_outlined,
+        activeIcon: Icons.groups_rounded,
         route: '/users',
       ),
     ],
@@ -97,8 +97,8 @@ final List<SidebarSection> sidebarSections = [
     items: [
       SidebarItem(
         label: AppStrings.settings,
-        icon: Icons.settings_outlined,
-        activeIcon: Icons.settings_rounded,
+        icon: Icons.admin_panel_settings_outlined,
+        activeIcon: Icons.admin_panel_settings_rounded,
         route: '/settings',
       ),
     ],
@@ -218,22 +218,14 @@ class Sidebar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Logo icon
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, AppColors.primaryLight],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.hexagon_rounded,
-              color: Colors.white,
-              size: 24,
+          // Logo image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/images/logo.png',
+              width: 40,
+              height: 40,
+              fit: BoxFit.contain,
             ),
           ),
 

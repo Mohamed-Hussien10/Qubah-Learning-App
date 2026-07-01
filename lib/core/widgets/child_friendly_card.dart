@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/helpers.dart';
 
 class ChildFriendlyCard extends StatefulWidget {
   final String title;
@@ -105,7 +106,7 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                       ),
                       child: widget.imageUrl != null && widget.imageUrl!.isNotEmpty
                           ? Image.network(
-                              _resolveImageUrl(widget.imageUrl!),
+                              AppHelpers.resolveMediaUrl(widget.imageUrl!),
                               fit: BoxFit.contain,
                               errorBuilder: (_, __, ___) => Icon(
                                 widget.defaultIcon,
@@ -165,23 +166,7 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
     );
   }
 
-  String _resolveImageUrl(String path) {
-    if (path.startsWith('http')) {
-      if (path.contains('localhost') || path.contains('127.0.0.1')) {
-        return path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'https://qubahom.com');
-      }
-      return path;
-    }
-    // Assuming backend serves storage files or similar
-    const baseUrl = 'https://qubahom.com'; 
-    if (path.startsWith('/')) {
-      return '$baseUrl$path';
-    } else if (path.startsWith('storage/')) {
-      return '$baseUrl/$path';
-    } else {
-      return '$baseUrl/storage/$path';
-    }
-  }
+
 }
 
 

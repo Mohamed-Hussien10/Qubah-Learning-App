@@ -36,7 +36,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   Future<void> _init() async {
     try {
-      await _player.setUrl(widget.audioUrl);
+      await _player.setUrl(Uri.encodeFull(Uri.decodeFull(widget.audioUrl)));
       _player.durationStream.listen(
         (d) => setState(() => _duration = d ?? Duration.zero),
       );

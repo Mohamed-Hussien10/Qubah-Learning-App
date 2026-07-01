@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/error_display.dart';
 import '../../../../core/utils/error_utils.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
@@ -31,29 +32,30 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
   }
 
   void _openFile(BuildContext context, dynamic file) {
+    final fileUrl = AppHelpers.resolveMediaUrl(file.filePath);
     if (file.type == 'video' || file.type == 'mp4') {
       context.push(
         AppRoutes.videoPlayer,
-        extra: {'videoUrl': file.filePath, 'title': file.name},
+        extra: {'videoUrl': fileUrl, 'title': file.name},
       );
     } else if (file.type == 'audio' || file.type == 'mp3') {
       context.push(
         AppRoutes.audioPlayer,
         extra: {
-          'audioUrl': file.filePath,
+          'audioUrl': fileUrl,
           'title': file.name,
-          'coverImageUrl': file.imageUrl,
+          'coverImageUrl': file.imageUrl != null ? AppHelpers.resolveMediaUrl(file.imageUrl!) : null,
         },
       );
     } else if (file.type == 'pdf') {
       context.push(
         AppRoutes.pdfViewer,
-        extra: {'pdfUrl': file.filePath, 'title': file.name},
+        extra: {'pdfUrl': fileUrl, 'title': file.name},
       );
     } else if (file.type == 'scorm' || file.type == 'interactive') {
       context.push(
         AppRoutes.interactiveViewer,
-        extra: {'contentUrl': file.filePath, 'title': file.name},
+        extra: {'contentUrl': fileUrl, 'title': file.name},
       );
     } else {
       ScaffoldMessenger.of(

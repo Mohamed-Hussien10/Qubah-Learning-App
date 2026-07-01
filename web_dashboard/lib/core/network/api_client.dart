@@ -209,9 +209,19 @@ class _ErrorInterceptor extends Interceptor {
         break;
       case DioExceptionType.cancel:
         throw const ServerException('تم إلغاء الطلب.');
+      case DioExceptionType.unknown:
+        if (err.message != null && err.message!.contains('XMLHttpRequest error')) {
+          throw const NetworkException(
+            'لا يمكن الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت أو إعدادات الحماية.',
+          );
+        }
+        throw ServerException(
+          'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.',
+          statusCode: err.response?.statusCode,
+        );
       default:
         throw ServerException(
-          err.message ?? 'حدث خطأ غير متوقع.',
+          'حدث خطأ في الشبكة، يرجى المحاولة مرة أخرى.',
           statusCode: err.response?.statusCode,
         );
     }

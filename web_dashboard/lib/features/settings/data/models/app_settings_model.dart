@@ -90,7 +90,7 @@ class AppSettingsModel extends Equatable {
     },
     maintenanceMode: false,
     defaultLanguage: 'ar',
-    baseUrl: 'http://localhost:8000/api/v1',
+    baseUrl: 'https://qubahom.com/api/v1',
     apiKey: 'qubah-api-key-2026-xxxx-yyyy',
   );
 

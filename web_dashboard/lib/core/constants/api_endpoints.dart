@@ -3,7 +3,7 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   // ── Base URL ──────────────────────────────────────────────────────────
-  static const String baseUrl = 'http://localhost:8000/api/v1';
+  static const String baseUrl = 'https://qubahom.com/api/v1';
 
   // ── Auth ──────────────────────────────────────────────────────────────
   static const String login = '/auth/login';
