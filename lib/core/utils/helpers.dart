@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 /// ──────────────────────────────────────────────────────────────────────────────
@@ -171,16 +172,20 @@ class AppHelpers {
     }
   }
 
-  /// Resolves partial or localhost media URLs to full production URLs.
   static String resolveMediaUrl(String path) {
     if (path.isEmpty) return '';
+    
+    final String host = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS
+        ? 'http://192.168.1.190:8000'
+        : 'http://127.0.0.1:8000';
+        
     if (path.contains('thumbnails/')) {
       final fileName = path.split('thumbnails/').last;
-      return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
+      return '$host/api/v1/thumbnails/' + fileName;
     }
     if (path.startsWith('http')) {
-      if (path.contains('localhost') || path.contains('127.0.0.1')) {
-        path = path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1)(:\d+)?'), 'http://127.0.0.1:8000');
+      if (path.contains('localhost') || path.contains('127.0.0.1') || path.contains('10.0.2.2') || path.contains('192.168.1.190')) {
+        path = path.replaceAll(RegExp(r'http://(?:localhost|127\.0\.0\.1|10\.0\.2\.2|192\.168\.1\.190)(:\d+)?'), host);
       }
       
       // Proxy storage files to bypass CORS
@@ -188,20 +193,19 @@ class AppHelpers {
         final filePath = path.split('/storage/').last;
         if (filePath.startsWith('thumbnails/')) {
           final fileName = filePath.split('thumbnails/').last;
-          return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
+          return '$host/api/v1/thumbnails/' + fileName;
         }
-        return 'http://127.0.0.1:8000/api/v1/files/' + filePath;
+        return '$host/api/v1/files/' + filePath;
       }
       return path;
     }
-    const baseUrl = 'http://127.0.0.1:8000'; 
     if (path.startsWith('/')) {
-      return '$baseUrl$path';
+      return '$host$path';
     } else if (path.startsWith('storage/')) {
       final filePath = path.split('storage/').last;
-      return '$baseUrl/api/v1/files/$filePath';
+      return '$host/api/v1/files/$filePath';
     } else {
-      return '$baseUrl/api/v1/files/$path';
+      return '$host/api/v1/files/$path';
     }
   }
 }

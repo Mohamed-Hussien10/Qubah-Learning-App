@@ -44,7 +44,9 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 60,
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.1,
+                          ),
                           child: const Icon(
                             Icons.person_rounded,
                             size: 70,
@@ -84,13 +86,14 @@ class ProfileScreen extends StatelessWidget {
                         email = user.email.isNotEmpty ? user.email : email;
                         stage = user.stageName ?? stage;
                         grade = user.gradeName ?? grade;
-                        
+
                         final exp = user.subscriptionExpiry;
                         if (exp != null && exp.isAfter(DateTime.now())) {
-                           subscription = 'فعال';
-                           subscription += ' حتى ${exp.toString().split(" ").first.split("T").first}';
+                          subscription = 'فعال';
+                          subscription +=
+                              ' حتى ${exp.toString().split(" ").first.split("T").first}';
                         } else {
-                           subscription = 'غير فعال أو منتهي';
+                          subscription = 'غير فعال أو منتهي';
                         }
                       }
                       return Column(
@@ -114,39 +117,62 @@ class ProfileScreen extends StatelessWidget {
                           const SizedBox(height: 40),
                           // Info Cards
                           _ProfileMenuItem(
-                            icon: Icons.school_rounded,
-                            title: 'المرحلة والصف',
-                            subtitle: '$stage - $grade',
-                            onTap: () {},
-                          ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
+                                icon: Icons.school_rounded,
+                                title: 'المرحلة والصف',
+                                subtitle: '$stage - $grade',
+                                onTap: () {},
+                              )
+                              .animate()
+                              .fadeIn(delay: 400.ms)
+                              .slideY(begin: 0.1, end: 0),
                           const SizedBox(height: 12),
-                          subscription != 'غير فعال أو منتهي' 
-                            ? _ProfileMenuItem(
-                                icon: Icons.subscriptions_rounded,
-                                title: 'الاشتراك',
-                                subtitle: subscription,
-                                onTap: () => context.push(AppRoutes.subscription),
-                              ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0)
-                            : _ProfileMenuItem(
-                                icon: Icons.support_agent_rounded,
-                                title: 'تجديد الاشتراك',
-                                subtitle: 'تواصل مع الإدارة للتجديد',
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                      title: Text('تواصل مع الإدارة', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-                                      content: Text('عزيزي الطالب، يرجى التواصل مع إدارة التطبيق لتجديد اشتراكك.', style: GoogleFonts.cairo()),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(ctx),
-                                          child: Text('حسناً', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
+                          subscription != 'غير فعال أو منتهي'
+                              ? _ProfileMenuItem(
+                                      icon: Icons.subscriptions_rounded,
+                                      title: 'الاشتراك',
+                                      subtitle: subscription,
+                                      onTap: () => {},
+                                    )
+                                    .animate()
+                                    .fadeIn(delay: 500.ms)
+                                    .slideY(begin: 0.1, end: 0)
+                              : _ProfileMenuItem(
+                                      icon: Icons.support_agent_rounded,
+                                      title: 'تجديد الاشتراك',
+                                      subtitle: 'تواصل مع الإدارة للتجديد',
+                                      onTap: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                            title: Text(
+                                              'تواصل مع الإدارة',
+                                              style: GoogleFonts.cairo(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            content: Text(
+                                              'عزيزي الطالب، يرجى التواصل مع إدارة التطبيق لتجديد اشتراكك.',
+                                              style: GoogleFonts.cairo(),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(ctx),
+                                                child: Text(
+                                                  'حسناً',
+                                                  style: GoogleFonts.cairo(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    )
+                                    .animate()
+                                    .fadeIn(delay: 500.ms)
+                                    .slideY(begin: 0.1, end: 0),
                         ],
                       );
                     },
