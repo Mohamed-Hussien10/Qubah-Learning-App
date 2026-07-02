@@ -359,10 +359,6 @@ class _UsersScreenBodyState extends State<_UsersScreenBody> {
                         size: ColumnSize.S,
                       ),
                       DataColumn2(
-                        label: Text('الاشتراك', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-                        size: ColumnSize.S,
-                      ),
-                      DataColumn2(
                         label: Text('آخر دخول', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
                         size: ColumnSize.M,
                       ),
@@ -418,7 +414,6 @@ class _UsersScreenBodyState extends State<_UsersScreenBody> {
                           DataCell(Text(user.email, overflow: TextOverflow.ellipsis)),
                           DataCell(_buildRoleChip(user.role)),
                           DataCell(_buildStatusBadge(user.isActive)),
-                          DataCell(_buildSubscriptionBadge(user.subscriptionStatus, isDark)),
                           DataCell(
                             Text(
                               user.lastLogin != null
@@ -532,35 +527,7 @@ class _UsersScreenBodyState extends State<_UsersScreenBody> {
     );
   }
 
-  Widget _buildSubscriptionBadge(String status, bool isDark) {
-    Color color;
-    String label;
-    switch (status) {
-      case 'active':
-        color = AppColors.success;
-        label = 'مفعل';
-        break;
-      case 'expired':
-        color = AppColors.warning;
-        label = 'منتهي';
-        break;
-      case 'cancelled':
-        color = AppColors.error;
-        label = 'ملغي';
-        break;
-      default:
-        color = isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight;
-        label = 'بدون';
-    }
-    return Text(
-      label,
-      style: GoogleFonts.cairo(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        color: color,
-      ),
-    );
-  }
+
 
   Widget _buildPagination(BuildContext context, UsersState state, bool isDark) {
     return Row(

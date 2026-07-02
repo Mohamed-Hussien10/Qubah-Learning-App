@@ -15,8 +15,6 @@ import 'package:web_dashboard/features/units/data/repositories/units_repository.
 import 'package:web_dashboard/features/lessons/data/repositories/lessons_repository.dart';
 import 'package:web_dashboard/features/lesson_files/data/repositories/lesson_files_repository.dart';
 import 'package:web_dashboard/features/users/data/repositories/users_repository.dart';
-import 'package:web_dashboard/features/subscriptions/data/repositories/subscriptions_repository.dart';
-import 'package:web_dashboard/features/notifications/data/repositories/notifications_repository.dart';
 import 'package:web_dashboard/features/analytics/data/repositories/analytics_repository.dart';
 import 'package:web_dashboard/features/settings/data/repositories/settings_repository.dart';
 import 'package:web_dashboard/features/dashboard/data/repositories/dashboard_repository.dart';
@@ -31,8 +29,6 @@ import 'package:web_dashboard/features/units/presentation/manager/units_cubit.da
 import 'package:web_dashboard/features/lessons/presentation/manager/lessons_cubit.dart';
 import 'package:web_dashboard/features/lesson_files/presentation/manager/lesson_files_cubit.dart';
 import 'package:web_dashboard/features/users/presentation/manager/users_cubit.dart';
-import 'package:web_dashboard/features/subscriptions/presentation/manager/subscriptions_cubit.dart';
-import 'package:web_dashboard/features/notifications/presentation/manager/notifications_cubit.dart';
 import 'package:web_dashboard/features/analytics/presentation/manager/analytics_cubit.dart';
 import 'package:web_dashboard/features/settings/presentation/manager/settings_cubit.dart';
 import 'package:web_dashboard/features/dashboard/presentation/manager/dashboard_cubit.dart';
@@ -70,8 +66,6 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<LessonsRepository>(() => LessonsRepository(sl<ApiClient>()));
   sl.registerLazySingleton<LessonFilesRepository>(() => LessonFilesRepository(sl<ApiClient>()));
   sl.registerLazySingleton<UsersRepository>(() => UsersRepository(sl<ApiClient>()));
-  sl.registerLazySingleton<SubscriptionsRepository>(() => SubscriptionsRepository(sl<ApiClient>()));
-  sl.registerLazySingleton<NotificationsRepository>(() => NotificationsRepository(sl<ApiClient>()));
   sl.registerLazySingleton<AnalyticsRepository>(() => AnalyticsRepository(sl<ApiClient>()));
   sl.registerLazySingleton<SettingsRepository>(() => SettingsRepository(sl<ApiClient>()));
   sl.registerLazySingleton<DashboardRepository>(() => DashboardRepository(sl<ApiClient>()));
@@ -103,12 +97,6 @@ Future<void> initDependencies() async {
   );
   sl.registerFactory<UsersCubit>(
     () => UsersCubit(sl<UsersRepository>()),
-  );
-  sl.registerFactory<SubscriptionsCubit>(
-    () => SubscriptionsCubit(sl<SubscriptionsRepository>()),
-  );
-  sl.registerFactory<NotificationsCubit>(
-    () => NotificationsCubit(sl<NotificationsRepository>()),
   );
   sl.registerFactory<AnalyticsCubit>(
     () => AnalyticsCubit(sl<AnalyticsRepository>()),

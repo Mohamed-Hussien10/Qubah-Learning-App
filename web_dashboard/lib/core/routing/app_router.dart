@@ -12,8 +12,6 @@ import 'package:web_dashboard/features/units/presentation/screens/units_screen.d
 import 'package:web_dashboard/features/lessons/presentation/screens/lessons_screen.dart';
 import 'package:web_dashboard/features/lesson_files/presentation/screens/lesson_files_screen.dart';
 import 'package:web_dashboard/features/users/presentation/screens/users_screen.dart';
-import 'package:web_dashboard/features/subscriptions/presentation/screens/subscriptions_screen.dart';
-import 'package:web_dashboard/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:web_dashboard/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:web_dashboard/features/settings/presentation/screens/settings_screen.dart';
 import 'package:web_dashboard/features/user_profile/presentation/screens/profile_screen.dart';
@@ -133,14 +131,6 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/users',
           builder: (context, state) => const UsersScreen(),
-        ),
-        GoRoute(
-          path: '/subscriptions',
-          builder: (context, state) => const SubscriptionsScreen(),
-        ),
-        GoRoute(
-          path: '/notifications',
-          builder: (context, state) => const NotificationsScreen(),
         ),
         GoRoute(
           path: '/analytics',

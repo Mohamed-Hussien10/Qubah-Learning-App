@@ -57,7 +57,13 @@ class _LoginScreenState extends State<LoginScreen> {
           body: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthAuthenticated) {
-                context.go(AppRoutes.appEntryLock);
+                sl<SecureStorage>().hasParentPin().then((hasPin) {
+                  if (hasPin) {
+                    context.go(AppRoutes.appEntryLock);
+                  } else {
+                    context.go(AppRoutes.home);
+                  }
+                });
               } else if (state is AuthError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

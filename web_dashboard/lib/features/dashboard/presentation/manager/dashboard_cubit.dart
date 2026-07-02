@@ -20,7 +20,6 @@ class DashboardCubit extends Cubit<DashboardState> {
       // Fetch all data in parallel for faster loading
       final results = await Future.wait([
         _repository.getStats(),
-        _repository.getRevenueData(),
         _repository.getUserGrowthData(),
         _repository.getRecentActivity(),
       ]);
@@ -28,9 +27,8 @@ class DashboardCubit extends Cubit<DashboardState> {
       if (!isClosed) {
         emit(DashboardLoaded(
           stats: results[0] as dynamic,
-          revenueData: results[1] as dynamic,
-          userGrowthData: results[2] as dynamic,
-          recentActivity: results[3] as dynamic,
+          userGrowthData: results[1] as dynamic,
+          recentActivity: results[2] as dynamic,
         ));
       }
     } catch (e) {

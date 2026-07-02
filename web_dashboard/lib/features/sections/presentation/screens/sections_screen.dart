@@ -659,10 +659,10 @@ String resolveImageUrl(String path) {
   if (path.isEmpty) return '';
   if (path.contains('thumbnails/')) {
     final fileName = path.split('thumbnails/').last;
-    return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+    return 'http://127.0.0.1:8000/api/v1/thumbnails/' + fileName;
   }
   if (path.startsWith('http')) return path;
-  const baseUrl = 'https://qubahom.com';
+  const baseUrl = 'http://127.0.0.1:8000';
   if (path.startsWith('/')) return '$baseUrl$path';
   if (path.startsWith('storage/')) return '$baseUrl/$path';
   return '$baseUrl/storage/$path';

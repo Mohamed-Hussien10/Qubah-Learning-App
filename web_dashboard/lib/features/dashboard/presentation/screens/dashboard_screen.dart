@@ -11,7 +11,7 @@ import 'package:web_dashboard/features/dashboard/presentation/manager/dashboard_
 import 'package:web_dashboard/features/dashboard/presentation/manager/dashboard_state.dart';
 import 'package:web_dashboard/features/dashboard/presentation/widgets/quick_actions_card.dart';
 import 'package:web_dashboard/features/dashboard/presentation/widgets/recent_activity_card.dart';
-import 'package:web_dashboard/features/dashboard/presentation/widgets/revenue_chart.dart';
+
 import 'package:web_dashboard/features/dashboard/presentation/widgets/user_growth_chart.dart';
 import 'package:web_dashboard/core/services/dependency_injection.dart';
 
@@ -215,21 +215,12 @@ class _DashboardViewState extends State<_DashboardView> {
         changeText: '+3.8%',
         isPositiveTrend: true,
       ),
-      StatCard(
-        title: AppStrings.totalRevenue,
-        value: '${_formatNumber(stats.totalRevenue.toInt())} ر.س',
-        icon: Icons.account_balance_wallet_rounded,
-        iconColor: AppColors.success,
-        iconBackgroundColor: AppColors.successBg,
-        changeText: '${stats.revenueGrowthPercent >= 0 ? "+" : ""}${stats.revenueGrowthPercent.toStringAsFixed(1)}%',
-        isPositiveTrend: stats.revenueGrowthPercent >= 0,
-      ),
     ];
 
-    // Responsive: 4 cols desktop, 2 tablet, 1 mobile
+    // Responsive: 2 cols desktop, 2 tablet, 1 mobile
     int crossAxisCount;
     if (width >= 1200) {
-      crossAxisCount = 4;
+      crossAxisCount = 2;
     } else if (width >= 700) {
       crossAxisCount = 2;
     } else {
@@ -254,34 +245,12 @@ class _DashboardViewState extends State<_DashboardView> {
   // Charts row
   // ─────────────────────────────────────────────────────────────────────
   Widget _buildChartsRow(DashboardLoaded state, double width) {
-    final revenueChart = RevenueChart(data: state.revenueData)
-        .animate()
-        .fadeIn(duration: 600.ms, delay: 300.ms)
-        .slideY(begin: 0.1, end: 0, duration: 600.ms, delay: 300.ms);
-
     final userChart = UserGrowthChart(data: state.userGrowthData)
         .animate()
         .fadeIn(duration: 600.ms, delay: 450.ms)
         .slideY(begin: 0.1, end: 0, duration: 600.ms, delay: 450.ms);
 
-    if (width >= 900) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 3, child: revenueChart),
-          const SizedBox(width: 16),
-          Expanded(flex: 2, child: userChart),
-        ],
-      );
-    }
-
-    return Column(
-      children: [
-        revenueChart,
-        const SizedBox(height: 16),
-        userChart,
-      ],
-    );
+    return userChart;
   }
 
   // ─────────────────────────────────────────────────────────────────────
@@ -445,7 +414,7 @@ class _DashboardViewState extends State<_DashboardView> {
 
   int _responsiveColumns(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
-    if (w >= 1200) return 4;
+    if (w >= 1200) return 2;
     if (w >= 700) return 2;
     return 1;
   }

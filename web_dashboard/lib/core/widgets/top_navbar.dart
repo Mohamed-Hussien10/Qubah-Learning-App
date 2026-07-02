@@ -55,8 +55,6 @@ class TopNavbar extends StatelessWidget implements PreferredSizeWidget {
     if (path.startsWith('/lessons')) return AppStrings.lessons;
     if (path.startsWith('/lesson-files')) return AppStrings.lessonFiles;
     if (path.startsWith('/users')) return AppStrings.users;
-    if (path.startsWith('/subscriptions')) return AppStrings.subscriptions;
-    if (path.startsWith('/notifications')) return AppStrings.notifications;
     if (path.startsWith('/analytics')) return AppStrings.analytics;
     if (path.startsWith('/settings')) return AppStrings.settings;
     if (path.startsWith('/profile')) return AppStrings.profile;
@@ -162,53 +160,7 @@ class TopNavbar extends StatelessWidget implements PreferredSizeWidget {
 
           const SizedBox(width: 8),
 
-          // ── Notifications ───────────────────────────────────────
-          Stack(
-            children: [
-              IconButton(
-                onPressed: () => context.go('/notifications'),
-                icon: const Icon(Icons.notifications_outlined, size: 22),
-                tooltip: AppStrings.notifications,
-                style: IconButton.styleFrom(
-                  backgroundColor: isDark
-                      ? AppColors.backgroundDark
-                      : AppColors.backgroundLight,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              if (notificationCount > 0)
-                Positioned(
-                  top: 4,
-                  left: 4,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    constraints: const BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
-                    ),
-                    decoration: const BoxDecoration(
-                      color: AppColors.error,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      notificationCount > 99
-                          ? '99+'
-                          : notificationCount.toString(),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
 
-          const SizedBox(width: 12),
 
           // ── Divider ─────────────────────────────────────────────
           Container(

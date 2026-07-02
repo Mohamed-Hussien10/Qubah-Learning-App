@@ -8,10 +8,8 @@ class UserModel extends Equatable {
   final String email;
   final UserRole role;
   final bool isActive;
-  final String subscriptionStatus;
   final int? stageId;
   final int? gradeId;
-  final DateTime? subscriptionExpiry;
   final DateTime createdAt;
   final DateTime? lastLogin;
 
@@ -21,10 +19,8 @@ class UserModel extends Equatable {
     required this.email,
     required this.role,
     required this.isActive,
-    required this.subscriptionStatus,
     this.stageId,
     this.gradeId,
-    this.subscriptionExpiry,
     required this.createdAt,
     this.lastLogin,
   });
@@ -46,10 +42,8 @@ class UserModel extends Equatable {
     String? email,
     UserRole? role,
     bool? isActive,
-    String? subscriptionStatus,
     int? stageId,
     int? gradeId,
-    DateTime? subscriptionExpiry,
     DateTime? createdAt,
     DateTime? lastLogin,
   }) {
@@ -59,10 +53,8 @@ class UserModel extends Equatable {
       email: email ?? this.email,
       role: role ?? this.role,
       isActive: isActive ?? this.isActive,
-      subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
       stageId: stageId ?? this.stageId,
       gradeId: gradeId ?? this.gradeId,
-      subscriptionExpiry: subscriptionExpiry ?? this.subscriptionExpiry,
       createdAt: createdAt ?? this.createdAt,
       lastLogin: lastLogin ?? this.lastLogin,
     );
@@ -78,12 +70,8 @@ class UserModel extends Equatable {
         orElse: () => UserRole.student,
       ),
       isActive: json['is_active'] == 1 || json['is_active'] == true,
-      subscriptionStatus: json['subscription_status'] as String? ?? 'none',
       stageId: json['stage_id'] as int?,
       gradeId: json['grade_id'] as int?,
-      subscriptionExpiry: json['subscription_expiry'] != null
-          ? DateTime.tryParse(json['subscription_expiry'] as String)
-          : null,
       createdAt: DateTime.parse(json['created_at'] as String),
       lastLogin: json['last_login'] != null
           ? DateTime.tryParse(json['last_login'] as String)
@@ -98,10 +86,8 @@ class UserModel extends Equatable {
       'email': email,
       'role': role.name,
       'is_active': isActive,
-      'subscription_status': subscriptionStatus,
       'stage_id': stageId,
       'grade_id': gradeId,
-      'subscription_expiry': subscriptionExpiry?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'last_login': lastLogin?.toIso8601String(),
     };
@@ -114,7 +100,6 @@ class UserModel extends Equatable {
       email: 'ahmed@example.com',
       role: UserRole.admin,
       isActive: true,
-      subscriptionStatus: 'active',
       createdAt: DateTime(2024, 1, 15),
       lastLogin: DateTime(2026, 5, 26, 10, 30),
     ),
@@ -124,7 +109,6 @@ class UserModel extends Equatable {
       email: 'fatima@example.com',
       role: UserRole.student,
       isActive: true,
-      subscriptionStatus: 'active',
       createdAt: DateTime(2024, 2, 20),
       lastLogin: DateTime(2026, 5, 25, 14, 0),
     ),
@@ -134,7 +118,6 @@ class UserModel extends Equatable {
       email: 'omar@example.com',
       role: UserRole.student,
       isActive: true,
-      subscriptionStatus: 'active',
       createdAt: DateTime(2024, 3, 10),
       lastLogin: DateTime(2026, 5, 24, 9, 15),
     ),
@@ -144,7 +127,6 @@ class UserModel extends Equatable {
       email: 'mariam@example.com',
       role: UserRole.student,
       isActive: false,
-      subscriptionStatus: 'expired',
       createdAt: DateTime(2024, 4, 5),
       lastLogin: DateTime(2026, 4, 10, 16, 45),
     ),
@@ -154,7 +136,6 @@ class UserModel extends Equatable {
       email: 'yousef@example.com',
       role: UserRole.student,
       isActive: true,
-      subscriptionStatus: 'active',
       createdAt: DateTime(2024, 5, 18),
       lastLogin: DateTime(2026, 5, 23, 11, 0),
     ),
@@ -164,7 +145,6 @@ class UserModel extends Equatable {
       email: 'noura@example.com',
       role: UserRole.student,
       isActive: true,
-      subscriptionStatus: 'active',
       createdAt: DateTime(2024, 6, 22),
       lastLogin: DateTime(2026, 5, 22, 8, 30),
     ),
@@ -174,7 +154,6 @@ class UserModel extends Equatable {
       email: 'sultan@example.com',
       role: UserRole.student,
       isActive: true,
-      subscriptionStatus: 'cancelled',
       createdAt: DateTime(2024, 7, 14),
       lastLogin: DateTime(2026, 5, 20, 13, 20),
     ),
@@ -184,7 +163,6 @@ class UserModel extends Equatable {
       email: 'hind@example.com',
       role: UserRole.student,
       isActive: false,
-      subscriptionStatus: 'expired',
       createdAt: DateTime(2024, 8, 3),
       lastLogin: DateTime(2026, 3, 15, 17, 0),
     ),
@@ -194,7 +172,6 @@ class UserModel extends Equatable {
       email: 'khaled@example.com',
       role: UserRole.admin,
       isActive: true,
-      subscriptionStatus: 'active',
       createdAt: DateTime(2024, 9, 11),
       lastLogin: DateTime(2026, 5, 26, 9, 0),
     ),
@@ -204,12 +181,11 @@ class UserModel extends Equatable {
       email: 'reem@example.com',
       role: UserRole.student,
       isActive: true,
-      subscriptionStatus: 'active',
       createdAt: DateTime(2024, 10, 25),
       lastLogin: DateTime(2026, 5, 21, 15, 10),
     ),
   ];
 
   @override
-  List<Object?> get props => [id, name, email, role, isActive, subscriptionStatus, stageId, gradeId, subscriptionExpiry, createdAt, lastLogin];
+  List<Object?> get props => [id, name, email, role, isActive, stageId, gradeId, createdAt, lastLogin];
 }

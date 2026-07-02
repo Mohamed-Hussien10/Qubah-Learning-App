@@ -35,11 +35,16 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuth() async {
     final secureStorage = sl<SecureStorage>();
     final isAuthenticated = await secureStorage.isAuthenticated();
+    final hasParentPin = await secureStorage.hasParentPin();
 
     if (!mounted) return;
 
     if (isAuthenticated) {
-      context.go(AppRoutes.appEntryLock);
+      if (hasParentPin) {
+        context.go(AppRoutes.appEntryLock);
+      } else {
+        context.go(AppRoutes.home);
+      }
     } else {
       setState(() {
         _isLoading = false;

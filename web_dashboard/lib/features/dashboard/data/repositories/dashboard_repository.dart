@@ -15,15 +15,7 @@ class DashboardRepository {
     return DashboardStats.fromJson(data as Map<String, dynamic>);
   }
 
-  /// Fetch monthly revenue data for the chart (12 months).
-  Future<List<RevenueData>> getRevenueData() async {
-    final response = await _apiClient.get('/dashboard/revenue');
-    final data = response.data['data'] ?? response.data;
-    if (data is List) {
-      return data.map((json) => RevenueData.fromJson(json as Map<String, dynamic>)).toList();
-    }
-    return [];
-  }
+
 
   /// Fetch monthly user-growth data for the chart (12 months).
   Future<List<ChartData>> getUserGrowthData() async {

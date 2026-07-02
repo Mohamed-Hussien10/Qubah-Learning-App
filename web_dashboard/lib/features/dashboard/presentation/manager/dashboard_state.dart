@@ -21,22 +21,19 @@ class DashboardLoading extends DashboardState {
   const DashboardLoading();
 }
 
-/// All dashboard data has been loaded successfully.
 class DashboardLoaded extends DashboardState {
   final DashboardStats stats;
-  final List<RevenueData> revenueData;
   final List<ChartData> userGrowthData;
   final List<Map<String, dynamic>> recentActivity;
 
   const DashboardLoaded({
     required this.stats,
-    required this.revenueData,
     required this.userGrowthData,
     required this.recentActivity,
   });
 
   @override
-  List<Object?> get props => [stats, revenueData, userGrowthData, recentActivity];
+  List<Object?> get props => [stats, userGrowthData, recentActivity];
 }
 
 /// An error occurred while fetching dashboard data.

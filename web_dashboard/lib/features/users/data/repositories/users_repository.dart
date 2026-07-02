@@ -33,7 +33,6 @@ class UsersRepository {
     bool isActive = true,
     int? stageId,
     int? gradeId,
-    DateTime? subscriptionExpiry,
   }) async {
     final payload = {
       'name': name,
@@ -44,7 +43,6 @@ class UsersRepository {
       'is_active': isActive ? 1 : 0,
       if (stageId != null) 'stage_id': stageId,
       if (gradeId != null) 'grade_id': gradeId,
-      if (subscriptionExpiry != null) 'subscription_expiry': subscriptionExpiry.toIso8601String(),
     };
     
     print('DEBUG: Creating user with payload: $payload');
@@ -78,14 +76,7 @@ class UsersRepository {
     return UserModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<UserModel> assignSubscription(int userId, String subscriptionStatus) async {
-    final response = await _apiClient.post(
-      '/users/$userId/assign-subscription',
-      data: {'subscription_status': subscriptionStatus},
-    );
-    final data = response.data['data'] ?? response.data;
-    return UserModel.fromJson(data as Map<String, dynamic>);
-  }
+
 
   Future<List<UserModel>> searchUsers(String query) async {
     final response = await _apiClient.get('/users', queryParameters: {'search': query});

@@ -34,7 +34,6 @@ class UsersCubit extends Cubit<UsersState> {
     bool isActive = true,
     int? stageId,
     int? gradeId,
-    DateTime? subscriptionExpiry,
   }) async {
     try {
       await _repository.create(
@@ -45,7 +44,6 @@ class UsersCubit extends Cubit<UsersState> {
         isActive: isActive,
         stageId: stageId,
         gradeId: gradeId,
-        subscriptionExpiry: subscriptionExpiry,
       );
       await loadUsers();
       _applyFilters();

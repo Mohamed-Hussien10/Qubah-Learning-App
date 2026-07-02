@@ -3,7 +3,7 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   // ── Base URL ──────────────────────────────────────────────────────────
-  static const String baseUrl = 'https://qubahom.com/api/v1';
+  static const String baseUrl = 'http://127.0.0.1:8000/api/v1';
 
   // ── Auth ──────────────────────────────────────────────────────────────
   static const String login = '/auth/login';
@@ -44,19 +44,6 @@ class ApiEndpoints {
   static const String users = '/users';
   static String user(int id) => '/users/$id';
   static String userToggleStatus(int id) => '/users/$id/toggle-status';
-  static String userSubscriptions(int id) => '/users/$id/subscriptions';
-
-  // ── Subscriptions (الاشتراكات) ────────────────────────────────────────
-  static const String subscriptions = '/subscriptions';
-  static String subscription(int id) => '/subscriptions/$id';
-  static String subscriptionToggle(int id) =>
-      '/subscriptions/$id/toggle-status';
-
-  // ── Notifications (الإشعارات) ────────────────────────────────────────
-  static const String notifications = '/notifications';
-  static String notification(int id) => '/notifications/$id';
-  static const String notificationsSend = '/notifications/send';
-  static const String notificationsSendAll = '/notifications/send-all';
 
   // ── Analytics (التقارير) ──────────────────────────────────────────────
   static const String analytics = '/analytics';

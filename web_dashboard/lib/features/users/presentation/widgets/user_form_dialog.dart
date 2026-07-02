@@ -36,8 +36,6 @@ class _UserFormDialogState extends State<UserFormDialog> {
   late bool _isActive;
   String? _selectedStageId;
   String? _selectedGradeId;
-  DateTime? _subscriptionExpiry;
-  
   List<StageModel> _stages = [];
   List<GradeModel> _grades = [];
   bool _isLoadingStages = true;
@@ -55,7 +53,6 @@ class _UserFormDialogState extends State<UserFormDialog> {
     _isActive = widget.user?.isActive ?? true;
     _selectedStageId = widget.user?.stageId?.toString();
     _selectedGradeId = widget.user?.gradeId?.toString();
-    _subscriptionExpiry = widget.user?.subscriptionExpiry;
 
     _stages = widget.initialStages;
     _grades = widget.initialGrades;
@@ -351,56 +348,6 @@ class _UserFormDialogState extends State<UserFormDialog> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'تاريخ انتهاء الاشتراك',
-                    style: GoogleFonts.cairo(
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  InkWell(
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: _subscriptionExpiry ?? DateTime.now().add(const Duration(days: 30)),
-                        firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                        lastDate: DateTime.now().add(const Duration(days: 3650)),
-                      );
-                      if (picked != null) {
-                        setState(() => _subscriptionExpiry = picked);
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: isDark ? AppColors.surfaceDark : AppColors.backgroundLight,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            _subscriptionExpiry != null
-                                ? '${_subscriptionExpiry!.year}-${_subscriptionExpiry!.month.toString().padLeft(2, '0')}-${_subscriptionExpiry!.day.toString().padLeft(2, '0')}'
-                                : 'اختر التاريخ',
-                            style: GoogleFonts.cairo(
-                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                            ),
-                          ),
-                          Icon(
-                            Icons.calendar_today,
-                            color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight,
-                            size: 20,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                 ],
 
                 // ── Status ────────────────────────────────
@@ -526,7 +473,6 @@ class _UserFormDialogState extends State<UserFormDialog> {
         isActive: _isActive,
         stageId: _selectedRole == UserRole.student && _selectedStageId != null ? int.tryParse(_selectedStageId!) : null,
         gradeId: _selectedRole == UserRole.student && _selectedGradeId != null ? int.tryParse(_selectedGradeId!) : null,
-        subscriptionExpiry: _selectedRole == UserRole.student ? _subscriptionExpiry : null,
       ));
     } else {
       cubit.createUser(
@@ -537,7 +483,6 @@ class _UserFormDialogState extends State<UserFormDialog> {
         isActive: _isActive,
         stageId: _selectedRole == UserRole.student && _selectedStageId != null ? int.tryParse(_selectedStageId!) : null,
         gradeId: _selectedRole == UserRole.student && _selectedGradeId != null ? int.tryParse(_selectedGradeId!) : null,
-        subscriptionExpiry: _selectedRole == UserRole.student ? _subscriptionExpiry : null,
       );
     }
 
