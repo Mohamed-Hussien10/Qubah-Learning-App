@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qubah_learning_app/core/constants/app_colors.dart';
 import 'package:qubah_learning_app/features/authentication/presentation/manager/cubit/auth_cubit.dart';
+import 'package:qubah_learning_app/core/routing/app_router.dart';
 
 class SubscriptionExpiredScreen extends StatelessWidget {
   const SubscriptionExpiredScreen({super.key});
@@ -41,22 +43,32 @@ class SubscriptionExpiredScreen extends StatelessWidget {
               const SizedBox(height: 32),
               FilledButton.icon(
                 onPressed: () {
-                  // Logout to force re-authentication or go to a renewal page
-                  context.read<AuthCubit>().logout();
+                  context.push(AppRoutes.support);
                 },
-                icon: const Icon(Icons.logout_rounded),
+                icon: const Icon(Icons.support_agent_rounded),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.error,
+                  backgroundColor: AppColors.primary,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 label: Text(
-                  'تسجيل الخروج',
+                  'تواصل مع الدعم الفني',
                   style: GoogleFonts.cairo(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  context.read<AuthCubit>().logout();
+                },
+                child: Text(
+                  'تسجيل الخروج',
+                  style: GoogleFonts.cairo(
+                    color: Colors.grey[600],
                   ),
                 ),
               ),

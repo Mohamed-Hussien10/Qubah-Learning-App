@@ -13,6 +13,9 @@ abstract class AuthRepository {
   /// Returns the currently cached user, if any.
   Future<UserEntity?> getCachedUser();
 
+  /// Fetches the profile from the server and updates cache.
+  Future<UserEntity> fetchProfile();
+
   /// Checks if user is currently authenticated.
   Future<bool> isAuthenticated();
 }

@@ -56,6 +56,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<UserEntity> fetchProfile() async {
+    if (!await _networkInfo.isConnected) {
+      throw const NetworkException();
+    }
+    final user = await _apiService.getProfile();
+    await _localService.saveUser(user);
+    return user.toEntity();
+  }
+
+  @override
   Future<bool> isAuthenticated() async {
     return _localService.isAuthenticated();
   }

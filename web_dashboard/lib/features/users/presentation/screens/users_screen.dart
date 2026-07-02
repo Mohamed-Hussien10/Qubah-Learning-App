@@ -1,3 +1,5 @@
+import 'dart:html' as html;
+import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -31,25 +33,29 @@ class _UsersScreenBody extends StatefulWidget {
   const _UsersScreenBody();
 
   @override
-  State<_UsersScreenBody> createState() => _UsersScreenBodyState();
+  State<_UsersScreenBody> createState() => _UsersScreenState();
 }
 
-class _UsersScreenBodyState extends State<_UsersScreenBody> {
+class _UsersScreenState extends State<_UsersScreenBody> {
   List<StageModel> _stages = [];
 
   @override
   void initState() {
     super.initState();
-    _preloadData();
+    _loadStages();
   }
 
-  Future<void> _preloadData() async {
+  Future<void> _loadStages() async {
     try {
       final stages = await sl<StagesRepository>().getAll();
       if (mounted) {
-        setState(() => _stages = stages);
+        setState(() {
+          _stages = stages;
+        });
       }
-    } catch (_) {}
+    } catch (_) {
+      // Ignored
+    }
   }
 
   @override
@@ -122,24 +128,77 @@ class _UsersScreenBodyState extends State<_UsersScreenBody> {
     ).animate().fadeIn(delay: 100.ms, duration: 400.ms);
   }
 
+  Future<void> _exportToExcel(List<UserModel> users) async {
+    final excel = Excel.createExcel();
+    final sheet = excel['المستخدمين'];
+    excel.setDefaultSheet('المستخدمين');
+
+    // Headers
+    sheet.appendRow([
+      TextCellValue('المعرف'),
+      TextCellValue('الاسم'),
+      TextCellValue('البريد الإلكتروني'),
+      TextCellValue('الدور'),
+      TextCellValue('الحالة'),
+      TextCellValue('تاريخ الانضمام'),
+      TextCellValue('تاريخ انتهاء الاشتراك'),
+    ]);
+
+    // Data rows
+    for (final user in users) {
+      sheet.appendRow([
+        TextCellValue(user.id.toString()),
+        TextCellValue(user.name),
+        TextCellValue(user.email),
+        TextCellValue(user.roleLabel),
+        TextCellValue(user.statusLabel),
+        TextCellValue('${user.createdAt.year}-${user.createdAt.month}-${user.createdAt.day}'),
+        TextCellValue(user.subscriptionExpiry != null 
+            ? '${user.subscriptionExpiry!.year}-${user.subscriptionExpiry!.month}-${user.subscriptionExpiry!.day}' 
+            : 'غير محدد'),
+      ]);
+    }
+
+    final bytes = excel.encode();
+    if (bytes != null) {
+      final blob = html.Blob([bytes], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.document.createElement('a') as html.AnchorElement
+        ..href = url
+        ..style.display = 'none'
+        ..download = 'users_export_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+      html.document.body!.children.add(anchor);
+      anchor.click();
+      html.document.body!.children.remove(anchor);
+      html.Url.revokeObjectUrl(url);
+    }
+  }
+
   Widget _buildExportButton(BuildContext context, bool isDark) {
-    return OutlinedButton.icon(
-      onPressed: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('جاري تصدير البيانات...', style: GoogleFonts.cairo()),
-            backgroundColor: AppColors.info,
+    return BlocBuilder<UsersCubit, UsersState>(
+      builder: (context, state) {
+        return OutlinedButton.icon(
+          onPressed: () {
+            if (state.status == UsersStatus.loaded || state.filteredUsers.isNotEmpty) {
+              _exportToExcel(state.filteredUsers);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('تم تصدير البيانات بنجاح', style: GoogleFonts.cairo()),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            }
+          },
+          icon: const Icon(Icons.file_download_outlined, size: 18),
+          label: Text(AppStrings.exportData, style: GoogleFonts.cairo()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            side: BorderSide(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       },
-      icon: const Icon(Icons.file_download_outlined, size: 18),
-      label: Text(AppStrings.exportData, style: GoogleFonts.cairo()),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-        side: BorderSide(color: isDark ? AppColors.borderDark : AppColors.borderLight),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
     );
   }
 
@@ -358,8 +417,9 @@ class _UsersScreenBodyState extends State<_UsersScreenBody> {
                         label: Text(AppStrings.status, style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
                         size: ColumnSize.S,
                       ),
+
                       DataColumn2(
-                        label: Text('آخر دخول', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                        label: Text('انتهاء الاشتراك', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
                         size: ColumnSize.M,
                       ),
                       DataColumn2(
@@ -414,11 +474,12 @@ class _UsersScreenBodyState extends State<_UsersScreenBody> {
                           DataCell(Text(user.email, overflow: TextOverflow.ellipsis)),
                           DataCell(_buildRoleChip(user.role)),
                           DataCell(_buildStatusBadge(user.isActive)),
+
                           DataCell(
                             Text(
-                              user.lastLogin != null
-                                  ? intl.DateFormat('yyyy/MM/dd HH:mm').format(user.lastLogin!)
-                                  : 'لم يدخل بعد',
+                              user.subscriptionExpiry != null
+                                  ? intl.DateFormat('yyyy/MM/dd').format(user.subscriptionExpiry!)
+                                  : 'غير محدد',
                               style: GoogleFonts.cairo(
                                 fontSize: 12,
                                 color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight,

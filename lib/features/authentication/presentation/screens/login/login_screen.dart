@@ -245,6 +245,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                           }
                                         },
                                       ),
+
+                                      const SizedBox(height: 16),
+                                      
+                                      TextButton(
+                                        onPressed: () => context.push(AppRoutes.support),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: AppColors.hessaBrown,
+                                        ),
+                                        child: Text(
+                                          'نسيت البريد الإلكتروني أو كلمة المرور؟ تواصل مع الدعم',
+                                          style: GoogleFonts.cairo(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),

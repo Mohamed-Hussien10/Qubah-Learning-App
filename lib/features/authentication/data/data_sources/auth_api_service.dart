@@ -39,6 +39,23 @@ class AuthApiService {
     }
   }
 
+  /// Fetches the current user profile from the server.
+  Future<UserModel> getProfile() async {
+    try {
+      // The endpoint is typically /api/v1/auth/me or /api/v1/user
+      final response = await _dioClient.get('/auth/me');
+      final data = response.data as Map<String, dynamic>;
+      return UserModel.fromJson(data['data']['user'] as Map<String, dynamic>);
+    } catch (e) {
+      if (e is ServerException ||
+          e is NetworkException ||
+          e is AuthenticationException) {
+        rethrow;
+      }
+      throw ServerException(message: ErrorHandler.handle(e));
+    }
+  }
+
   /// Logs out the user on the server side.
   Future<void> logout() async {
     try {

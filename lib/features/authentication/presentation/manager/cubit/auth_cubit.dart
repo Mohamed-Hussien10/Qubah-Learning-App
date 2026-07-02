@@ -24,11 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
       final user = await _loginUseCase(
         LoginParams(email: email, password: password),
       );
-      if (user.subscriptionExpiry != null && !user.isSubscriptionValid) {
-        emit(AuthSubscriptionExpired());
-      } else {
-        emit(AuthAuthenticated(user));
-      }
+      emit(AuthAuthenticated(user));
     } catch (e) {
       emit(AuthError(ErrorHandler.handle(e)));
     }

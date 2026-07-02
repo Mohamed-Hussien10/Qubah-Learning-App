@@ -61,12 +61,12 @@ class UserModel {
     // Custom handling to extract nested stage and grade titles
     final model = _$UserModelFromJson(json);
     
-    String? sName;
+    String? sName = model.stageName;
     if (json['stage'] != null && json['stage']['title'] != null) {
       sName = json['stage']['title'].toString();
     }
     
-    String? gName;
+    String? gName = model.gradeName;
     if (json['grade'] != null && json['grade']['title'] != null) {
       gName = json['grade']['title'].toString();
     }

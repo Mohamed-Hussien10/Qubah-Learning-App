@@ -33,6 +33,7 @@ class UsersRepository {
     bool isActive = true,
     int? stageId,
     int? gradeId,
+    DateTime? subscriptionExpiry,
   }) async {
     final payload = {
       'name': name,
@@ -43,6 +44,7 @@ class UsersRepository {
       'is_active': isActive ? 1 : 0,
       if (stageId != null) 'stage_id': stageId,
       if (gradeId != null) 'grade_id': gradeId,
+      if (subscriptionExpiry != null) 'subscription_expiry': subscriptionExpiry.toIso8601String().split('T').first,
     };
     
     print('DEBUG: Creating user with payload: $payload');

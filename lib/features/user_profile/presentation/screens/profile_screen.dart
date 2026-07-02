@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'dart:convert';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/storage/secure_storage.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/qubah_button.dart';
 import '../../../authentication/presentation/manager/cubit/auth_cubit.dart';
 import '../../../authentication/presentation/manager/state/auth_state.dart';
+import '../../../authentication/domain/entities/user_entity.dart';
+import '../../../authentication/domain/repositories/auth_repository.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -44,7 +44,7 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 60,
-                          backgroundColor: AppColors.primary.withOpacity(0.1),
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                           child: const Icon(
                             Icons.person_rounded,
                             size: 70,
@@ -69,8 +69,8 @@ class ProfileScreen extends StatelessWidget {
                   ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
                   const SizedBox(height: 24),
                   // Name
-                  FutureBuilder<String?>(
-                    future: sl<SecureStorage>().getUserData(),
+                  FutureBuilder<UserEntity?>(
+                    future: sl<AuthRepository>().getCachedUser(),
                     builder: (context, snapshot) {
                       String name = 'اسم الطالب';
                       String email = 'طالب@مثال.com';
@@ -79,26 +79,19 @@ class ProfileScreen extends StatelessWidget {
                       String subscription = 'غير فعال';
 
                       if (snapshot.hasData && snapshot.data != null) {
-                        try {
-                          final data = jsonDecode(snapshot.data!);
-                          name = data['name'] ?? name;
-                          email = data['email'] ?? email;
-                          stage = data['stageName'] ?? data['stage_name'] ?? (data['stage'] != null ? data['stage']['title'] : null) ?? stage;
-                          grade = data['gradeName'] ?? data['grade_name'] ?? (data['grade'] != null ? data['grade']['title'] : null) ?? grade;
-                          
-                          final expString = data['subscription_expiry'];
-                          DateTime? exp;
-                          if (expString != null) {
-                            exp = DateTime.tryParse(expString);
-                          }
-                          
-                          if (exp != null && exp.isAfter(DateTime.now())) {
-                             subscription = 'فعال';
-                             subscription += ' حتى ${exp.toString().split(" ").first.split("T").first}';
-                          } else {
-                             subscription = 'غير فعال أو منتهي';
-                          }
-                        } catch (_) {}
+                        final user = snapshot.data!;
+                        name = user.name.isNotEmpty ? user.name : name;
+                        email = user.email.isNotEmpty ? user.email : email;
+                        stage = user.stageName ?? stage;
+                        grade = user.gradeName ?? grade;
+                        
+                        final exp = user.subscriptionExpiry;
+                        if (exp != null && exp.isAfter(DateTime.now())) {
+                           subscription = 'فعال';
+                           subscription += ' حتى ${exp.toString().split(" ").first.split("T").first}';
+                        } else {
+                           subscription = 'غير فعال أو منتهي';
+                        }
                       }
                       return Column(
                         children: [

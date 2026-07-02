@@ -12,6 +12,7 @@ class UserModel extends Equatable {
   final int? gradeId;
   final DateTime createdAt;
   final DateTime? lastLogin;
+  final DateTime? subscriptionExpiry;
 
   const UserModel({
     required this.id,
@@ -23,6 +24,7 @@ class UserModel extends Equatable {
     this.gradeId,
     required this.createdAt,
     this.lastLogin,
+    this.subscriptionExpiry,
   });
 
   String get roleLabel {
@@ -46,6 +48,7 @@ class UserModel extends Equatable {
     int? gradeId,
     DateTime? createdAt,
     DateTime? lastLogin,
+    DateTime? subscriptionExpiry,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -57,6 +60,7 @@ class UserModel extends Equatable {
       gradeId: gradeId ?? this.gradeId,
       createdAt: createdAt ?? this.createdAt,
       lastLogin: lastLogin ?? this.lastLogin,
+      subscriptionExpiry: subscriptionExpiry ?? this.subscriptionExpiry,
     );
   }
 
@@ -76,6 +80,9 @@ class UserModel extends Equatable {
       lastLogin: json['last_login'] != null
           ? DateTime.tryParse(json['last_login'] as String)
           : null,
+      subscriptionExpiry: json['subscription_expiry'] != null
+          ? DateTime.tryParse(json['subscription_expiry'] as String)
+          : null,
     );
   }
 
@@ -90,6 +97,7 @@ class UserModel extends Equatable {
       'grade_id': gradeId,
       'created_at': createdAt.toIso8601String(),
       'last_login': lastLogin?.toIso8601String(),
+      'subscription_expiry': subscriptionExpiry?.toIso8601String(),
     };
   }
 
@@ -102,90 +110,10 @@ class UserModel extends Equatable {
       isActive: true,
       createdAt: DateTime(2024, 1, 15),
       lastLogin: DateTime(2026, 5, 26, 10, 30),
-    ),
-    UserModel(
-      id: 2,
-      name: 'فاطمة حسن إبراهيم',
-      email: 'fatima@example.com',
-      role: UserRole.student,
-      isActive: true,
-      createdAt: DateTime(2024, 2, 20),
-      lastLogin: DateTime(2026, 5, 25, 14, 0),
-    ),
-    UserModel(
-      id: 3,
-      name: 'عمر خالد الصالح',
-      email: 'omar@example.com',
-      role: UserRole.student,
-      isActive: true,
-      createdAt: DateTime(2024, 3, 10),
-      lastLogin: DateTime(2026, 5, 24, 9, 15),
-    ),
-    UserModel(
-      id: 4,
-      name: 'مريم عبدالله الشمري',
-      email: 'mariam@example.com',
-      role: UserRole.student,
-      isActive: false,
-      createdAt: DateTime(2024, 4, 5),
-      lastLogin: DateTime(2026, 4, 10, 16, 45),
-    ),
-    UserModel(
-      id: 5,
-      name: 'يوسف سعيد القحطاني',
-      email: 'yousef@example.com',
-      role: UserRole.student,
-      isActive: true,
-      createdAt: DateTime(2024, 5, 18),
-      lastLogin: DateTime(2026, 5, 23, 11, 0),
-    ),
-    UserModel(
-      id: 6,
-      name: 'نورة محمد العتيبي',
-      email: 'noura@example.com',
-      role: UserRole.student,
-      isActive: true,
-      createdAt: DateTime(2024, 6, 22),
-      lastLogin: DateTime(2026, 5, 22, 8, 30),
-    ),
-    UserModel(
-      id: 7,
-      name: 'سلطان عبدالرحمن الدوسري',
-      email: 'sultan@example.com',
-      role: UserRole.student,
-      isActive: true,
-      createdAt: DateTime(2024, 7, 14),
-      lastLogin: DateTime(2026, 5, 20, 13, 20),
-    ),
-    UserModel(
-      id: 8,
-      name: 'هند ناصر الحربي',
-      email: 'hind@example.com',
-      role: UserRole.student,
-      isActive: false,
-      createdAt: DateTime(2024, 8, 3),
-      lastLogin: DateTime(2026, 3, 15, 17, 0),
-    ),
-    UserModel(
-      id: 9,
-      name: 'خالد فهد المالكي',
-      email: 'khaled@example.com',
-      role: UserRole.admin,
-      isActive: true,
-      createdAt: DateTime(2024, 9, 11),
-      lastLogin: DateTime(2026, 5, 26, 9, 0),
-    ),
-    UserModel(
-      id: 10,
-      name: 'ريم عادل السبيعي',
-      email: 'reem@example.com',
-      role: UserRole.student,
-      isActive: true,
-      createdAt: DateTime(2024, 10, 25),
-      lastLogin: DateTime(2026, 5, 21, 15, 10),
+      subscriptionExpiry: DateTime(2026, 12, 31),
     ),
   ];
 
   @override
-  List<Object?> get props => [id, name, email, role, isActive, stageId, gradeId, createdAt, lastLogin];
+  List<Object?> get props => [id, name, email, role, isActive, stageId, gradeId, createdAt, lastLogin, subscriptionExpiry];
 }

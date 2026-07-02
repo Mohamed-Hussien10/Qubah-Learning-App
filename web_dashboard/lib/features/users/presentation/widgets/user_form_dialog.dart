@@ -36,6 +36,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
   late bool _isActive;
   String? _selectedStageId;
   String? _selectedGradeId;
+  DateTime? _subscriptionExpiry;
   List<StageModel> _stages = [];
   List<GradeModel> _grades = [];
   bool _isLoadingStages = true;
@@ -53,6 +54,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
     _isActive = widget.user?.isActive ?? true;
     _selectedStageId = widget.user?.stageId?.toString();
     _selectedGradeId = widget.user?.gradeId?.toString();
+    _subscriptionExpiry = widget.user?.subscriptionExpiry;
 
     _stages = widget.initialStages;
     _grades = widget.initialGrades;
@@ -350,7 +352,59 @@ class _UserFormDialogState extends State<UserFormDialog> {
                   const SizedBox(height: 16),
                 ],
 
-                // ── Status ────────────────────────────────
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'تاريخ انتهاء الاشتراك',
+                      style: GoogleFonts.cairo(
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: _subscriptionExpiry ?? DateTime.now().add(const Duration(days: 30)),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) {
+                          setState(() => _subscriptionExpiry = picked);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: isDark ? AppColors.surfaceDark : AppColors.backgroundLight,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_today, size: 20, color: AppColors.primary),
+                            const SizedBox(width: 8),
+                            Text(
+                              _subscriptionExpiry != null
+                                  ? '${_subscriptionExpiry!.year}-${_subscriptionExpiry!.month.toString().padLeft(2, '0')}-${_subscriptionExpiry!.day.toString().padLeft(2, '0')}'
+                                  : 'غير محدد (مفتوح)',
+                              style: GoogleFonts.cairo(
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                  // ── Status ────────────────────────────────
                 Row(
                   children: [
                     Text(
@@ -473,6 +527,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
         isActive: _isActive,
         stageId: _selectedRole == UserRole.student && _selectedStageId != null ? int.tryParse(_selectedStageId!) : null,
         gradeId: _selectedRole == UserRole.student && _selectedGradeId != null ? int.tryParse(_selectedGradeId!) : null,
+        subscriptionExpiry: _subscriptionExpiry,
       ));
     } else {
       cubit.createUser(
@@ -483,6 +538,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
         isActive: _isActive,
         stageId: _selectedRole == UserRole.student && _selectedStageId != null ? int.tryParse(_selectedStageId!) : null,
         gradeId: _selectedRole == UserRole.student && _selectedGradeId != null ? int.tryParse(_selectedGradeId!) : null,
+        subscriptionExpiry: _subscriptionExpiry,
       );
     }
 

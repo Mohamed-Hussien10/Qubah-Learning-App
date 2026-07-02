@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +33,97 @@ class _HomeScreenState extends State<HomeScreen> {
         _isGuest = isGuest;
       });
     }
+  }
+
+  Future<void> _handleStagesTap() async {
+    if (_isGuest) {
+      context.go(AppRoutes.splash);
+      return;
+    }
+
+    final secureStorage = sl<SecureStorage>();
+    final userDataJson = await secureStorage.getUserData();
+    bool isExpired = false;
+
+    if (userDataJson != null && userDataJson.isNotEmpty) {
+      try {
+        final userData = jsonDecode(userDataJson);
+        final expiryStr = userData['subscription_expiry'];
+        if (expiryStr != null) {
+          final expiry = DateTime.parse(expiryStr);
+          if (expiry.isBefore(DateTime.now())) {
+            isExpired = true;
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
+
+    if (isExpired) {
+      _showRenewSubscriptionDialog();
+    } else {
+      context.push(AppRoutes.stages);
+    }
+  }
+
+  void _showRenewSubscriptionDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_rounded, color: AppColors.error, size: 28),
+            const SizedBox(width: 8),
+            Text(
+              'الاشتراك منتهي',
+              style: GoogleFonts.cairo(
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'انتهى اشتراكك. يرجى تجديد الاشتراك لمواصلة التعلم وتصفح المراحل الدراسية.',
+          style: GoogleFonts.cairo(
+            fontSize: 16,
+            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'إلغاء',
+              style: GoogleFonts.cairo(
+                fontWeight: FontWeight.bold,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+              ),
+            ),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.push(AppRoutes.subscriptionExpired);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'تواصل مع الدعم',
+              style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -126,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               imageUrl: null,
                               color: AppColors.primary,
                               defaultIcon: Icons.school_rounded,
-                              onTap: () => context.push(AppRoutes.stages),
+                              onTap: _handleStagesTap,
                             ),
 
                             ChildFriendlyCard(
@@ -223,13 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () {
-                          if (_isGuest) {
-                            context.go(AppRoutes.splash);
-                          } else {
-                            context.push(AppRoutes.stages);
-                          }
-                        },
+                        onPressed: _handleStagesTap,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: AppColors.primary,

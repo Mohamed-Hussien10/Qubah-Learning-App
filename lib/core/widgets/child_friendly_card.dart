@@ -107,7 +107,9 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                       child: widget.imageUrl != null && widget.imageUrl!.isNotEmpty
                           ? Image.network(
                               AppHelpers.resolveMediaUrl(widget.imageUrl!),
-                              fit: BoxFit.contain,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
                               errorBuilder: (_, __, ___) => Icon(
                                 widget.defaultIcon,
                                 size: 60,
