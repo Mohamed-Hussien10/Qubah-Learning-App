@@ -22,8 +22,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'admin@qubah.com');
-  final _passwordController = TextEditingController(text: 'password123');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -414,7 +414,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   textDirection: TextDirection.ltr,
                   style: GoogleFonts.cairo(fontSize: 15),
                   decoration: _inputDecoration(
-                    hint: 'admin@qubah.com',
+                    hint: 'example@email.com',
                     prefixIcon: Icons.email_outlined,
                   ),
                   validator: (v) {
@@ -514,38 +514,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 20),
 
-                // ── Demo credentials hint ───────────────────────────────
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppColors.infoBg.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AppColors.info.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline_rounded,
-                        size: 18,
-                        color: AppColors.info.withValues(alpha: 0.8),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'بيانات تجريبية: admin@qubah.com / password123',
-                          style: GoogleFonts.cairo(
-                            fontSize: 12,
-                            color: AppColors.info,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
