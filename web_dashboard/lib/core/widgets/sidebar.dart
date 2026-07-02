@@ -216,8 +216,13 @@ class Sidebar extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        children: [
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        child: SizedBox(
+          width: 248,
+          child: Row(
+            children: [
           // Logo image
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
@@ -262,6 +267,8 @@ class Sidebar extends StatelessWidget {
             ),
           ],
         ],
+      ),
+        ),
       ),
     );
   }
@@ -310,9 +317,14 @@ class Sidebar extends StatelessWidget {
                       ),
                     ),
                   )
-                : Row(
-                    children: [
-                      Icon(
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: SizedBox(
+                      width: 232,
+                      child: Row(
+                        children: [
+                          Icon(
                         isActive
                             ? (item.activeIcon ?? item.icon)
                             : item.icon,
@@ -352,6 +364,8 @@ class Sidebar extends StatelessWidget {
                         ),
                     ],
                   ),
+                    ),
+                  ),
           ),
         ),
       ),
@@ -390,10 +404,15 @@ class Sidebar extends StatelessWidget {
                       ),
                     ),
                   )
-                : Row(
-                    children: [
-                      const Icon(
-                        Icons.logout_rounded,
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: SizedBox(
+                      width: 232,
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.logout_rounded,
                         size: 20,
                         color: AppColors.error,
                       ),
@@ -406,6 +425,8 @@ class Sidebar extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                    ),
                   ),
           ),
         ),
