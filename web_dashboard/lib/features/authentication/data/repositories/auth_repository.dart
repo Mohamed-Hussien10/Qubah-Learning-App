@@ -87,6 +87,38 @@ class AuthRepository {
 
   // ── Private helpers ──────────────────────────────────────────────────
 
+  Future<void> updateProfile(String name, String email) async {
+    try {
+      await _apiClient.post(
+        '/user/profile/update',
+        data: {
+          'name': name,
+          'email': email,
+        },
+      );
+    } catch (e) {
+      print('DEBUG: Web Dashboard update profile ERROR: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updatePassword(String currentPassword, String newPassword) async {
+    try {
+      // Assuming the endpoint is /user/change-password based on the mobile app's endpoints
+      await _apiClient.post(
+        '/user/change-password',
+        data: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+          'new_password_confirmation': newPassword,
+        },
+      );
+    } catch (e) {
+      print('DEBUG: Web Dashboard update password ERROR: $e');
+      rethrow;
+    }
+  }
+
   Future<void> _saveSession(AdminModel admin) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, admin.token);

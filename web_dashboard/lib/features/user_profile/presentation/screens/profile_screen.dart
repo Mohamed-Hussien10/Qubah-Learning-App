@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:web_dashboard/core/constants/app_colors.dart';
+import 'package:web_dashboard/core/services/dependency_injection.dart';
+import 'package:web_dashboard/features/authentication/data/repositories/auth_repository.dart';
 import 'package:web_dashboard/features/authentication/presentation/manager/auth_cubit.dart';
 import 'package:web_dashboard/features/authentication/presentation/manager/auth_state.dart';
 
@@ -57,33 +59,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _saveProfile() async {
     if (!_profileFormKey.currentState!.validate()) return;
     setState(() => _isSavingProfile = true);
-    await Future.delayed(const Duration(milliseconds: 1000));
-    setState(() => _isSavingProfile = false);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم تحديث بيانات الملف الشخصي بنجاح (معاينة)'),
-          backgroundColor: AppColors.success,
-        ),
+
+    try {
+      await sl<AuthRepository>().updateProfile(
+        _nameCtrl.text,
+        _emailCtrl.text,
       );
+      
+      // Update the cubit with new data
+      await context.read<AuthCubit>().checkAuthStatus();
+
+      setState(() => _isSavingProfile = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تم تحديث بيانات الملف الشخصي بنجاح'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() => _isSavingProfile = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('حدث خطأ أثناء تحديث بيانات الملف الشخصي'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
   Future<void> _savePassword() async {
     if (!_passwordFormKey.currentState!.validate()) return;
     setState(() => _isSavingPassword = true);
-    await Future.delayed(const Duration(milliseconds: 1000));
-    setState(() => _isSavingPassword = false);
-    _currentPassCtrl.clear();
-    _newPassCtrl.clear();
-    _confirmPassCtrl.clear();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم تغيير كلمة المرور بنجاح (معاينة)'),
-          backgroundColor: AppColors.success,
-        ),
+
+    try {
+      await sl<AuthRepository>().updatePassword(
+        _currentPassCtrl.text,
+        _newPassCtrl.text,
       );
+
+      setState(() => _isSavingPassword = false);
+      _currentPassCtrl.clear();
+      _newPassCtrl.clear();
+      _confirmPassCtrl.clear();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تم تغيير كلمة المرور بنجاح'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() => _isSavingPassword = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('حدث خطأ أثناء تغيير كلمة المرور'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 

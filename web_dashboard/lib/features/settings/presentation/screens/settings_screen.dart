@@ -49,6 +49,8 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
   late TextEditingController _baseUrlCtrl;
   late TextEditingController _apiKeyCtrl;
 
+  bool _maintenanceMode = false;
+
   @override
   void initState() {
     super.initState();
@@ -94,6 +96,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
 
     _baseUrlCtrl.text = settings.baseUrl;
     _apiKeyCtrl.text = settings.apiKey;
+    _maintenanceMode = settings.maintenanceMode;
   }
 
   @override
@@ -127,8 +130,6 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
             return _buildError(context, state.errorMessage ?? '');
           }
 
-          final settings = state.settings!;
-
           return Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -142,9 +143,9 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      _buildGeneralTab(context, settings, isDark),
-                      _buildSocialTab(context, settings, isDark),
-                      _buildApiTab(context, settings, isDark),
+                      _buildGeneralTab(context, state, isDark),
+                      _buildSocialTab(context, state, isDark),
+                      _buildApiTab(context, state, isDark),
                     ],
                   ),
                 ),
@@ -194,7 +195,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
     );
   }
 
-  Widget _buildGeneralTab(BuildContext context, AppSettingsModel settings, bool isDark) {
+  Widget _buildGeneralTab(BuildContext context, SettingsState state, bool isDark) {
     return SingleChildScrollView(
       child: Form(
         key: _generalFormKey,
@@ -273,9 +274,13 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
                     ),
                     const SizedBox(width: 24),
                     Switch.adaptive(
-                      value: settings.maintenanceMode,
+                      value: _maintenanceMode,
                       activeColor: AppColors.error,
-                      onChanged: (_) => context.read<SettingsCubit>().toggleMaintenanceMode(),
+                      onChanged: (val) {
+                        setState(() {
+                          _maintenanceMode = val;
+                        });
+                      },
                     ),
                   ],
                 ),
@@ -286,17 +291,26 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 FilledButton.icon(
-                  onPressed: () {
-                    if (_generalFormKey.currentState!.validate()) {
-                      context.read<SettingsCubit>().updateGeneralSettings(
-                            appName: _appNameCtrl.text.trim(),
-                            contactEmail: _emailCtrl.text.trim(),
-                            contactPhone: _phoneCtrl.text.trim(),
-                          );
-                    }
-                  },
-                  icon: const Icon(Icons.save_rounded),
-                  label: const Text('حفظ الإعدادات العامة'),
+                  onPressed: state.status == SettingsStatus.saving
+                      ? null
+                      : () {
+                          if (_generalFormKey.currentState!.validate()) {
+                            context.read<SettingsCubit>().updateGeneralSettings(
+                                  appName: _appNameCtrl.text.trim(),
+                                  contactEmail: _emailCtrl.text.trim(),
+                                  contactPhone: _phoneCtrl.text.trim(),
+                                  maintenanceMode: _maintenanceMode,
+                                );
+                          }
+                        },
+                  icon: state.status == SettingsStatus.saving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Icon(Icons.save_rounded),
+                  label: Text(state.status == SettingsStatus.saving ? 'جاري الحفظ...' : 'حفظ الإعدادات العامة'),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -310,7 +324,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
     );
   }
 
-  Widget _buildSocialTab(BuildContext context, AppSettingsModel settings, bool isDark) {
+  Widget _buildSocialTab(BuildContext context, SettingsState state, bool isDark) {
     return SingleChildScrollView(
       child: Form(
         key: _socialFormKey,
@@ -367,16 +381,24 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 FilledButton.icon(
-                  onPressed: () {
-                    context.read<SettingsCubit>().updateSocialLinks({
-                      'facebook': _fbCtrl.text.trim(),
-                      'twitter': _twCtrl.text.trim(),
-                      'instagram': _igCtrl.text.trim(),
-                      'youtube': _ytCtrl.text.trim(),
-                    });
-                  },
-                  icon: const Icon(Icons.save_rounded),
-                  label: const Text('حفظ روابط التواصل'),
+                  onPressed: state.status == SettingsStatus.saving
+                      ? null
+                      : () {
+                          context.read<SettingsCubit>().updateSocialLinks({
+                            'facebook': _fbCtrl.text.trim(),
+                            'twitter': _twCtrl.text.trim(),
+                            'instagram': _igCtrl.text.trim(),
+                            'youtube': _ytCtrl.text.trim(),
+                          });
+                        },
+                  icon: state.status == SettingsStatus.saving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Icon(Icons.save_rounded),
+                  label: Text(state.status == SettingsStatus.saving ? 'جاري الحفظ...' : 'حفظ روابط التواصل'),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -390,7 +412,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
     );
   }
 
-  Widget _buildApiTab(BuildContext context, AppSettingsModel settings, bool isDark) {
+  Widget _buildApiTab(BuildContext context, SettingsState state, bool isDark) {
     return SingleChildScrollView(
       child: Card(
         child: Padding(

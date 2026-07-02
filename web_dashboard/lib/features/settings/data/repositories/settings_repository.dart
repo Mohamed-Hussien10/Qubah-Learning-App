@@ -36,6 +36,7 @@ class SettingsRepository {
     String? contactEmail,
     String? contactPhone,
     String? logoUrl,
+    bool? maintenanceMode,
   }) async {
     final settings = await getSettings();
     final updated = settings.copyWith(
@@ -43,6 +44,7 @@ class SettingsRepository {
       contactEmail: contactEmail,
       contactPhone: contactPhone,
       logoUrl: logoUrl,
+      maintenanceMode: maintenanceMode,
     );
     return updateSettings(updated);
   }

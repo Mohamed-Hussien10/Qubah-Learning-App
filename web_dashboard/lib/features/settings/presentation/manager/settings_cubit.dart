@@ -59,6 +59,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     String? contactEmail,
     String? contactPhone,
     String? logoUrl,
+    bool? maintenanceMode,
   }) async {
     emit(state.copyWith(status: SettingsStatus.saving));
     try {
@@ -67,6 +68,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         contactEmail: contactEmail,
         contactPhone: contactPhone,
         logoUrl: logoUrl,
+        maintenanceMode: maintenanceMode,
       );
       emit(state.copyWith(
         status: SettingsStatus.loaded,

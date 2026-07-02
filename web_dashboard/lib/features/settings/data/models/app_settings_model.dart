@@ -49,31 +49,34 @@ class AppSettingsModel extends Equatable {
 
   factory AppSettingsModel.fromJson(Map<String, dynamic> json) {
     return AppSettingsModel(
-      appName: json['app_name'] as String? ?? '',
-      logoUrl: json['logo_url'] as String?,
-      contactEmail: json['contact_email'] as String? ?? '',
-      contactPhone: json['contact_phone'] as String? ?? '',
-      socialLinks: json['social_links'] != null
-          ? Map<String, String>.from(json['social_links'] as Map)
+      appName: json['appName']?.toString() ?? '',
+      logoUrl: json['logoUrl']?.toString(),
+      contactEmail: json['contactEmail']?.toString() ?? '',
+      contactPhone: json['contactPhone']?.toString() ?? '',
+      socialLinks: json['socialLinks'] != null
+          ? Map<String, String>.from(json['socialLinks'] as Map)
           : {},
-      maintenanceMode: json['maintenance_mode'] as bool? ?? false,
-      defaultLanguage: json['default_language'] as String? ?? 'ar',
-      baseUrl: json['base_url'] as String? ?? '',
-      apiKey: json['api_key'] as String? ?? '',
+      maintenanceMode: json['maintenanceMode'] == true ||
+          json['maintenanceMode'] == 'true' ||
+          json['maintenanceMode'] == 1 ||
+          json['maintenanceMode'] == '1',
+      defaultLanguage: json['defaultLanguage']?.toString() ?? 'ar',
+      baseUrl: json['baseUrl']?.toString() ?? '',
+      apiKey: json['apiKey']?.toString() ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'app_name': appName,
-      'logo_url': logoUrl,
-      'contact_email': contactEmail,
-      'contact_phone': contactPhone,
-      'social_links': socialLinks,
-      'maintenance_mode': maintenanceMode,
-      'default_language': defaultLanguage,
-      'base_url': baseUrl,
-      'api_key': apiKey,
+      'appName': appName,
+      'logoUrl': logoUrl,
+      'contactEmail': contactEmail,
+      'contactPhone': contactPhone,
+      'socialLinks': socialLinks,
+      'maintenanceMode': maintenanceMode,
+      'defaultLanguage': defaultLanguage,
+      'baseUrl': baseUrl,
+      'apiKey': apiKey,
     };
   }
 

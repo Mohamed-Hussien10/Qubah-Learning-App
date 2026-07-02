@@ -10,6 +10,8 @@ import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/storage/secure_storage.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/qubah_button.dart';
+import '../../../../core/network/dio_client.dart';
+import '../../../../core/network/api_endpoints.dart';
 import 'package:qubah_learning_app/features/authentication/domain/repositories/auth_repository.dart'
     as qubah_auth;
 
@@ -62,6 +64,29 @@ class _SplashScreenState extends State<SplashScreen> {
           } catch (_) {}
         }
       }
+    }
+
+    // 1. Fetch Maintenance Mode Status
+    try {
+      final dioClient = sl<DioClient>();
+      // Fallback to getting base URL from ApiEndpoints if needed, but DioClient usually has it.
+      final response = await dioClient.get(ApiEndpoints.appConfig);
+      final data = response.data['data'] ?? response.data;
+      final bool isMaintenance = data['maintenanceMode'] ?? false;
+      
+      if (isMaintenance) {
+        if (!mounted) return;
+        context.go(
+          AppRoutes.maintenance,
+          extra: {
+            'contactEmail': data['contactEmail'],
+            'contactPhone': data['contactPhone'],
+          },
+        );
+        return;
+      }
+    } catch (e) {
+      debugPrint('Failed to check maintenance mode: $e');
     }
 
     if (!mounted) return;

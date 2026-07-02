@@ -24,6 +24,7 @@ import '../../features/parent_lock/presentation/screens/change_pin_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_expired_screen.dart';
 import '../../features/settings/presentation/screens/support_screen.dart';
 import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
+import '../../features/splash/presentation/screens/maintenance_screen.dart';
 
 /// Route name constants.
 class AppRoutes {
@@ -54,6 +55,7 @@ class AppRoutes {
   static const String appExitLock = '/app-exit-lock';
   static const String support = '/support';
   static const String privacy = '/privacy';
+  static const String maintenance = '/maintenance';
 }
 
 /// Application router configuration using GoRouter.
@@ -72,6 +74,17 @@ class AppRouter {
         path: AppRoutes.splash,
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.maintenance,
+        name: 'maintenance',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return MaintenanceScreen(
+            contactEmail: extra['contactEmail']?.toString() ?? 'support@qubah.com',
+            contactPhone: extra['contactPhone']?.toString() ?? '+966500000000',
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.login,
@@ -268,7 +281,13 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.support,
         name: 'support',
-        builder: (context, state) => const SupportScreen(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return SupportScreen(
+            initialContactEmail: extra['contactEmail']?.toString(),
+            initialContactPhone: extra['contactPhone']?.toString(),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.privacy,
