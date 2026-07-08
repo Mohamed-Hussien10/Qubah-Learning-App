@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// ──────────────────────────────────────────────────────────────────────────────
 /// API Endpoints
@@ -10,9 +9,7 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   // ── Base Configuration ──────────────────────────────────────────────────
-  static String baseUrl = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS
-      ? 'http://192.168.1.190:8000/api/v1'
-      : 'http://127.0.0.1:8000/api/v1'; // Production backend
+  static const String baseUrl = 'https://qubahom.com/api/v1'; // Production backend
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 

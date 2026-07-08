@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
 /// ──────────────────────────────────────────────────────────────────────────────
@@ -175,9 +174,7 @@ class AppHelpers {
   static String resolveMediaUrl(String path) {
     if (path.isEmpty) return '';
     
-    final String host = defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS
-        ? 'http://192.168.1.190:8000'
-        : 'http://127.0.0.1:8000';
+    const String host = 'https://qubahom.com';
         
     if (path.contains('thumbnails/')) {
       final fileName = path.split('thumbnails/').last;

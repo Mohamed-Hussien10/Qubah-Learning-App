@@ -36,11 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _handleStagesTap() async {
-    if (_isGuest) {
-      context.go(AppRoutes.splash);
-      return;
-    }
-
     final secureStorage = sl<SecureStorage>();
     final userDataJson = await secureStorage.getUserData();
     bool isExpired = false;
@@ -65,6 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       context.push(AppRoutes.stages);
     }
+  }
+
+  Future<void> _handleSubscribeNow() async {
+    context.go(AppRoutes.splash);
   }
 
   void _showRenewSubscriptionDialog() {
@@ -315,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: _handleStagesTap,
+                        onPressed: _isGuest ? _handleSubscribeNow : _handleStagesTap,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: AppColors.primary,
