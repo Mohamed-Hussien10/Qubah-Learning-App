@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -39,36 +42,7 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
                   // Avatar
-                  Center(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundColor: AppColors.primary.withValues(
-                            alpha: 0.1,
-                          ),
-                          child: const Icon(
-                            Icons.person_rounded,
-                            size: 70,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            radius: 18,
-                            backgroundColor: AppColors.primary,
-                            child: const Icon(
-                              Icons.camera_alt_rounded,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
+                  const _ProfileAvatarWidget(),
                   const SizedBox(height: 24),
                   // Name
                   FutureBuilder<UserEntity?>(
@@ -270,5 +244,84 @@ class _ProfileMenuItem extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _ProfileAvatarWidget extends StatefulWidget {
+  const _ProfileAvatarWidget();
+
+  @override
+  State<_ProfileAvatarWidget> createState() => _ProfileAvatarWidgetState();
+}
+
+class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
+  String? _imagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _imagePath = prefs.getString('user_profile_image');
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    if (result != null && result.files.single.path != null) {
+      final path = result.files.single.path!;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_profile_image', path);
+      setState(() {
+        _imagePath = path;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: _pickImage,
+            child: CircleAvatar(
+              radius: 60,
+              backgroundColor: AppColors.primary.withValues(
+                alpha: 0.1,
+              ),
+              backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
+              child: _imagePath == null
+                  ? const Icon(
+                      Icons.person_rounded,
+                      size: 70,
+                      color: AppColors.primary,
+                    )
+                  : null,
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: _pickImage,
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: AppColors.primary,
+                child: const Icon(
+                  Icons.camera_alt_rounded,
+                  size: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).animate().scale(duration: 400.ms, curve: Curves.elasticOut);
   }
 }

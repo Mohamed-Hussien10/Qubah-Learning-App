@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -130,8 +131,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        // Prevent back navigation completely
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final hasPin = await sl<SecureStorage>().hasParentPin();
+        if (hasPin && context.mounted) {
+          context.push(AppRoutes.appExitLock);
+        } else {
+          SystemNavigator.pop();
+        }
       },
       child: Scaffold(
         body: SafeArea(

@@ -9,7 +9,7 @@ class AppStrings {
   static const String dashboard = 'الرئيسية';
   static const String stages = 'المراحل التعليمية';
   static const String grades = 'الصفوف';
-  static const String sections = 'الأقسام';
+  static const String sections = 'الفصول';
   static const String subjects = 'المواد';
   static const String units = 'الوحدات';
   static const String lessons = 'الدروس';

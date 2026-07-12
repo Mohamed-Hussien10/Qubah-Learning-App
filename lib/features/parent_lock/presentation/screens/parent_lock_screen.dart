@@ -26,7 +26,7 @@ class ParentLockScreen extends StatefulWidget {
 
 class _ParentLockScreenState extends State<ParentLockScreen> {
   final _pinController = TextEditingController();
-  String _correctPin = '1234'; 
+  String _correctPin = '1234';
   bool _isLockEnabled = false;
   bool _isChecking = true;
 
@@ -76,7 +76,10 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم تعطيل الرقابة الأبوية'), backgroundColor: AppColors.success),
+          const SnackBar(
+            content: Text('تم تعطيل الرقابة الأبوية'),
+            backgroundColor: AppColors.success,
+          ),
         );
       }
     } else {
@@ -88,7 +91,10 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم تفعيل الرقابة الأبوية (الرمز: 1234)'), backgroundColor: AppColors.success),
+          const SnackBar(
+            content: Text('تم تفعيل الرقابة الأبوية (الرمز: 1234)'),
+            backgroundColor: AppColors.success,
+          ),
         );
       }
     }
@@ -144,7 +150,10 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
           iconTheme: const IconThemeData(color: Colors.black87),
           title: Text(
             'قفل الوالدين',
-            style: GoogleFonts.cairo(fontWeight: FontWeight.bold, color: Colors.black87),
+            style: GoogleFonts.cairo(
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
         ),
         body: SafeArea(
@@ -186,11 +195,19 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
                         child: SwitchListTile(
                           title: Text(
                             _isLockEnabled ? 'تعطيل القفل' : 'تفعيل القفل',
-                            style: GoogleFonts.cairo(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: GoogleFonts.cairo(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           subtitle: Text(
-                            _isLockEnabled ? 'سيتم تعطيل حماية التطبيق' : 'تفعيل القفل برمز 1234',
-                            style: GoogleFonts.cairo(fontSize: 12, color: Colors.grey.shade600),
+                            _isLockEnabled
+                                ? 'سيتم تعطيل حماية التطبيق'
+                                : 'تفعيل القفل برمز 1234',
+                            style: GoogleFonts.cairo(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
                           value: _isLockEnabled,
                           onChanged: (val) => _toggleLock(),
@@ -209,7 +226,9 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
                             ? 'يرجى إدخال رمز PIN المكون من 4 أرقام لدخول التطبيق.'
                             : 'يرجى إدخال رمز PIN للوصول أو التعديل.',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                         ),
                         textAlign: TextAlign.center,
                       ).animate().fadeIn(delay: 300.ms),
@@ -237,11 +256,15 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
                               fillColor: Colors.grey.shade50,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.grey.shade200),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade200,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: Colors.grey.shade200),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade200,
+                                ),
                               ),
                             ),
                           )
@@ -258,12 +281,6 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
                           .fadeIn(delay: 500.ms)
                           .slideY(begin: 0.1, end: 0),
                       const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {
-                          // Forgot PIN logic
-                        },
-                        child: Text('نسيت الرمز؟', style: GoogleFonts.cairo(color: AppColors.primary)),
-                      ).animate().fadeIn(delay: 600.ms),
                     ],
                   ],
                 ),

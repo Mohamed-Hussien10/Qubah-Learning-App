@@ -129,7 +129,7 @@ class _SectionsView extends StatelessWidget {
         FilledButton.icon(
           onPressed: () => _showForm(context),
           icon: const Icon(Icons.add_rounded),
-          label: Text('${AppStrings.add} قسم'),
+          label: Text('${AppStrings.add} فصل'),
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.primary,
             padding:
@@ -285,7 +285,7 @@ class _SectionsView extends StatelessWidget {
                       ? AppColors.textSecondaryDark
                       : AppColors.textSecondaryLight)),
           const SizedBox(height: 8),
-          Text('لا توجد أقسام في هذا الصف',
+          Text('لا توجد فصول في هذا الصف',
               style: TextStyle(
                   color: isDark
                       ? AppColors.textTertiaryDark
@@ -541,7 +541,7 @@ class _SectionFormDialogState extends State<_SectionFormDialog> {
                   Icon(_isEditing ? Icons.edit : Icons.add,
                       color: AppColors.primary),
                   const SizedBox(width: 8),
-                  Text(_isEditing ? 'تعديل القسم' : 'إضافة قسم جديد',
+                  Text(_isEditing ? 'تعديل الفصل' : 'إضافة فصل جديد',
                       style: Theme.of(context)
                           .textTheme
                           .titleLarge
@@ -558,7 +558,7 @@ class _SectionFormDialogState extends State<_SectionFormDialog> {
                   controller: _titleCtrl,
                   decoration: InputDecoration(
                     labelText: 'العنوان *',
-                    hintText: 'مثال: القسم العلمي',
+                    hintText: 'مثال: الفصل العلمي',
                     prefixIcon: const Icon(Icons.title),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12)),

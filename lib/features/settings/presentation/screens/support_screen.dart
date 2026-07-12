@@ -58,8 +58,14 @@ class _SupportScreenState extends State<SupportScreen> {
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('لا يمكن فتح الرابط، تأكد من وجود التطبيق المناسب')),
+        );
+      }
     }
   }
 
