@@ -26,7 +26,7 @@ class LessonFileModel {
         id: json['id'].toString(),
         name: json['title'] ?? '',
         description: json['description'] as String?,
-        imageUrl: json['thumbnail_url'] as String?,
+        imageUrl: json['thumbnail_path'] as String? ?? json['thumbnail_url'] as String?,
         order: json['order'] as int? ?? 0,
         childCount: 0,
         type: json['type'] ?? 'unknown',

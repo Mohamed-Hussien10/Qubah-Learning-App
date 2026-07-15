@@ -248,16 +248,59 @@ class _LessonFilesView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: themeColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
+
+                  if (file.thumbnailUrl != null)
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: themeColor.withValues(alpha: 0.2), width: 1.5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: themeColor.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          resolveImageUrl(file.thumbnailUrl!),
+                          fit: BoxFit.cover,
+                          errorBuilder: (ctx, err, stack) {
+                            return Container(
+                              padding: const EdgeInsets.all(12),
+                              color: themeColor.withValues(alpha: 0.1),
+                              child: Icon(iconData, color: themeColor, size: 28),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      width: 56,
+                      height: 56,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: themeColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: themeColor.withValues(alpha: 0.2), width: 1.5),
+                      ),
+                      child: Icon(iconData, color: themeColor, size: 28),
                     ),
-                    child: Icon(iconData, color: themeColor, size: 24),
-                  ),
                   Row(
                     children: [
+                      IconButton(
+                        icon: const Icon(Icons.add_photo_alternate_rounded, color: AppColors.primary),
+                        onPressed: () => _pickAndUploadThumbnail(context, file),
+                        tooltip: 'إضافة صورة مصغرة',
+                        style: IconButton.styleFrom(
+                          padding: const EdgeInsets.all(8),
+                        ),
+                      ),
                       IconButton(
                         icon: const Icon(Icons.download_rounded),
                         onPressed: () => _downloadFile(context, file),
@@ -447,10 +490,10 @@ class _LessonFilesView extends StatelessWidget {
           fileType = 'html5';
         }
 
-        // Show quick input dialog for the file Title
         if (!context.mounted) return;
         final titleCtrl = TextEditingController(text: fileName.split('.').first);
-        final title = await showDialog<String>(
+        String? title;
+        await showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text('تأكيد رفع الملف'),
@@ -468,22 +511,25 @@ class _LessonFilesView extends StatelessWidget {
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text(AppStrings.cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(ctx, titleCtrl.text.trim()),
-                child: const Text('رفع'),
-              ),
-            ],
-          ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text(AppStrings.cancel),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    title = titleCtrl.text.trim();
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('رفع'),
+                ),
+              ],
+            ),
         );
 
-        if (title != null && title.isNotEmpty) {
+        if (title != null && title!.isNotEmpty) {
           await cubit.uploadFile(
-            title: title,
+            title: title!,
             type: fileType,
             fileName: fileName,
             bytesCount: bytesCount,
@@ -493,6 +539,55 @@ class _LessonFilesView extends StatelessWidget {
       }
     } catch (e) {
       debugPrint('Error picking file: $e');
+    }
+  }
+
+  Future<void> _pickAndUploadThumbnail(BuildContext context, LessonFileModel file) async {
+    final cubit = context.read<LessonFilesCubit>();
+    BuildContext? dialogContext;
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.image,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final pickedFile = result.files.first;
+        if (pickedFile.bytes != null) {
+          if (!context.mounted) return;
+          
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) {
+              dialogContext = ctx;
+              return const Center(child: CircularProgressIndicator());
+            },
+          );
+
+          try {
+            final success = await cubit.uploadThumbnail(
+              fileId: file.id,
+              thumbnailBytes: pickedFile.bytes!,
+              thumbnailFileName: pickedFile.name,
+            );
+
+            if (success && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('تم رفع الصورة المصغرة بنجاح'),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            }
+          } finally {
+            if (dialogContext != null && dialogContext!.mounted) {
+              Navigator.pop(dialogContext!);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error picking thumbnail: $e');
     }
   }
 
@@ -547,4 +642,17 @@ class _LessonFilesView extends StatelessWidget {
   void _downloadFile(BuildContext context, LessonFileModel file) {
     _previewFile(context, file);
   }
+}
+
+String resolveImageUrl(String path) {
+  if (path.isEmpty) return '';
+  if (path.contains('thumbnails/')) {
+    final fileName = path.split('thumbnails/').last;
+    return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+  }
+  if (path.startsWith('http')) return path;
+  const baseUrl = 'https://qubahom.com';
+  if (path.startsWith('/')) return '$baseUrl$path';
+  if (path.startsWith('storage/')) return '$baseUrl/$path';
+  return '$baseUrl/storage/$path';
 }

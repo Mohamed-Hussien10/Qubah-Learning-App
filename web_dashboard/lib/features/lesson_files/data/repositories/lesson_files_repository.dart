@@ -1,3 +1,4 @@
+
 import 'package:web_dashboard/core/network/api_client.dart';
 import 'package:web_dashboard/features/lesson_files/data/models/lesson_file_model.dart';
 
@@ -85,6 +86,44 @@ class LessonFilesRepository {
       final response = await _apiClient.post('/lesson-files', data: payload);
       final data = response.data['data'] ?? response.data;
       return LessonFileModel.fromJson(data as Map<String, dynamic>);
+    }
+  }
+
+  /// Upload a thumbnail for a specific lesson file
+  Future<LessonFileModel> uploadThumbnail({
+    required String fileId,
+    required List<int> thumbnailBytes,
+    required String thumbnailFileName,
+  }) async {
+    try {
+      print('DEBUG: Starting thumbnail upload for fileId: $fileId');
+      
+      // 1. Upload thumbnail to generic thumbnail endpoint
+      final uploadResponse = await _apiClient.uploadFileBytes(
+        '/thumbnails/upload',
+        fileBytes: thumbnailBytes,
+        fileName: thumbnailFileName,
+        fileFieldName: 'thumbnail',
+        additionalFields: {'folder': 'files'},
+      );
+      print('DEBUG: Upload response: ${uploadResponse.data}');
+      
+      final uploadData = uploadResponse.data['data'] ?? uploadResponse.data;
+      final String thumbnailPath = uploadData['path'];
+      print('DEBUG: Thumbnail path received: $thumbnailPath');
+
+      // 2. Fetch current file
+      final fileModel = await getById(fileId);
+      print('DEBUG: Fetched current file: ${fileModel.toJson()}');
+
+      // 3. Update file with new thumbnail path
+      final updatedModel = fileModel.copyWith(thumbnailUrl: thumbnailPath);
+      final updateResult = await update(updatedModel);
+      print('DEBUG: Update successful');
+      return updateResult;
+    } catch (e) {
+      print('DEBUG: Error in uploadThumbnail: $e');
+      rethrow;
     }
   }
 }

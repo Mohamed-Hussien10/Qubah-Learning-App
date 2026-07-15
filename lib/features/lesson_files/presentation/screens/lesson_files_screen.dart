@@ -10,6 +10,7 @@ import '../../../../core/widgets/child_friendly_card.dart';
 import '../manager/cubit/lesson_files_cubit.dart';
 import '../manager/state/lesson_files_state.dart';
 import '../../../../core/routing/app_router.dart';
+import '../../../../core/network/api_endpoints.dart';
 
 class LessonFilesScreen extends StatefulWidget {
   final String parentId;
@@ -137,7 +138,11 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
                       return ChildFriendlyCard(
                         title: item.name,
                         subtitle: item.type.toUpperCase(),
-                        imageUrl: null,
+                        imageUrl: item.imageUrl != null
+                            ? (item.imageUrl!.startsWith('http')
+                                ? item.imageUrl
+                                : '${ApiEndpoints.baseUrl}/${item.imageUrl!}')
+                            : null,
                         color: color,
                         defaultIcon: icon,
                         onTap: () {

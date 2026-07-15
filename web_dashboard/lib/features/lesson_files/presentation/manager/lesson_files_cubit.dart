@@ -85,4 +85,34 @@ class LessonFilesCubit extends Cubit<LessonFilesState> {
       }
     }
   }
+
+  Future<bool> uploadThumbnail({
+    required String fileId,
+    required List<int> thumbnailBytes,
+    required String thumbnailFileName,
+  }) async {
+    final currentState = state;
+    if (currentState is LessonFilesLoaded) {
+      try {
+        await _repository.uploadThumbnail(
+          fileId: fileId,
+          thumbnailBytes: thumbnailBytes,
+          thumbnailFileName: thumbnailFileName,
+        );
+        // Reload files to show new thumbnail
+        final freshFiles = await _repository.getByLessonId(_lessonId);
+        emit(LessonFilesLoaded(
+          files: freshFiles,
+          lessonId: _lessonId,
+          lessonName: currentState.lessonName,
+          uploadProgress: null,
+        ));
+        return true;
+      } catch (e) {
+        emit(LessonFilesError(ErrorHandler.handle(e)));
+        return false;
+      }
+    }
+    return false;
+  }
 }

@@ -4,6 +4,7 @@ class ApiEndpoints {
 
   // ── Base URL ──────────────────────────────────────────────────────────
   static const String baseUrl = 'https://qubahom.com/api/v1';
+  static const String storageUrl = 'https://qubahom.com/storage';
 
   // ── Auth ──────────────────────────────────────────────────────────────
   static const String login = '/auth/login';

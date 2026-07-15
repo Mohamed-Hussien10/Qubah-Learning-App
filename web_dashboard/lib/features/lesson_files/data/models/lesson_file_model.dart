@@ -6,6 +6,7 @@ class LessonFileModel extends BaseEntity {
   final String type; // video, audio, pdf, image, scorm, html5
   final String fileUrl;
   final String fileSize;
+  final String? thumbnailUrl;
 
   const LessonFileModel({
     required super.id,
@@ -14,6 +15,7 @@ class LessonFileModel extends BaseEntity {
     required this.type,
     required this.fileUrl,
     required this.fileSize,
+    this.thumbnailUrl,
     super.isActive = true,
     super.order = 0,
     super.createdAt,
@@ -21,7 +23,7 @@ class LessonFileModel extends BaseEntity {
 
   @override
   List<Object?> get props =>
-      [...super.props, lessonId, type, fileUrl, fileSize];
+      [...super.props, lessonId, type, fileUrl, fileSize, thumbnailUrl];
 
   factory LessonFileModel.fromJson(Map<String, dynamic> json) {
     return LessonFileModel(
@@ -31,6 +33,7 @@ class LessonFileModel extends BaseEntity {
       type: json['type'] ?? 'pdf',
       fileUrl: json['file_url'] ?? json['file_path'] ?? '',
       fileSize: json['file_size'] ?? (json['metadata'] is Map ? json['metadata']['file_size'] : null) ?? '0 KB',
+      thumbnailUrl: json['thumbnail_url'],
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       createdAt: json['created_at'] != null
@@ -47,6 +50,7 @@ class LessonFileModel extends BaseEntity {
       'type': type,
       'file_url': fileUrl,
       'file_size': fileSize,
+      'thumbnail_path': thumbnailUrl,
       'is_active': isActive,
       'order': order,
       'created_at': createdAt?.toIso8601String(),
@@ -62,6 +66,7 @@ class LessonFileModel extends BaseEntity {
     String? type,
     String? fileUrl,
     String? fileSize,
+    String? thumbnailUrl,
     bool? isActive,
     int? order,
     DateTime? createdAt,
@@ -73,6 +78,7 @@ class LessonFileModel extends BaseEntity {
       type: type ?? this.type,
       fileUrl: fileUrl ?? this.fileUrl,
       fileSize: fileSize ?? this.fileSize,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       isActive: isActive ?? this.isActive,
       order: order ?? this.order,
       createdAt: createdAt ?? this.createdAt,
