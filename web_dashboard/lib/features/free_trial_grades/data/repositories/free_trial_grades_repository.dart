@@ -34,7 +34,7 @@ class FreeTrialGradesRepository {
         fileBytes: imageBytes,
         fileName: imageName,
         fileFieldName: 'thumbnail',
-        additionalFields: {'folder': 'free_trial_grades'},
+        additionalFields: {'folder': 'free-trial/grades'},
       );
       payload['thumbnail_path'] = uploadRes.data['data']['path'];
     }
@@ -53,7 +53,7 @@ class FreeTrialGradesRepository {
         fileBytes: imageBytes,
         fileName: imageName,
         fileFieldName: 'thumbnail',
-        additionalFields: {'folder': 'free_trial_grades'},
+        additionalFields: {'folder': 'free-trial/grades'},
       );
       payload['thumbnail_path'] = uploadRes.data['data']['path'];
     }

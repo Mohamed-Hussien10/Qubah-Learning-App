@@ -36,7 +36,7 @@ class FreeTrialStagesRepository {
         fileBytes: imageBytes,
         fileName: imageName,
         fileFieldName: 'thumbnail',
-        additionalFields: {'folder': 'free_trial_stages'},
+        additionalFields: {'folder': 'free-trial/stages'},
       );
       final path = uploadRes.data['data']['path'];
       payload['thumbnail_path'] = path;
@@ -48,7 +48,7 @@ class FreeTrialStagesRepository {
         fileBytes: bgImageBytes,
         fileName: bgImageName,
         fileFieldName: 'thumbnail',
-        additionalFields: {'folder': 'free_trial_stages'},
+        additionalFields: {'folder': 'free-trial/stages'},
       );
       final path = uploadRes.data['data']['path'];
       payload['background_image_path'] = path;
@@ -70,7 +70,7 @@ class FreeTrialStagesRepository {
         fileBytes: imageBytes,
         fileName: imageName,
         fileFieldName: 'thumbnail',
-        additionalFields: {'folder': 'free_trial_stages'},
+        additionalFields: {'folder': 'free-trial/stages'},
       );
       final path = uploadRes.data['data']['path'];
       payload['thumbnail_path'] = path;
@@ -82,7 +82,7 @@ class FreeTrialStagesRepository {
         fileBytes: bgImageBytes,
         fileName: bgImageName,
         fileFieldName: 'thumbnail',
-        additionalFields: {'folder': 'free_trial_stages'},
+        additionalFields: {'folder': 'free-trial/stages'},
       );
       final path = uploadRes.data['data']['path'];
       payload['background_image_path'] = path;

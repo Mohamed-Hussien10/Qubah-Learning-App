@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:web_dashboard/core/constants/app_colors.dart';
 
 class NetworkAvatar extends StatelessWidget {
@@ -33,26 +32,32 @@ class NetworkAvatar extends StatelessWidget {
       );
     }
 
-    return CachedNetworkImage(
-      imageUrl: _resolveImageUrl(imageUrl!),
-      imageBuilder: (context, imageProvider) => CircleAvatar(
-        radius: radius,
-        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
-        backgroundImage: imageProvider,
-      ),
-      placeholder: (context, url) => CircleAvatar(
-        radius: radius,
-        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
-        child: SizedBox(
-          width: radius,
-          height: radius,
-          child: const CircularProgressIndicator(strokeWidth: 2),
+    return ClipOval(
+      child: Container(
+        width: radius * 2,
+        height: radius * 2,
+        color: AppColors.primaryLight.withOpacity(0.2),
+        child: Image.network(
+          _resolveImageUrl(imageUrl!),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => CircleAvatar(
+            radius: radius,
+            backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+            child: Icon(defaultIcon, size: radius, color: AppColors.primary),
+          ),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return CircleAvatar(
+              radius: radius,
+              backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+              child: SizedBox(
+                width: radius,
+                height: radius,
+                child: const CircularProgressIndicator(strokeWidth: 2),
+              ),
+            );
+          },
         ),
-      ),
-      errorWidget: (context, url, error) => CircleAvatar(
-        radius: radius,
-        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
-        child: Icon(defaultIcon, size: radius, color: AppColors.primary),
       ),
     );
   }
