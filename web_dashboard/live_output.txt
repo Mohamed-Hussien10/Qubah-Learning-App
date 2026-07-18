@@ -1,0 +1,67 @@
+STAGES:
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "ابتدائي تجريبي",
+      "description": "ابتدائي تجريبي",
+      "thumbnail_path": "thumbnails/free-trial/stages/Z5KlmByJcFmNxSzsJEdKPOVbI4kqXMaYk62qV9g2.jpg",
+      "background_image_path": null,
+      "order": 1,
+      "is_active": 1,
+      "created_at": "2026-07-15T00:57:28.000000Z",
+      "updated_at": "2026-07-15T00:57:54.000000Z",
+      "deleted_at": null,
+      "grades_count": 2,
+      "thumbnail_url": "https://qubahom.com/storage/thumbnails/free-trial/stages/Z5KlmByJcFmNxSzsJEdKPOVbI4kqXMaYk62qV9g2.jpg",
+      "background_image_url": null
+    },
+    {
+      "id": 2,
+      "title": "اعدادي تجريبي",
+      "description": null,
+      "thumbnail_path": "thumbnails/free-trial/stages/lpIeVNByeBBxO5XHWHg3ylecDVngSvkG02PnSBkq.jpg",
+      "background_image_path": null,
+      "order": 2,
+      "is_active": 1,
+      "created_at": "2026-07-15T14:17:42.000000Z",
+      "updated_at": "2026-07-15T14:17:42.000000Z",
+      "deleted_at": null,
+      "grades_count": 0,
+      "thumbnail_url": "https://qubahom.com/storage/thumbnails/free-trial/stages/lpIeVNByeBBxO5XHWHg3ylecDVngSvkG02PnSBkq.jpg",
+      "background_image_url": null
+    }
+  ]
+}
+
+FETCHING GRADES FOR STAGE 1...
+{
+  "data": [
+    {
+      "id": 1,
+      "free_trial_educational_stage_id": 1,
+      "title": "الصف الاول",
+      "description": null,
+      "thumbnail_path": "thumbnails/free-trial/grades/CRLkjpPmfEPylLy6Z1ElglSxuS4MiNk0GqedYp7z.jpg",
+      "order": 1,
+      "is_active": 1,
+      "created_at": "2026-07-15T01:03:32.000000Z",
+      "updated_at": "2026-07-15T01:03:32.000000Z",
+      "deleted_at": null,
+      "thumbnail_url": "https://qubahom.com/storage/thumbnails/free-trial/grades/CRLkjpPmfEPylLy6Z1ElglSxuS4MiNk0GqedYp7z.jpg"
+    },
+    {
+      "id": 2,
+      "free_trial_educational_stage_id": 1,
+      "title": "الصف الثاني",
+      "description": null,
+      "thumbnail_path": null,
+      "order": 2,
+      "is_active": 1,
+      "created_at": "2026-07-18T11:28:46.000000Z",
+      "updated_at": "2026-07-18T11:28:46.000000Z",
+      "deleted_at": null,
+      "thumbnail_url": null
+    }
+  ]
+}

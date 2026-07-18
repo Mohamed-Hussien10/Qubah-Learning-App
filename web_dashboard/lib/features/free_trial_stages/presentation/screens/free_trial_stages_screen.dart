@@ -381,7 +381,11 @@ class _FreeTrialStagesView extends StatelessWidget {
   }
 
   void _navigateToGrades(BuildContext context, FreeTrialStageModel free_trial_stage) {
-    context.push('/free-trial-grades/${free_trial_stage.id}');
+    context.push('/free-trial-grades/${free_trial_stage.id}').then((_) {
+      if (context.mounted) {
+        context.read<FreeTrialStagesCubit>().loadFreeTrialStages();
+      }
+    });
   }
 
   String resolveImageUrl(String path) {

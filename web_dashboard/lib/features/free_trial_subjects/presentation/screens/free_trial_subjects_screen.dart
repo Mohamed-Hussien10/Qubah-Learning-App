@@ -207,7 +207,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
             DataColumn2(
                 label: Text(AppStrings.description), size: ColumnSize.L),
             DataColumn2(label: Text(AppStrings.status), fixedWidth: 100),
-            DataColumn2(label: Text('الوحدات'), fixedWidth: 90),
+            DataColumn2(label: Text('الملفات'), fixedWidth: 90),
             DataColumn2(label: Text(AppStrings.actions), fixedWidth: 200),
           ],
           rows: free_trial_subjects.map((free_trial_subject) {
@@ -229,7 +229,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
                 DataCell(Text(free_trial_subject.description ?? '—',
                     overflow: TextOverflow.ellipsis)),
                 DataCell(_StatusBadge(isActive: free_trial_subject.isActive)),
-                DataCell(Text('${free_trial_subject.unitsCount}')),
+                DataCell(Text('${free_trial_subject.lessonFilesCount}')),
                 DataCell(Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -377,7 +377,11 @@ class _FreeTrialSubjectsView extends StatelessWidget {
   }
 
   void _navigateToLessonFiles(BuildContext context, FreeTrialSubjectModel free_trial_subject) {
-    context.push('/free-trial-lesson-files/${free_trial_subject.id}');
+    context.push('/free-trial-lesson-files/${free_trial_subject.id}').then((_) {
+      if (context.mounted) {
+        context.read<FreeTrialSubjectsCubit>().loadFreeTrialSubjects(free_trial_subject.gradeId);
+      }
+    });
   }
 }
 
@@ -496,7 +500,7 @@ class _FreeTrialSubjectFormDialogState extends State<_FreeTrialSubjectFormDialog
       isActive: _isActive,
       thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
-      unitsCount: widget.free_trial_subject?.unitsCount ?? 0,
+      lessonFilesCount: widget.free_trial_subject?.lessonFilesCount ?? 0,
       createdAt: widget.free_trial_subject?.createdAt,
     );
     try {

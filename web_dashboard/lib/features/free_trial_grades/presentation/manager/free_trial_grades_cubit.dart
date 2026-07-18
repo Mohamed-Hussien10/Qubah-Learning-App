@@ -1,9 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:web_dashboard/features/educational_stages/data/models/stage_model.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 import 'package:web_dashboard/features/free_trial_grades/data/models/free_trial_grade_model.dart';
 import 'package:web_dashboard/features/free_trial_grades/data/repositories/free_trial_grades_repository.dart';
-import 'package:web_dashboard/features/free_trial_grades/presentation/manager/free_trial_grades_state.dart';
-import 'package:web_dashboard/core/errors/error_handler.dart';
+
+import 'package:web_dashboard/core/services/dependency_injection.dart';
+import 'package:web_dashboard/features/free_trial_subjects/data/repositories/free_trial_subjects_repository.dart';
+
+import 'free_trial_grades_state.dart';
 
 class FreeTrialGradesCubit extends Cubit<FreeTrialGradesState> {
   final FreeTrialGradesRepository _repository;
@@ -18,15 +21,22 @@ class FreeTrialGradesCubit extends Cubit<FreeTrialGradesState> {
     emit(const FreeTrialGradesLoading());
     try {
       final free_trial_grades = await _repository.getByStageId(stageId);
-      // Resolve parent stage name from dummy data.
-      final stageName = StageModel.dummyList
-              .where((s) => s.id == stageId)
-              .map((s) => s.title)
-              .firstOrNull ??
-          'المرحلة';
+      final stageName = 'المرحلة';
+      
+      List<FreeTrialGradeModel> updatedGrades = [];
+      for (final grade in free_trial_grades) {
+        try {
+          final subjects = await sl<FreeTrialSubjectsRepository>().getByGradeId(grade.id);
+          updatedGrades.add(grade.copyWith(subjectsCount: subjects.length));
+        } catch (e) {
+          // If it fails, set to -99 so the user can visibly see there was an error
+          updatedGrades.add(grade.copyWith(subjectsCount: -99));
+        }
+      }
+
       emit(FreeTrialGradesLoaded(
-        free_trial_grades: free_trial_grades,
-        filteredFreeTrialGrades: free_trial_grades,
+        free_trial_grades: updatedGrades,
+        filteredFreeTrialGrades: updatedGrades,
         stageId: stageId,
         stageName: stageName,
       ));
@@ -62,34 +72,17 @@ class FreeTrialGradesCubit extends Cubit<FreeTrialGradesState> {
     }
   }
 
-  Future<void> toggleStatus(String id) async {
-    try {
-      await _repository.toggleStatus(_stageId, id);
-      await loadFreeTrialGrades(_stageId);
-    } catch (e) {
-      emit(FreeTrialGradesError(ErrorHandler.handle(e)));
-    }
-  }
-
   void search(String query) {
-    final currentState = state;
-    if (currentState is FreeTrialGradesLoaded) {
+    if (state is FreeTrialGradesLoaded) {
+      final currentState = state as FreeTrialGradesLoaded;
       if (query.isEmpty) {
-        emit(currentState.copyWith(
-          filteredFreeTrialGrades: currentState.free_trial_grades,
-          searchQuery: '',
-        ));
-      } else {
-        final filtered = currentState.free_trial_grades.where((g) {
-          final q = query.toLowerCase();
-          return g.title.toLowerCase().contains(q) ||
-              (g.description?.toLowerCase().contains(q) ?? false);
-        }).toList();
-        emit(currentState.copyWith(
-          filteredFreeTrialGrades: filtered,
-          searchQuery: query,
-        ));
+        emit(currentState.copyWith(filteredFreeTrialGrades: currentState.free_trial_grades));
+        return;
       }
+      final filtered = currentState.free_trial_grades.where((free_trial_grade) {
+        return free_trial_grade.title.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+      emit(currentState.copyWith(filteredFreeTrialGrades: filtered));
     }
   }
 }

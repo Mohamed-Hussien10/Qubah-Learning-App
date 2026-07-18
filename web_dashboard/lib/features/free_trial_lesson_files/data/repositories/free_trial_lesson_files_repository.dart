@@ -61,7 +61,7 @@ class FreeTrialLessonFilesRepository {
         fileName: fileName,
         fileFieldName: 'file',
         additionalFields: {
-          'subject_id': subjectId,
+          'free_trial_subject_id': subjectId,
           'title': title,
           'type': type,
         },
@@ -76,7 +76,7 @@ class FreeTrialLessonFilesRepository {
     } else {
       // If no file bytes are present, send metadata only
       final payload = {
-        'subject_id': subjectId,
+        'free_trial_subject_id': subjectId,
         'title': title,
         'type': type,
         'file_name': fileName,

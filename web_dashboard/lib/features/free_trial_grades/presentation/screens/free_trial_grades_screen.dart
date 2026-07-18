@@ -218,7 +218,7 @@ class _FreeTrialGradesView extends StatelessWidget {
             DataColumn2(
                 label: Text(AppStrings.description), size: ColumnSize.L),
             DataColumn2(label: Text(AppStrings.status), fixedWidth: 100),
-            DataColumn2(label: Text(AppStrings.sections), fixedWidth: 90),
+            DataColumn2(label: Text(AppStrings.subjects), fixedWidth: 90),
             DataColumn2(label: Text(AppStrings.actions), fixedWidth: 200),
           ],
           rows: free_trial_grades.map((free_trial_grade) {
@@ -243,7 +243,7 @@ class _FreeTrialGradesView extends StatelessWidget {
                 DataCell(Text(free_trial_grade.description ?? '—',
                     overflow: TextOverflow.ellipsis)),
                 DataCell(_StatusBadge(isActive: free_trial_grade.isActive)),
-                DataCell(Text('${free_trial_grade.sectionsCount}')),
+                DataCell(Text('${free_trial_grade.subjectsCount}')),
                 DataCell(Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -394,7 +394,11 @@ class _FreeTrialGradesView extends StatelessWidget {
   }
 
   void _navigateToSubjects(BuildContext context, FreeTrialGradeModel free_trial_grade) {
-    context.push('/free-trial-subjects/${free_trial_grade.id}');
+    context.push('/free-trial-subjects/${free_trial_grade.id}').then((_) {
+      if (context.mounted) {
+        context.read<FreeTrialGradesCubit>().loadFreeTrialGrades(free_trial_grade.stageId);
+      }
+    });
   }
 }
 
@@ -529,7 +533,7 @@ class _FreeTrialGradeFormDialogState extends State<_FreeTrialGradeFormDialog> {
       isActive: _isActive,
       thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
-      sectionsCount: widget.free_trial_grade?.sectionsCount ?? 0,
+      subjectsCount: widget.free_trial_grade?.subjectsCount ?? 0,
       createdAt: widget.free_trial_grade?.createdAt,
     );
     try {

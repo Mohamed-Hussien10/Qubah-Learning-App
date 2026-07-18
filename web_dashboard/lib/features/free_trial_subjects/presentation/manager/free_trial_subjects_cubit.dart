@@ -1,9 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:web_dashboard/features/grades/data/models/grade_model.dart';
+import 'package:web_dashboard/core/errors/error_handler.dart';
 import 'package:web_dashboard/features/free_trial_subjects/data/models/free_trial_subject_model.dart';
 import 'package:web_dashboard/features/free_trial_subjects/data/repositories/free_trial_subjects_repository.dart';
-import 'package:web_dashboard/features/free_trial_subjects/presentation/manager/free_trial_subjects_state.dart';
-import 'package:web_dashboard/core/errors/error_handler.dart';
+import 'package:web_dashboard/features/free_trial_grades/data/models/free_trial_grade_model.dart';
+import 'package:web_dashboard/core/services/dependency_injection.dart';
+import 'package:web_dashboard/features/free_trial_lesson_files/data/repositories/free_trial_lesson_files_repository.dart';
+
+import 'free_trial_subjects_state.dart';
 
 class FreeTrialSubjectsCubit extends Cubit<FreeTrialSubjectsState> {
   final FreeTrialSubjectsRepository _repository;
@@ -18,18 +21,26 @@ class FreeTrialSubjectsCubit extends Cubit<FreeTrialSubjectsState> {
     emit(const FreeTrialSubjectsLoading());
     try {
       final free_trial_subjects = await _repository.getByGradeId(gradeId);
-      String gradeName = 'القسم';
-      for (final grades in GradeModel.dummyMap.values) {
-        for (final s in grades) {
-          if (s.id == gradeId) {
-            gradeName = s.title;
-            break;
-          }
+      final gradeName = FreeTrialGradeModel.dummyMap.values
+              .expand((e) => e)
+              .where((g) => g.id == gradeId)
+              .map((g) => g.title)
+              .firstOrNull ??
+          'الصف';
+      
+      List<FreeTrialSubjectModel> updatedSubjects = [];
+      for (final subject in free_trial_subjects) {
+        try {
+          final files = await sl<FreeTrialLessonFilesRepository>().getBySubjectId(subject.id);
+          updatedSubjects.add(subject.copyWith(lessonFilesCount: files.length));
+        } catch (e) {
+          updatedSubjects.add(subject.copyWith(lessonFilesCount: -99));
         }
       }
+
       emit(FreeTrialSubjectsLoaded(
-        free_trial_subjects: free_trial_subjects,
-        filteredFreeTrialSubjects: free_trial_subjects,
+        free_trial_subjects: updatedSubjects,
+        filteredFreeTrialSubjects: updatedSubjects,
         gradeId: gradeId,
         gradeName: gradeName,
       ));
@@ -65,34 +76,17 @@ class FreeTrialSubjectsCubit extends Cubit<FreeTrialSubjectsState> {
     }
   }
 
-  Future<void> toggleStatus(String id) async {
-    try {
-      await _repository.toggleStatus(_gradeId, id);
-      await loadFreeTrialSubjects(_gradeId);
-    } catch (e) {
-      emit(FreeTrialSubjectsError(ErrorHandler.handle(e)));
-    }
-  }
-
   void search(String query) {
-    final currentState = state;
-    if (currentState is FreeTrialSubjectsLoaded) {
+    if (state is FreeTrialSubjectsLoaded) {
+      final currentState = state as FreeTrialSubjectsLoaded;
       if (query.isEmpty) {
-        emit(currentState.copyWith(
-          filteredFreeTrialSubjects: currentState.free_trial_subjects,
-          searchQuery: '',
-        ));
-      } else {
-        final filtered = currentState.free_trial_subjects.where((s) {
-          final q = query.toLowerCase();
-          return s.title.toLowerCase().contains(q) ||
-              (s.description?.toLowerCase().contains(q) ?? false);
-        }).toList();
-        emit(currentState.copyWith(
-          filteredFreeTrialSubjects: filtered,
-          searchQuery: query,
-        ));
+        emit(currentState.copyWith(filteredFreeTrialSubjects: currentState.free_trial_subjects));
+        return;
       }
+      final filtered = currentState.free_trial_subjects.where((free_trial_subject) {
+        return free_trial_subject.title.toLowerCase().contains(query.toLowerCase());
+      }).toList();
+      emit(currentState.copyWith(filteredFreeTrialSubjects: filtered));
     }
   }
 }

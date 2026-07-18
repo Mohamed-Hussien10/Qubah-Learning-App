@@ -28,7 +28,7 @@ class FreeTrialLessonFileModel extends BaseEntity {
   factory FreeTrialLessonFileModel.fromJson(Map<String, dynamic> json) {
     return FreeTrialLessonFileModel(
       id: json['id']?.toString() ?? '',
-      subjectId: json['subject_id']?.toString() ?? '',
+      subjectId: json['free_trial_subject_id']?.toString() ?? json['subject_id']?.toString() ?? '',
       title: json['title'] ?? '',
       type: json['type'] ?? 'pdf',
       fileUrl: json['file_url'] ?? json['file_path'] ?? '',
@@ -45,7 +45,7 @@ class FreeTrialLessonFileModel extends BaseEntity {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'subject_id': subjectId,
+      'free_trial_subject_id': subjectId,
       'title': title,
       'type': type,
       'file_url': fileUrl,
