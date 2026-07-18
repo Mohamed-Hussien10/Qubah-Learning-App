@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
@@ -20,11 +22,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isGuest = false;
+  String? _imagePath;
 
   @override
   void initState() {
     super.initState();
     _checkGuestStatus();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _imagePath = prefs.getString('user_profile_image');
+    });
   }
 
   Future<void> _checkGuestStatus() async {
@@ -178,14 +189,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (!_isGuest) ...[
                       const SizedBox(width: 4),
                       GestureDetector(
-                        onTap: () => context.push(AppRoutes.profile),
+                        onTap: () async {
+                          await context.push(AppRoutes.profile);
+                          _loadImage();
+                        },
                         child: CircleAvatar(
                           radius: 22,
                           backgroundColor: AppColors.primary.withOpacity(0.2),
-                          child: const Icon(
-                            Icons.person_rounded,
-                            color: AppColors.primary,
-                          ),
+                          backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
+                          child: _imagePath == null
+                              ? const Icon(
+                                  Icons.person_rounded,
+                                  color: AppColors.primary,
+                                )
+                              : null,
                         ),
                       ),
                     ],

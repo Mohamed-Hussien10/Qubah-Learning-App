@@ -25,6 +25,7 @@ import '../../features/subscription/presentation/screens/subscription_expired_sc
 import '../../features/settings/presentation/screens/support_screen.dart';
 import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
 import '../../features/splash/presentation/screens/maintenance_screen.dart';
+import '../../features/free_trial/presentation/screens/free_trial_screens.dart';
 
 /// Route name constants.
 class AppRoutes {
@@ -56,6 +57,8 @@ class AppRoutes {
   static const String support = '/support';
   static const String privacy = '/privacy';
   static const String maintenance = '/maintenance';
+  static const String freeTrialSubjects = '/free-trial-subjects/:gradeId';
+  static const String freeTrialLessonFiles = '/free-trial-lesson-files/:subjectId';
 }
 
 /// Application router configuration using GoRouter.
@@ -293,6 +296,39 @@ class AppRouter {
         path: AppRoutes.privacy,
         name: 'privacy',
         builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.freeTrialSubjects,
+        name: 'freeTrialSubjects',
+        builder: (context, state) {
+          final gradeId = state.pathParameters['gradeId'] ?? '';
+          final titlePath =
+              (state.extra as Map<String, dynamic>?)?['titlePath']
+                  as List<String>? ??
+              [];
+          final backgroundImageUrl =
+              (state.extra as Map<String, dynamic>?)?['backgroundImageUrl'] as String?;
+          return FreeTrialSubjectsScreen(
+            gradeId: gradeId,
+            titlePath: titlePath,
+            backgroundImageUrl: backgroundImageUrl,
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.freeTrialLessonFiles,
+        name: 'freeTrialLessonFiles',
+        builder: (context, state) {
+          final subjectId = state.pathParameters['subjectId'] ?? '';
+          final titlePath =
+              (state.extra as Map<String, dynamic>?)?['titlePath']
+                  as List<String>? ??
+              [];
+          return FreeTrialLessonFilesScreen(
+            subjectId: subjectId,
+            titlePath: titlePath,
+          );
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

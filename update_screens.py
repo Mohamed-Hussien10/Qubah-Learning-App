@@ -1,29 +1,43 @@
 import os
-import glob
 import re
 
-directories = [
-    'd:/Flutter/Qubah App/qubah_learning_app/lib/features/educational_stages',
-    'd:/Flutter/Qubah App/qubah_learning_app/lib/features/grades',
-    'd:/Flutter/Qubah App/qubah_learning_app/lib/features/sections',
-    'd:/Flutter/Qubah App/qubah_learning_app/lib/features/subjects',
-    'd:/Flutter/Qubah App/qubah_learning_app/lib/features/units',
-    'd:/Flutter/Qubah App/qubah_learning_app/lib/features/lessons',
-    'd:/Flutter/Qubah App/qubah_learning_app/lib/features/lesson_files',
-]
+def process_file(filepath, rules):
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    for k, v in rules.items():
+        content = content.replace(k, v)
+        
+    # Remove Add Button from header
+    content = re.sub(r'FilledButton\.icon\([^;]+;', 'const SizedBox();', content, flags=re.DOTALL)
+    
+    # Remove Actions column
+    content = content.replace("DataColumn2(label: Text(AppStrings.actions), fixedWidth: 200),", "")
+    content = content.replace("DataColumn2(label: Text(AppStrings.actions), fixedWidth: 150),", "")
+    
+    # Remove Action Icons cell from rows
+    # This might be tricky with regex, so let's just make the action cells empty
+    content = re.sub(r'DataCell\(\s*Row\(\s*mainAxisSize: MainAxisSize\.min,\s*children: \[\s*_ActionIcon[^\]]+\]\,\s*\)\,\s*\)', 'DataCell(const SizedBox()),', content, flags=re.DOTALL)
+    
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(content)
 
-for d in directories:
-    for filepath in glob.glob(d + '/**/*.dart', recursive=True):
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        # Remove hardcoded background color for Scaffold
-        new_content = re.sub(r'\s*backgroundColor:\s*Colors\.grey\.shade50\s*,', '', content)
-        
-        # Remove hardcoded foreground color for AppBar which breaks dark mode
-        new_content = re.sub(r'\s*foregroundColor:\s*Colors\.black87\s*,', '', new_content)
-        
-        if content != new_content:
-            with open(filepath, 'w', encoding='utf-8') as f:
-                f.write(new_content)
-            print(f'Updated {filepath}')
+# Free Trial Stages
+rules_stages = {
+    'StagesScreen': 'FreeTrialStagesScreen',
+    'AppStrings.stages': '"المراحل التجريبية"',
+    '_StagesView': '_FreeTrialStagesView',
+    "context.push('/grades/${stage.id}')": "context.push('/free-trial-grades/${stage.id}')",
+}
+process_file('web_dashboard/lib/features/free_trial/presentation/screens/free_trial_stages_screen.dart', rules_stages)
+
+# Free Trial Grades
+rules_grades = {
+    'GradesScreen': 'FreeTrialGradesScreen',
+    'AppStrings.grades': '"الصفوف التجريبية"',
+    '_GradesView': '_FreeTrialGradesView',
+    "context.push('/sections/${grade.id}')": "context.push('/free-trial-subjects/${grade.id}')",
+}
+process_file('web_dashboard/lib/features/free_trial/presentation/screens/free_trial_grades_screen.dart', rules_grades)
+
+print("Screens updated.")

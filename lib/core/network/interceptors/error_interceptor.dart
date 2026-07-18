@@ -18,6 +18,17 @@ class ErrorInterceptor extends Interceptor {
       'API Error: ${err.requestOptions.method} ${err.requestOptions.path}',
       error: err,
     );
+    print('--- DETAILED DIO DEBUGGING ---');
+    print('Type: ${err.type}');
+    print('Message: ${err.message}');
+    print('Error object: ${err.error}');
+    if (err.error != null) {
+      print('Error object type: ${err.error.runtimeType}');
+    }
+    print('Response status: ${err.response?.statusCode}');
+    print('Response data: ${err.response?.data}');
+    print('Request URI: ${err.requestOptions.uri}');
+    print('------------------------------');
 
     switch (err.type) {
       case DioExceptionType.connectionTimeout:
@@ -50,6 +61,11 @@ class ErrorInterceptor extends Interceptor {
         if (err.error is SocketException) {
           throw const NetworkException(message: 'لا يوجد اتصال بالإنترنت.');
         }
+        throw ServerException(
+          message: err.message ?? 'حدث خطأ غير متوقع. يرجى المحاولة لاحقاً.',
+        );
+
+      default:
         throw ServerException(
           message: err.message ?? 'حدث خطأ غير متوقع. يرجى المحاولة لاحقاً.',
         );

@@ -21,6 +21,12 @@ class AppStrings {
   static const String settings = 'الإعدادات';
   static const String profile = 'الملف الشخصي';
 
+  // ── Free Trial ───────────────────────────────────────────────────────
+  static const String free_trial_stages = 'مراحل التجربة المجانية';
+  static const String free_trial_grades = 'صفوف التجربة المجانية';
+  static const String free_trial_subjects = 'مواد التجربة المجانية';
+  static const String subjectFiles = 'ملفات المادة';
+
   // ── Auth ─────────────────────────────────────────────────────────────
   static const String login = 'تسجيل الدخول';
   static const String logout = 'تسجيل الخروج';

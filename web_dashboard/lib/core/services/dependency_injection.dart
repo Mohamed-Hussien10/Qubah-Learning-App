@@ -33,6 +33,16 @@ import 'package:web_dashboard/features/analytics/presentation/manager/analytics_
 import 'package:web_dashboard/features/settings/presentation/manager/settings_cubit.dart';
 import 'package:web_dashboard/features/dashboard/presentation/manager/dashboard_cubit.dart';
 
+// Free Trial
+import 'package:web_dashboard/features/free_trial_stages/data/repositories/free_trial_stages_repository.dart';
+import 'package:web_dashboard/features/free_trial_grades/data/repositories/free_trial_grades_repository.dart';
+import 'package:web_dashboard/features/free_trial_subjects/data/repositories/free_trial_subjects_repository.dart';
+import 'package:web_dashboard/features/free_trial_lesson_files/data/repositories/free_trial_lesson_files_repository.dart';
+import 'package:web_dashboard/features/free_trial_stages/presentation/manager/free_trial_stages_cubit.dart';
+import 'package:web_dashboard/features/free_trial_grades/presentation/manager/free_trial_grades_cubit.dart';
+import 'package:web_dashboard/features/free_trial_subjects/presentation/manager/free_trial_subjects_cubit.dart';
+import 'package:web_dashboard/features/free_trial_lesson_files/presentation/manager/free_trial_lesson_files_cubit.dart';
+
 /// Global service locator instance.
 final sl = GetIt.instance;
 
@@ -70,6 +80,11 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<SettingsRepository>(() => SettingsRepository(sl<ApiClient>()));
   sl.registerLazySingleton<DashboardRepository>(() => DashboardRepository(sl<ApiClient>()));
 
+  sl.registerLazySingleton<FreeTrialStagesRepository>(() => FreeTrialStagesRepository(sl<ApiClient>()));
+  sl.registerLazySingleton<FreeTrialGradesRepository>(() => FreeTrialGradesRepository(sl<ApiClient>()));
+  sl.registerLazySingleton<FreeTrialSubjectsRepository>(() => FreeTrialSubjectsRepository(sl<ApiClient>()));
+  sl.registerLazySingleton<FreeTrialLessonFilesRepository>(() => FreeTrialLessonFilesRepository(sl<ApiClient>()));
+
   // ── Feature Cubits (Factories) ──────────────────────────────────────────
   sl.registerFactory<AuthCubit>(
     () => AuthCubit(authRepository: sl<AuthRepository>()),
@@ -106,5 +121,18 @@ Future<void> initDependencies() async {
   );
   sl.registerFactory<DashboardCubit>(
     () => DashboardCubit(repository: sl<DashboardRepository>()),
+  );
+
+  sl.registerFactory<FreeTrialStagesCubit>(
+    () => FreeTrialStagesCubit(repository: sl<FreeTrialStagesRepository>()),
+  );
+  sl.registerFactory<FreeTrialGradesCubit>(
+    () => FreeTrialGradesCubit(repository: sl<FreeTrialGradesRepository>()),
+  );
+  sl.registerFactory<FreeTrialSubjectsCubit>(
+    () => FreeTrialSubjectsCubit(repository: sl<FreeTrialSubjectsRepository>()),
+  );
+  sl.registerFactory<FreeTrialLessonFilesCubit>(
+    () => FreeTrialLessonFilesCubit(repository: sl<FreeTrialLessonFilesRepository>()),
   );
 }

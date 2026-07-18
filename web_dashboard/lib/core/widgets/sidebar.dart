@@ -79,6 +79,36 @@ final List<SidebarSection> sidebarSections = [
       ),
     ],
   ),
+  // Free Trial
+  const SidebarSection(
+    label: 'التجربة المجانية',
+    items: [
+      SidebarItem(
+        label: AppStrings.free_trial_stages,
+        icon: Icons.card_giftcard_outlined,
+        activeIcon: Icons.card_giftcard_rounded,
+        route: '/free-trial-stages',
+      ),
+      SidebarItem(
+        label: AppStrings.free_trial_grades,
+        icon: Icons.stars_outlined,
+        activeIcon: Icons.stars_rounded,
+        route: '/free-trial-grades',
+      ),
+      SidebarItem(
+        label: AppStrings.free_trial_subjects,
+        icon: Icons.menu_book_outlined,
+        activeIcon: Icons.menu_book_rounded,
+        route: '/free-trial-subjects',
+      ),
+      SidebarItem(
+        label: AppStrings.subjectFiles,
+        icon: Icons.snippet_folder_outlined,
+        activeIcon: Icons.snippet_folder_rounded,
+        route: '/free-trial-lesson-files',
+      ),
+    ],
+  ),
   // Management
   const SidebarSection(
     label: 'الإدارة',

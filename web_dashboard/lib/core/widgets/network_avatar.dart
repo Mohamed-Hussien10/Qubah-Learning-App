@@ -1,0 +1,59 @@
+import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:web_dashboard/core/constants/app_colors.dart';
+
+class NetworkAvatar extends StatelessWidget {
+  final String? imageUrl;
+  final IconData defaultIcon;
+  final double radius;
+
+  const NetworkAvatar({
+    super.key,
+    this.imageUrl,
+    required this.defaultIcon,
+    this.radius = 18,
+  });
+
+  String _resolveImageUrl(String path) {
+    if (path.isEmpty) return '';
+    if (path.startsWith('http')) return path;
+    const domainUrl = 'https://qubahom.com';
+    if (path.startsWith('/')) return '$domainUrl$path';
+    if (path.startsWith('storage/')) return '$domainUrl/$path';
+    return '$domainUrl/storage/$path';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+        child: Icon(defaultIcon, size: radius, color: AppColors.primary),
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: _resolveImageUrl(imageUrl!),
+      imageBuilder: (context, imageProvider) => CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+        backgroundImage: imageProvider,
+      ),
+      placeholder: (context, url) => CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+        child: SizedBox(
+          width: radius,
+          height: radius,
+          child: const CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+      errorWidget: (context, url, error) => CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+        child: Icon(defaultIcon, size: radius, color: AppColors.primary),
+      ),
+    );
+  }
+}

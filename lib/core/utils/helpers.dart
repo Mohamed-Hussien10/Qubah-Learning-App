@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../network/api_endpoints.dart';
+
 /// ──────────────────────────────────────────────────────────────────────────────
 /// Application Helpers
 ///
@@ -174,7 +176,7 @@ class AppHelpers {
   static String resolveMediaUrl(String path) {
     if (path.isEmpty) return '';
     
-    const String host = 'https://qubahom.com';
+    final String host = ApiEndpoints.domainUrl;
         
     if (path.contains('thumbnails/')) {
       final fileName = path.split('thumbnails/').last;
@@ -198,11 +200,10 @@ class AppHelpers {
     }
     if (path.startsWith('/')) {
       return '$host$path';
-    } else if (path.startsWith('storage/')) {
-      final filePath = path.split('storage/').last;
-      return '$host/api/v1/files/$filePath';
-    } else {
-      return '$host/api/v1/files/$path';
     }
+    if (path.startsWith('storage/')) {
+      return '$host/$path';
+    }
+    return '$host/storage/$path';
   }
 }

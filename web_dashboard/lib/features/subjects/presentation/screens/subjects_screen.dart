@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:web_dashboard/core/widgets/network_avatar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -216,19 +217,7 @@ class _SubjectsView extends StatelessWidget {
                 DataCell(Text('${subject.order}')),
                 DataCell(Row(
                   children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
-                      backgroundImage: (subject.thumbnailUrl != null && subject.thumbnailUrl!.isNotEmpty)
-                          ? NetworkImage(resolveImageUrl(subject.thumbnailUrl!))
-                          : null,
-                      onBackgroundImageError: (subject.thumbnailUrl != null && subject.thumbnailUrl!.isNotEmpty)
-                          ? (_, __) {}
-                          : null,
-                      child: (subject.thumbnailUrl == null || subject.thumbnailUrl!.isEmpty)
-                          ? const Icon(Icons.book, size: 18, color: AppColors.primary)
-                          : null,
-                    ),
+                    NetworkAvatar(imageUrl: subject.thumbnailUrl, defaultIcon: Icons.menu_book_rounded),
                     const SizedBox(width: 10),
                     Expanded(
                         child: Text(subject.title,

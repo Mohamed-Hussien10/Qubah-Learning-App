@@ -125,14 +125,27 @@ class _GradesScreenState extends State<GradesScreen> {
                         imageUrl: item.imageUrl,
                         color: Colors.blue,
                         defaultIcon: Icons.class_rounded,
-                        onTap: () {
-                          context.push(
-                            '/sections/${item.id}',
-                            extra: {
-                              'titlePath': [...widget.titlePath, item.name],
-                              'backgroundImageUrl': widget.backgroundImageUrl,
-                            },
-                          );
+                        onTap: () async {
+                          final isGuest = await sl<import_secure_storage.SecureStorage>().isGuest();
+                          if (context.mounted) {
+                            if (isGuest) {
+                              context.push(
+                                '/free-trial-subjects/${item.id}',
+                                extra: {
+                                  'titlePath': [...widget.titlePath, item.name],
+                                  'backgroundImageUrl': widget.backgroundImageUrl,
+                                },
+                              );
+                            } else {
+                              context.push(
+                                '/sections/${item.id}',
+                                extra: {
+                                  'titlePath': [...widget.titlePath, item.name],
+                                  'backgroundImageUrl': widget.backgroundImageUrl,
+                                },
+                              );
+                            }
+                          }
                         },
                       );
                     },

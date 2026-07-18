@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:web_dashboard/core/widgets/network_avatar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -217,19 +218,7 @@ class _SectionsView extends StatelessWidget {
                 DataCell(Text('${section.order}')),
                 DataCell(Row(
                   children: [
-                    CircleAvatar(
-                        radius: 18,
-                        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
-                        backgroundImage: (section.thumbnailUrl != null && section.thumbnailUrl!.isNotEmpty)
-                            ? NetworkImage(resolveImageUrl(section.thumbnailUrl!))
-                            : null,
-                        onBackgroundImageError: (section.thumbnailUrl != null && section.thumbnailUrl!.isNotEmpty) 
-                            ? (_, __) {} 
-                            : null,
-                        child: (section.thumbnailUrl == null || section.thumbnailUrl!.isEmpty)
-                            ? const Icon(Icons.account_tree, size: 18, color: AppColors.primary)
-                            : null,
-                      ),
+                    NetworkAvatar(imageUrl: section.thumbnailUrl, defaultIcon: Icons.category_rounded),
                     const SizedBox(width: 10),
                     Expanded(
                         child: Text(section.title,

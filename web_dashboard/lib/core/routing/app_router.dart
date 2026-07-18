@@ -15,6 +15,10 @@ import 'package:web_dashboard/features/users/presentation/screens/users_screen.d
 import 'package:web_dashboard/features/analytics/presentation/screens/analytics_screen.dart';
 import 'package:web_dashboard/features/settings/presentation/screens/settings_screen.dart';
 import 'package:web_dashboard/features/user_profile/presentation/screens/profile_screen.dart';
+import 'package:web_dashboard/features/free_trial_stages/presentation/screens/free_trial_stages_screen.dart';
+import 'package:web_dashboard/features/free_trial_grades/presentation/screens/free_trial_grades_screen.dart';
+import 'package:web_dashboard/features/free_trial_subjects/presentation/screens/free_trial_subjects_screen.dart';
+import 'package:web_dashboard/features/free_trial_lesson_files/presentation/screens/free_trial_lesson_files_screen.dart';
 import 'package:web_dashboard/core/widgets/dashboard_shell.dart';
 
 class NavigationState {
@@ -126,6 +130,46 @@ final GoRouter appRouter = GoRouter(
             final lessonId = state.pathParameters['lessonId']!;
             NavigationState.lastLessonId = lessonId;
             return LessonFilesScreen(lessonId: lessonId);
+          },
+        ),
+        GoRoute(
+          path: '/free-trial-stages',
+          builder: (context, state) => const FreeTrialStagesScreen(),
+        ),
+        GoRoute(
+          path: '/free-trial-grades',
+          redirect: (context, state) => NavigationState.lastStageId != null ? '/free-trial-grades/${NavigationState.lastStageId}' : '/free-trial-stages',
+        ),
+        GoRoute(
+          path: '/free-trial-grades/:stageId',
+          builder: (context, state) {
+            final stageId = state.pathParameters['stageId']!;
+            NavigationState.lastStageId = stageId;
+            return FreeTrialGradesScreen(stageId: stageId);
+          },
+        ),
+        GoRoute(
+          path: '/free-trial-subjects',
+          redirect: (context, state) => NavigationState.lastGradeId != null ? '/free-trial-subjects/${NavigationState.lastGradeId}' : '/free-trial-stages',
+        ),
+        GoRoute(
+          path: '/free-trial-subjects/:gradeId',
+          builder: (context, state) {
+            final gradeId = state.pathParameters['gradeId']!;
+            NavigationState.lastGradeId = gradeId;
+            return FreeTrialSubjectsScreen(gradeId: gradeId);
+          },
+        ),
+        GoRoute(
+          path: '/free-trial-lesson-files',
+          redirect: (context, state) => NavigationState.lastSubjectId != null ? '/free-trial-lesson-files/${NavigationState.lastSubjectId}' : '/free-trial-stages',
+        ),
+        GoRoute(
+          path: '/free-trial-lesson-files/:subjectId',
+          builder: (context, state) {
+            final subjectId = state.pathParameters['subjectId']!;
+            NavigationState.lastSubjectId = subjectId;
+            return FreeTrialLessonFilesScreen(subjectId: subjectId);
           },
         ),
         GoRoute(

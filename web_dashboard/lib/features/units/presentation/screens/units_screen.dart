@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:web_dashboard/core/widgets/network_avatar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -216,19 +217,7 @@ class _UnitsView extends StatelessWidget {
                 DataCell(Text('${unit.order}')),
                 DataCell(Row(
                   children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
-                      backgroundImage: (unit.thumbnailUrl != null && unit.thumbnailUrl!.isNotEmpty)
-                          ? NetworkImage(resolveImageUrl(unit.thumbnailUrl!))
-                          : null,
-                      onBackgroundImageError: (unit.thumbnailUrl != null && unit.thumbnailUrl!.isNotEmpty)
-                          ? (_, __) {}
-                          : null,
-                      child: (unit.thumbnailUrl == null || unit.thumbnailUrl!.isEmpty)
-                          ? const Icon(Icons.folder, size: 18, color: AppColors.primary)
-                          : null,
-                    ),
+                    NetworkAvatar(imageUrl: unit.thumbnailUrl, defaultIcon: Icons.view_module_rounded),
                     const SizedBox(width: 10),
                     Expanded(
                         child: Text(unit.title,
