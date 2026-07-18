@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
+import '../../../../core/utils/helpers.dart';
+
 class PdfViewerScreen extends StatelessWidget {
   final String pdfUrl;
   final String title;
@@ -13,7 +15,8 @@ class PdfViewerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final encodedUrl = Uri.encodeFull(Uri.decodeFull(pdfUrl));
+    final resolvedUrl = AppHelpers.resolveMediaUrl(pdfUrl);
+    final encodedUrl = Uri.encodeFull(Uri.decodeFull(resolvedUrl));
     debugPrint('=== PDF VIEWER DEBUG ===');
     debugPrint('Original URL: $pdfUrl');
     debugPrint('Encoded URL: $encodedUrl');
