@@ -1,6 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
-import 'package:web_dashboard/core/widgets/network_avatar.dart';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -217,7 +217,20 @@ class _FreeTrialSubjectsView extends StatelessWidget {
                 DataCell(Text('${free_trial_subject.order}')),
                 DataCell(Row(
                   children: [
-                    NetworkAvatar(imageUrl: free_trial_subject.thumbnailUrl, defaultIcon: Icons.menu_book_rounded),
+                    CircleAvatar(
+                        radius: 18,
+                        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+                          backgroundImage: (free_trial_subject.thumbnailUrl != null &&
+                                  free_trial_subject.thumbnailUrl!.isNotEmpty)
+                              ? NetworkImage(resolveImageUrl(free_trial_subject.thumbnailUrl!))
+                              : null,
+                        onBackgroundImageError: (free_trial_subject.thumbnailUrl != null && free_trial_subject.thumbnailUrl!.isNotEmpty) 
+                            ? (_, __) {} 
+                            : null,
+                        child: (free_trial_subject.thumbnailUrl == null || free_trial_subject.thumbnailUrl!.isEmpty)
+                            ? const Icon(Icons.menu_book_rounded, size: 18, color: AppColors.primary)
+                            : null,
+                      ),
                     const SizedBox(width: 10),
                     Expanded(
                         child: Text(free_trial_subject.title,
