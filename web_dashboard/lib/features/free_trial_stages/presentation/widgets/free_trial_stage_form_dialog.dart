@@ -6,23 +6,23 @@ import 'package:web_dashboard/features/free_trial_stages/data/models/free_trial_
 /// A dialog for creating or editing an educational free_trial_stage.
 class FreeTrialStageFormDialog extends StatefulWidget {
   /// If non-null, the dialog is in "edit" mode.
-  final FreeTrialStageModel? free_trial_stage;
+  final FreeTrialStageModel? freeTrialStage;
 
   /// Called when the user taps Save with valid data.
-  final Future<void> Function(FreeTrialStageModel free_trial_stage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) onSave;
+  final Future<void> Function(FreeTrialStageModel freeTrialStage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) onSave;
 
-  const FreeTrialStageFormDialog({super.key, this.free_trial_stage, required this.onSave});
+  const FreeTrialStageFormDialog({super.key, this.freeTrialStage, required this.onSave});
 
   /// Convenience helper to show the dialog.
   static Future<void> show(
     BuildContext context, {
-    FreeTrialStageModel? free_trial_stage,
-    required Future<void> Function(FreeTrialStageModel free_trial_stage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) onSave,
+    FreeTrialStageModel? freeTrialStage,
+    required Future<void> Function(FreeTrialStageModel freeTrialStage, {List<int>? imageBytes, String? imageName, List<int>? bgImageBytes, String? bgImageName}) onSave,
   }) {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => FreeTrialStageFormDialog(free_trial_stage: free_trial_stage, onSave: onSave),
+      builder: (_) => FreeTrialStageFormDialog(freeTrialStage: freeTrialStage, onSave: onSave),
     );
   }
 
@@ -44,19 +44,19 @@ class _FreeTrialStageFormDialogState extends State<FreeTrialStageFormDialog> {
   String? _selectedBgFileName;
   List<int>? _selectedBgFileBytes;
 
-  bool get _isEditing => widget.free_trial_stage != null;
+  bool get _isEditing => widget.freeTrialStage != null;
 
   @override
   void initState() {
     super.initState();
-    _titleCtrl = TextEditingController(text: widget.free_trial_stage?.title ?? '');
-    _descCtrl = TextEditingController(text: widget.free_trial_stage?.description ?? '');
-    _thumbCtrl = TextEditingController(text: widget.free_trial_stage?.thumbnailUrl ?? '');
-    _bgCtrl = TextEditingController(text: widget.free_trial_stage?.backgroundImageUrl ?? '');
+    _titleCtrl = TextEditingController(text: widget.freeTrialStage?.title ?? '');
+    _descCtrl = TextEditingController(text: widget.freeTrialStage?.description ?? '');
+    _thumbCtrl = TextEditingController(text: widget.freeTrialStage?.thumbnailUrl ?? '');
+    _bgCtrl = TextEditingController(text: widget.freeTrialStage?.backgroundImageUrl ?? '');
     _orderCtrl = TextEditingController(
-      text: widget.free_trial_stage?.order.toString() ?? '0',
+      text: widget.freeTrialStage?.order.toString() ?? '0',
     );
-    _isActive = widget.free_trial_stage?.isActive ?? true;
+    _isActive = widget.freeTrialStage?.isActive ?? true;
   }
 
   @override
@@ -101,8 +101,8 @@ class _FreeTrialStageFormDialogState extends State<FreeTrialStageFormDialog> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
 
-    final free_trial_stage = FreeTrialStageModel(
-      id: widget.free_trial_stage?.id ?? '',
+    final freeTrialStage = FreeTrialStageModel(
+      id: widget.freeTrialStage?.id ?? '',
       title: _titleCtrl.text.trim(),
       description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       thumbnailUrl:
@@ -111,12 +111,12 @@ class _FreeTrialStageFormDialogState extends State<FreeTrialStageFormDialog> {
           _bgCtrl.text.trim().isEmpty ? null : _bgCtrl.text.trim(),
       isActive: _isActive,
       order: int.tryParse(_orderCtrl.text) ?? 0,
-      gradesCount: widget.free_trial_stage?.gradesCount ?? 0,
-      createdAt: widget.free_trial_stage?.createdAt,
+      gradesCount: widget.freeTrialStage?.gradesCount ?? 0,
+      createdAt: widget.freeTrialStage?.createdAt,
     );
 
     try {
-      await widget.onSave(free_trial_stage, imageBytes: _selectedFileBytes, imageName: _selectedFileName, bgImageBytes: _selectedBgFileBytes, bgImageName: _selectedBgFileName);
+      await widget.onSave(freeTrialStage, imageBytes: _selectedFileBytes, imageName: _selectedFileName, bgImageBytes: _selectedBgFileBytes, bgImageName: _selectedBgFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -356,7 +356,7 @@ class _FreeTrialStageFormDialogState extends State<FreeTrialStageFormDialog> {
                         const Text('نشط'),
                         Switch.adaptive(
                           value: _isActive,
-                          activeColor: AppColors.success,
+                          activeTrackColor: AppColors.success,
                           onChanged:
                               _isSaving
                                   ? null

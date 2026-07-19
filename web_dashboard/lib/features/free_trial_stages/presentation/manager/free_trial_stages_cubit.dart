@@ -19,10 +19,10 @@ class FreeTrialStagesCubit extends Cubit<FreeTrialStagesState> {
   Future<void> loadFreeTrialStages() async {
     emit(const FreeTrialStagesLoading());
     try {
-      final free_trial_stages = await _repository.getAll();
+      final freeTrialStages = await _repository.getAll();
       
       List<FreeTrialStageModel> updatedStages = [];
-      for (final stage in free_trial_stages) {
+      for (final stage in freeTrialStages) {
         try {
           final grades = await sl<FreeTrialGradesRepository>().getByStageId(stage.id);
           updatedStages.add(stage.copyWith(gradesCount: grades.length));
@@ -31,7 +31,7 @@ class FreeTrialStagesCubit extends Cubit<FreeTrialStagesState> {
         }
       }
 
-      emit(FreeTrialStagesLoaded(free_trial_stages: updatedStages, filteredFreeTrialStages: updatedStages));
+      emit(FreeTrialStagesLoaded(freeTrialStages: updatedStages, filteredFreeTrialStages: updatedStages));
     } catch (e) {
       emit(FreeTrialStagesError(ErrorHandler.handle(e)));
     }
@@ -40,7 +40,7 @@ class FreeTrialStagesCubit extends Cubit<FreeTrialStagesState> {
   // ── Create ────────────────────────────────────────────────────────────
 
   Future<void> createFreeTrialStage(
-    FreeTrialStageModel free_trial_stage, {
+    FreeTrialStageModel freeTrialStage, {
     List<int>? imageBytes,
     String? imageName,
     List<int>? bgImageBytes,
@@ -48,7 +48,7 @@ class FreeTrialStagesCubit extends Cubit<FreeTrialStagesState> {
   }) async {
     try {
       await _repository.create(
-        free_trial_stage,
+        freeTrialStage,
         imageBytes: imageBytes,
         imageName: imageName,
         bgImageBytes: bgImageBytes,
@@ -63,7 +63,7 @@ class FreeTrialStagesCubit extends Cubit<FreeTrialStagesState> {
   // ── Update ────────────────────────────────────────────────────────────
 
   Future<void> updateFreeTrialStage(
-    FreeTrialStageModel free_trial_stage, {
+    FreeTrialStageModel freeTrialStage, {
     List<int>? imageBytes,
     String? imageName,
     List<int>? bgImageBytes,
@@ -71,7 +71,7 @@ class FreeTrialStagesCubit extends Cubit<FreeTrialStagesState> {
   }) async {
     try {
       await _repository.update(
-        free_trial_stage,
+        freeTrialStage,
         imageBytes: imageBytes,
         imageName: imageName,
         bgImageBytes: bgImageBytes,
@@ -100,11 +100,11 @@ class FreeTrialStagesCubit extends Cubit<FreeTrialStagesState> {
     if (state is FreeTrialStagesLoaded) {
       final currentState = state as FreeTrialStagesLoaded;
       if (query.isEmpty) {
-        emit(currentState.copyWith(filteredFreeTrialStages: currentState.free_trial_stages));
+        emit(currentState.copyWith(filteredFreeTrialStages: currentState.freeTrialStages));
         return;
       }
-      final filtered = currentState.free_trial_stages.where((free_trial_stage) {
-        return free_trial_stage.title.toLowerCase().contains(query.toLowerCase());
+      final filtered = currentState.freeTrialStages.where((freeTrialStage) {
+        return freeTrialStage.title.toLowerCase().contains(query.toLowerCase());
       }).toList();
       emit(currentState.copyWith(filteredFreeTrialStages: filtered));
     }

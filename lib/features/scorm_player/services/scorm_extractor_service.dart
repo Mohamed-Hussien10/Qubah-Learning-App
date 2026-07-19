@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 import 'package:xml/xml.dart';
 
@@ -93,14 +94,17 @@ class ScormExtractorService {
     // ── 4. Extract files ────────────────────────────────────────────────────
     int extractedCount = 0;
     for (final entry in archive) {
-      final filePath = '${extractDir.path}/${entry.name}';
+      final entryPath = p.join(extractDir.path, entry.name);
+      if (!p.isWithin(extractDir.path, entryPath)) {
+        throw Exception('Zip Slip detected: ${entry.name}');
+      }
 
       if (entry.isFile) {
-        final file = File(filePath);
+        final file = File(entryPath);
         await file.create(recursive: true);
         await file.writeAsBytes(entry.content as List<int>);
       } else {
-        await Directory(filePath).create(recursive: true);
+        await Directory(entryPath).create(recursive: true);
       }
 
       extractedCount++;

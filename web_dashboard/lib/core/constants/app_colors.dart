@@ -1,4 +1,5 @@
 /// Application-wide color constants and design tokens.
+library;
 import 'package:flutter/material.dart';
 
 class AppColors {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,6 +27,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   bool _isPlaying = false;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
+  final List<StreamSubscription> _subscriptions = [];
 
   @override
   void initState() {
@@ -37,14 +39,20 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   Future<void> _init() async {
     try {
       await _player.setUrl(Uri.encodeFull(Uri.decodeFull(widget.audioUrl)));
-      _player.durationStream.listen(
-        (d) => setState(() => _duration = d ?? Duration.zero),
-      );
-      _player.positionStream.listen((p) => setState(() => _position = p));
-      _player.playerStateStream.listen((state) {
-        setState(() => _isPlaying = state.playing);
-      });
-      _player.play();
+      _subscriptions.add(_player.durationStream.listen(
+        (d) {
+          if (mounted) setState(() => _duration = d ?? Duration.zero);
+        },
+      ));
+      _subscriptions.add(_player.positionStream.listen((p) {
+        if (mounted) setState(() => _position = p);
+      }));
+      _subscriptions.add(_player.playerStateStream.listen((state) {
+        if (mounted) setState(() => _isPlaying = state.playing);
+      }));
+      if (mounted) {
+        _player.play();
+      }
     } catch (e) {
       // Handle error
     }
@@ -52,6 +60,9 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   @override
   void dispose() {
+    for (var sub in _subscriptions) {
+      sub.cancel();
+    }
     _player.dispose();
     super.dispose();
   }

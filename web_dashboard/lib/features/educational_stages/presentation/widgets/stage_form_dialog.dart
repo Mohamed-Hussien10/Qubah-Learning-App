@@ -356,7 +356,7 @@ class _StageFormDialogState extends State<StageFormDialog> {
                         const Text('نشط'),
                         Switch.adaptive(
                           value: _isActive,
-                          activeColor: AppColors.success,
+                          activeTrackColor: AppColors.success,
                           onChanged:
                               _isSaving
                                   ? null

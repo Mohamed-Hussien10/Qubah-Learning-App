@@ -20,11 +20,11 @@ class FreeTrialGradesCubit extends Cubit<FreeTrialGradesState> {
     _stageId = stageId;
     emit(const FreeTrialGradesLoading());
     try {
-      final free_trial_grades = await _repository.getByStageId(stageId);
+      final freeTrialGrades = await _repository.getByStageId(stageId);
       final stageName = 'المرحلة';
       
       List<FreeTrialGradeModel> updatedGrades = [];
-      for (final grade in free_trial_grades) {
+      for (final grade in freeTrialGrades) {
         try {
           final subjects = await sl<FreeTrialSubjectsRepository>().getByGradeId(grade.id);
           updatedGrades.add(grade.copyWith(subjectsCount: subjects.length));
@@ -35,7 +35,7 @@ class FreeTrialGradesCubit extends Cubit<FreeTrialGradesState> {
       }
 
       emit(FreeTrialGradesLoaded(
-        free_trial_grades: updatedGrades,
+        freeTrialGrades: updatedGrades,
         filteredFreeTrialGrades: updatedGrades,
         stageId: stageId,
         stageName: stageName,
@@ -45,18 +45,18 @@ class FreeTrialGradesCubit extends Cubit<FreeTrialGradesState> {
     }
   }
 
-  Future<void> createFreeTrialGrade(FreeTrialGradeModel free_trial_grade, {List<int>? imageBytes, String? imageName}) async {
+  Future<void> createFreeTrialGrade(FreeTrialGradeModel freeTrialGrade, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.create(free_trial_grade, imageBytes: imageBytes, imageName: imageName);
+      await _repository.create(freeTrialGrade, imageBytes: imageBytes, imageName: imageName);
       await loadFreeTrialGrades(_stageId);
     } catch (e) {
       emit(FreeTrialGradesError(ErrorHandler.handle(e)));
     }
   }
 
-  Future<void> updateFreeTrialGrade(FreeTrialGradeModel free_trial_grade, {List<int>? imageBytes, String? imageName}) async {
+  Future<void> updateFreeTrialGrade(FreeTrialGradeModel freeTrialGrade, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.update(free_trial_grade, imageBytes: imageBytes, imageName: imageName);
+      await _repository.update(freeTrialGrade, imageBytes: imageBytes, imageName: imageName);
       await loadFreeTrialGrades(_stageId);
     } catch (e) {
       emit(FreeTrialGradesError(ErrorHandler.handle(e)));
@@ -76,11 +76,11 @@ class FreeTrialGradesCubit extends Cubit<FreeTrialGradesState> {
     if (state is FreeTrialGradesLoaded) {
       final currentState = state as FreeTrialGradesLoaded;
       if (query.isEmpty) {
-        emit(currentState.copyWith(filteredFreeTrialGrades: currentState.free_trial_grades));
+        emit(currentState.copyWith(filteredFreeTrialGrades: currentState.freeTrialGrades));
         return;
       }
-      final filtered = currentState.free_trial_grades.where((free_trial_grade) {
-        return free_trial_grade.title.toLowerCase().contains(query.toLowerCase());
+      final filtered = currentState.freeTrialGrades.where((freeTrialGrade) {
+        return freeTrialGrade.title.toLowerCase().contains(query.toLowerCase());
       }).toList();
       emit(currentState.copyWith(filteredFreeTrialGrades: filtered));
     }

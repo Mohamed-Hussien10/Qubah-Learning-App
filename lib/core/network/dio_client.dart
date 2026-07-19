@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import 'api_endpoints.dart';
 import 'interceptors/auth_interceptor.dart';
@@ -37,13 +38,14 @@ class DioClient {
     _dio.interceptors.addAll([
       _authInterceptor,
       _errorInterceptor,
-      LogInterceptor(
-        request: true,
-        requestBody: true,
-        responseBody: true,
-        error: true,
-        logPrint: (obj) => LoggerService.instance.debug(obj.toString()),
-      ),
+      if (kDebugMode)
+        LogInterceptor(
+          request: true,
+          requestBody: false,
+          responseBody: false,
+          error: true,
+          logPrint: (obj) => LoggerService.instance.debug(obj.toString()),
+        ),
     ]);
   }
 

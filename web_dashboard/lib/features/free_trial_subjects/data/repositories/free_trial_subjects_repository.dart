@@ -20,13 +20,13 @@ class FreeTrialSubjectsRepository {
   }
 
   Future<FreeTrialSubjectModel> getById(String id) async {
-    final response = await _apiClient.get(ApiEndpoints.free_trial_subject(int.parse(id)));
+    final response = await _apiClient.get(ApiEndpoints.freeTrialSubject(int.parse(id)));
     final data = response.data['data'] ?? response.data;
     return FreeTrialSubjectModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<FreeTrialSubjectModel> create(FreeTrialSubjectModel free_trial_subject, {List<int>? imageBytes, String? imageName}) async {
-    final payload = free_trial_subject.toJson()..remove('id')..remove('created_at');
+  Future<FreeTrialSubjectModel> create(FreeTrialSubjectModel freeTrialSubject, {List<int>? imageBytes, String? imageName}) async {
+    final payload = freeTrialSubject.toJson()..remove('id')..remove('created_at');
     
     if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
       final uploadRes = await _apiClient.uploadFileBytes(
@@ -39,13 +39,13 @@ class FreeTrialSubjectsRepository {
       payload['thumbnail_path'] = uploadRes.data['data']['path'];
     }
 
-    final response = await _apiClient.post(ApiEndpoints.free_trial_subjects, data: payload);
+    final response = await _apiClient.post(ApiEndpoints.freeTrialSubjects, data: payload);
     final data = response.data['data'] ?? response.data;
     return FreeTrialSubjectModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<FreeTrialSubjectModel> update(FreeTrialSubjectModel free_trial_subject, {List<int>? imageBytes, String? imageName}) async {
-    final payload = free_trial_subject.toJson()..remove('created_at');
+  Future<FreeTrialSubjectModel> update(FreeTrialSubjectModel freeTrialSubject, {List<int>? imageBytes, String? imageName}) async {
+    final payload = freeTrialSubject.toJson()..remove('created_at');
 
     if (imageBytes != null && imageBytes.isNotEmpty && imageName != null) {
       final uploadRes = await _apiClient.uploadFileBytes(
@@ -58,19 +58,19 @@ class FreeTrialSubjectsRepository {
       payload['thumbnail_path'] = uploadRes.data['data']['path'];
     }
 
-    final response = await _apiClient.put(ApiEndpoints.free_trial_subject(int.parse(free_trial_subject.id)), data: payload);
+    final response = await _apiClient.put(ApiEndpoints.freeTrialSubject(int.parse(freeTrialSubject.id)), data: payload);
     final data = response.data['data'] ?? response.data;
     return FreeTrialSubjectModel.fromJson(data as Map<String, dynamic>);
   }
 
   Future<bool> delete(String gradeId, String id) async {
-    await _apiClient.delete(ApiEndpoints.free_trial_subject(int.parse(id)));
+    await _apiClient.delete(ApiEndpoints.freeTrialSubject(int.parse(id)));
     return true;
   }
 
   Future<FreeTrialSubjectModel> toggleStatus(String gradeId, String id) async {
-    final free_trial_subject = await getById(id);
-    final updated = free_trial_subject.copyWith(isActive: !free_trial_subject.isActive);
+    final freeTrialSubject = await getById(id);
+    final updated = freeTrialSubject.copyWith(isActive: !freeTrialSubject.isActive);
     return update(updated);
   }
 }

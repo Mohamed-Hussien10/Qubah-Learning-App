@@ -42,14 +42,14 @@ class ApiEndpoints {
   static String lessonFile(int id) => '/lesson-files/$id';
 
   // ── Free Trial Features (التجربة المجانية) ───────────────────────────
-  static const String free_trial_stages = '/free-trial/stages';
-  static String free_trial_stage(int id) => '/free-trial/stages/$id';
+  static const String freeTrialStages = '/free-trial/stages';
+  static String freeTrialStage(int id) => '/free-trial/stages/$id';
 
-  static const String free_trial_grades = '/free-trial/grades';
-  static String free_trial_grade(int id) => '/free-trial/grades/$id';
+  static const String freeTrialGrades = '/free-trial/grades';
+  static String freeTrialGrade(int id) => '/free-trial/grades/$id';
 
-  static const String free_trial_subjects = '/free-trial/subjects';
-  static String free_trial_subject(int id) => '/free-trial/subjects/$id';
+  static const String freeTrialSubjects = '/free-trial/subjects';
+  static String freeTrialSubject(int id) => '/free-trial/subjects/$id';
 
   // ── Users (المستخدمون) ──────────────────────────────────────────────
   static const String users = '/users';

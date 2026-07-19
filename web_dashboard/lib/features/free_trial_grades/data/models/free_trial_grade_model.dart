@@ -1,6 +1,6 @@
 import 'package:web_dashboard/features/shared/models/base_entity.dart';
 
-/// Model representing a free_trial_grade (صف) within a stage.
+/// Model representing a freeTrialGrade (صف) within a stage.
 class FreeTrialGradeModel extends BaseEntity {
   final String stageId;
   final int subjectsCount;
@@ -79,22 +79,22 @@ class FreeTrialGradeModel extends BaseEntity {
   /// Dummy data keyed by stageId.
   static Map<String, List<FreeTrialGradeModel>> get dummyMap => {
         'stage-1': [
-          FreeTrialGradeModel(id: 'free_trial_grade-1', stageId: 'stage-1', title: 'الصف الأول الابتدائي', description: 'الصف الأول من المرحلة الابتدائية', order: 1, subjectsCount: 2, createdAt: DateTime(2025, 1, 20)),
-          FreeTrialGradeModel(id: 'free_trial_grade-2', stageId: 'stage-1', title: 'الصف الثاني الابتدائي', description: 'الصف الثاني من المرحلة الابتدائية', order: 2, subjectsCount: 2, createdAt: DateTime(2025, 1, 20)),
-          FreeTrialGradeModel(id: 'free_trial_grade-3', stageId: 'stage-1', title: 'الصف الثالث الابتدائي', description: 'الصف الثالث من المرحلة الابتدائية', order: 3, subjectsCount: 2, createdAt: DateTime(2025, 1, 20)),
-          FreeTrialGradeModel(id: 'free_trial_grade-4', stageId: 'stage-1', title: 'الصف الرابع الابتدائي', description: 'الصف الرابع من المرحلة الابتدائية', order: 4, subjectsCount: 1, createdAt: DateTime(2025, 1, 20)),
-          FreeTrialGradeModel(id: 'free_trial_grade-5', stageId: 'stage-1', title: 'الصف الخامس الابتدائي', description: 'الصف الخامس من المرحلة الابتدائية', order: 5, subjectsCount: 1, createdAt: DateTime(2025, 1, 20)),
-          FreeTrialGradeModel(id: 'free_trial_grade-6', stageId: 'stage-1', title: 'الصف السادس الابتدائي', description: 'الصف السادس من المرحلة الابتدائية', order: 6, subjectsCount: 2, createdAt: DateTime(2025, 1, 20)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-1', stageId: 'stage-1', title: 'الصف الأول الابتدائي', description: 'الصف الأول من المرحلة الابتدائية', order: 1, subjectsCount: 2, createdAt: DateTime(2025, 1, 20)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-2', stageId: 'stage-1', title: 'الصف الثاني الابتدائي', description: 'الصف الثاني من المرحلة الابتدائية', order: 2, subjectsCount: 2, createdAt: DateTime(2025, 1, 20)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-3', stageId: 'stage-1', title: 'الصف الثالث الابتدائي', description: 'الصف الثالث من المرحلة الابتدائية', order: 3, subjectsCount: 2, createdAt: DateTime(2025, 1, 20)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-4', stageId: 'stage-1', title: 'الصف الرابع الابتدائي', description: 'الصف الرابع من المرحلة الابتدائية', order: 4, subjectsCount: 1, createdAt: DateTime(2025, 1, 20)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-5', stageId: 'stage-1', title: 'الصف الخامس الابتدائي', description: 'الصف الخامس من المرحلة الابتدائية', order: 5, subjectsCount: 1, createdAt: DateTime(2025, 1, 20)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-6', stageId: 'stage-1', title: 'الصف السادس الابتدائي', description: 'الصف السادس من المرحلة الابتدائية', order: 6, subjectsCount: 2, createdAt: DateTime(2025, 1, 20)),
         ],
         'stage-2': [
-          FreeTrialGradeModel(id: 'free_trial_grade-7', stageId: 'stage-2', title: 'الصف الأول المتوسط', description: 'الصف الأول من المرحلة المتوسطة', order: 1, subjectsCount: 2, createdAt: DateTime(2025, 2, 15)),
-          FreeTrialGradeModel(id: 'free_trial_grade-8', stageId: 'stage-2', title: 'الصف الثاني المتوسط', description: 'الصف الثاني من المرحلة المتوسطة', order: 2, subjectsCount: 2, createdAt: DateTime(2025, 2, 15)),
-          FreeTrialGradeModel(id: 'free_trial_grade-9', stageId: 'stage-2', title: 'الصف الثالث المتوسط', description: 'الصف الثالث من المرحلة المتوسطة', order: 3, subjectsCount: 2, createdAt: DateTime(2025, 2, 15)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-7', stageId: 'stage-2', title: 'الصف الأول المتوسط', description: 'الصف الأول من المرحلة المتوسطة', order: 1, subjectsCount: 2, createdAt: DateTime(2025, 2, 15)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-8', stageId: 'stage-2', title: 'الصف الثاني المتوسط', description: 'الصف الثاني من المرحلة المتوسطة', order: 2, subjectsCount: 2, createdAt: DateTime(2025, 2, 15)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-9', stageId: 'stage-2', title: 'الصف الثالث المتوسط', description: 'الصف الثالث من المرحلة المتوسطة', order: 3, subjectsCount: 2, createdAt: DateTime(2025, 2, 15)),
         ],
         'stage-3': [
-          FreeTrialGradeModel(id: 'free_trial_grade-10', stageId: 'stage-3', title: 'الصف الأول الثانوي', description: 'الصف الأول من المرحلة الثانوية', order: 1, subjectsCount: 2, createdAt: DateTime(2025, 3, 10)),
-          FreeTrialGradeModel(id: 'free_trial_grade-11', stageId: 'stage-3', title: 'الصف الثاني الثانوي', description: 'الصف الثاني من المرحلة الثانوية', order: 2, subjectsCount: 2, createdAt: DateTime(2025, 3, 10)),
-          FreeTrialGradeModel(id: 'free_trial_grade-12', stageId: 'stage-3', title: 'الصف الثالث الثانوي', description: 'الصف الثالث من المرحلة الثانوية', order: 3, subjectsCount: 2, createdAt: DateTime(2025, 3, 10)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-10', stageId: 'stage-3', title: 'الصف الأول الثانوي', description: 'الصف الأول من المرحلة الثانوية', order: 1, subjectsCount: 2, createdAt: DateTime(2025, 3, 10)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-11', stageId: 'stage-3', title: 'الصف الثاني الثانوي', description: 'الصف الثاني من المرحلة الثانوية', order: 2, subjectsCount: 2, createdAt: DateTime(2025, 3, 10)),
+          FreeTrialGradeModel(id: 'freeTrialGrade-12', stageId: 'stage-3', title: 'الصف الثالث الثانوي', description: 'الصف الثالث من المرحلة الثانوية', order: 3, subjectsCount: 2, createdAt: DateTime(2025, 3, 10)),
         ],
       };
 }

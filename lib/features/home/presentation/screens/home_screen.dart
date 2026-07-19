@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _handleSubscribeNow() async {
-    context.go(AppRoutes.splash);
+    context.go(AppRoutes.subscription);
   }
 
   void _showRenewSubscriptionDialog() {

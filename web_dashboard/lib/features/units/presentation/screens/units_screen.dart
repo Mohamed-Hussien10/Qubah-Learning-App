@@ -315,7 +315,7 @@ class _UnitsView extends StatelessWidget {
         child: ListView.builder(
           padding: const EdgeInsets.all(20),
           itemCount: 4,
-          itemBuilder: (_, __) => Padding(
+          itemBuilder: (_, _) => Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Container(
                 height: 48,
@@ -604,7 +604,7 @@ class _UnitFormDialogState extends State<_UnitFormDialog> {
                     const Text('نشط'),
                     Switch.adaptive(
                         value: _isActive,
-                        activeColor: AppColors.success,
+                        activeTrackColor: AppColors.success,
                         onChanged: _isSaving
                             ? null
                             : (v) => setState(() => _isActive = v)),
@@ -643,7 +643,7 @@ String resolveImageUrl(String path) {
   if (path.isEmpty) return '';
   if (path.contains('thumbnails/')) {
     final fileName = path.split('thumbnails/').last;
-    return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+    return 'https://qubahom.com/api/v1/thumbnails/$fileName';
   }
   if (path.startsWith('http')) return path;
   const baseUrl = 'https://qubahom.com';

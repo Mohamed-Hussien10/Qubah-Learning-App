@@ -18,17 +18,17 @@ class ErrorInterceptor extends Interceptor {
       'API Error: ${err.requestOptions.method} ${err.requestOptions.path}',
       error: err,
     );
-    print('--- DETAILED DIO DEBUGGING ---');
-    print('Type: ${err.type}');
-    print('Message: ${err.message}');
-    print('Error object: ${err.error}');
+    LoggerService.instance.debug('--- DETAILED DIO DEBUGGING ---');
+    LoggerService.instance.debug('Type: ${err.type}');
+    LoggerService.instance.debug('Message: ${err.message}');
+    LoggerService.instance.debug('Error object: ${err.error}');
     if (err.error != null) {
-      print('Error object type: ${err.error.runtimeType}');
+      LoggerService.instance.debug('Error object type: ${err.error.runtimeType}');
     }
-    print('Response status: ${err.response?.statusCode}');
-    print('Response data: ${err.response?.data}');
-    print('Request URI: ${err.requestOptions.uri}');
-    print('------------------------------');
+    LoggerService.instance.debug('Response status: ${err.response?.statusCode}');
+    LoggerService.instance.debug('Response data: ${err.response?.data}');
+    LoggerService.instance.debug('Request URI: ${err.requestOptions.uri}');
+    LoggerService.instance.debug('------------------------------');
 
     switch (err.type) {
       case DioExceptionType.connectionTimeout:

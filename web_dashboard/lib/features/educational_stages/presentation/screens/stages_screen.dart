@@ -185,13 +185,13 @@ class _StagesView extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+                        backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
                           backgroundImage: (stage.thumbnailUrl != null &&
                                   stage.thumbnailUrl!.isNotEmpty)
                               ? NetworkImage(resolveImageUrl(stage.thumbnailUrl!))
                               : null,
                         onBackgroundImageError: (stage.thumbnailUrl != null && stage.thumbnailUrl!.isNotEmpty) 
-                            ? (_, __) {} 
+                            ? (_, _) {} 
                             : null,
                         child: (stage.thumbnailUrl == null || stage.thumbnailUrl!.isEmpty)
                             ? const Icon(Icons.school, size: 18, color: AppColors.primary)
@@ -316,7 +316,7 @@ class _StagesView extends StatelessWidget {
         child: ListView.builder(
           padding: const EdgeInsets.all(20),
           itemCount: 5,
-          itemBuilder: (_, __) => Padding(
+          itemBuilder: (_, _) => Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Container(
               height: 48,
@@ -387,7 +387,7 @@ class _StagesView extends StatelessWidget {
     if (path.isEmpty) return '';
     if (path.contains('thumbnails/')) {
       final fileName = path.split('thumbnails/').last;
-      return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+      return 'https://qubahom.com/api/v1/thumbnails/$fileName';
     }
     if (path.startsWith('http')) return path;
     const baseUrl = 'https://qubahom.com';

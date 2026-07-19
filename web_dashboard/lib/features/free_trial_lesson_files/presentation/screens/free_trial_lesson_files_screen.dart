@@ -648,7 +648,7 @@ String resolveImageUrl(String path) {
   if (path.isEmpty) return '';
   if (path.contains('thumbnails/')) {
     final fileName = path.split('thumbnails/').last;
-    return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+    return 'https://qubahom.com/api/v1/thumbnails/$fileName';
   }
   if (path.startsWith('http')) return path;
   const baseUrl = 'https://qubahom.com';

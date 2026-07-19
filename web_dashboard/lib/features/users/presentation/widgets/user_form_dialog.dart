@@ -142,7 +142,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -250,7 +250,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<UserRole>(
-                  value: _selectedRole,
+                  initialValue: _selectedRole,
                   style: GoogleFonts.cairo(
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                   ),
@@ -285,7 +285,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                             _isLoadingStages
                                 ? const CircularProgressIndicator()
                                 : DropdownButtonFormField<String>(
-                                    value: _selectedStageId,
+                                    initialValue: _selectedStageId,
                                     style: GoogleFonts.cairo(
                                       color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                     ),
@@ -327,7 +327,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                             _isLoadingGrades
                                 ? const CircularProgressIndicator()
                                 : DropdownButtonFormField<String>(
-                                    value: _selectedGradeId,
+                                    initialValue: _selectedGradeId,
                                     style: GoogleFonts.cairo(
                                       color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                     ),
@@ -418,7 +418,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                     Switch(
                       value: _isActive,
                       onChanged: (v) => setState(() => _isActive = v),
-                      activeColor: AppColors.success,
+                      activeThumbColor: AppColors.success,
                     ),
                     Text(
                       _isActive ? AppStrings.active : AppStrings.inactive,

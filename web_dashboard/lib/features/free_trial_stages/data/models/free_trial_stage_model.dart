@@ -1,6 +1,6 @@
 import 'package:web_dashboard/features/shared/models/base_entity.dart';
 
-/// Model representing an educational free_trial_stage (e.g. Primary, Middle, Secondary).
+/// Model representing an educational freeTrialStage (e.g. Primary, Middle, Secondary).
 class FreeTrialStageModel extends BaseEntity {
   final String? thumbnailUrl;
   final String? backgroundImageUrl;
@@ -78,7 +78,7 @@ class FreeTrialStageModel extends BaseEntity {
   /// Dummy data for development / demo purposes.
   static List<FreeTrialStageModel> get dummyList => [
         FreeTrialStageModel(
-          id: 'free_trial_stage-1',
+          id: 'freeTrialStage-1',
           title: 'المرحلة الابتدائية',
           description: 'تشمل الصفوف من الأول إلى السادس الابتدائي',
           thumbnailUrl: 'https://via.placeholder.com/150/6C5CE7/FFFFFF?text=ابتدائي',
@@ -88,7 +88,7 @@ class FreeTrialStageModel extends BaseEntity {
           createdAt: DateTime(2025, 1, 15),
         ),
         FreeTrialStageModel(
-          id: 'free_trial_stage-2',
+          id: 'freeTrialStage-2',
           title: 'المرحلة المتوسطة',
           description: 'تشمل الصفوف من الأول إلى الثالث المتوسط',
           thumbnailUrl: 'https://via.placeholder.com/150/00D2D3/FFFFFF?text=متوسط',
@@ -98,7 +98,7 @@ class FreeTrialStageModel extends BaseEntity {
           createdAt: DateTime(2025, 2, 10),
         ),
         FreeTrialStageModel(
-          id: 'free_trial_stage-3',
+          id: 'freeTrialStage-3',
           title: 'المرحلة الثانوية',
           description: 'تشمل الصفوف من الأول إلى الثالث الثانوي',
           thumbnailUrl: 'https://via.placeholder.com/150/FF6B6B/FFFFFF?text=ثانوي',
@@ -108,7 +108,7 @@ class FreeTrialStageModel extends BaseEntity {
           createdAt: DateTime(2025, 3, 5),
         ),
         FreeTrialStageModel(
-          id: 'free_trial_stage-4',
+          id: 'freeTrialStage-4',
           title: 'المرحلة الجامعية',
           description: 'تشمل المقررات الجامعية والتخصصات المختلفة',
           thumbnailUrl: 'https://via.placeholder.com/150/10B981/FFFFFF?text=جامعي',

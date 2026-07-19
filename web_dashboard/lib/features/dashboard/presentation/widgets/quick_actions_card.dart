@@ -181,7 +181,7 @@ class _QuickActionButtonState extends State<_QuickActionButton> {
                 : [],
           ),
           transform:
-              _isHovered ? (Matrix4.identity()..translate(0, -2)) : Matrix4.identity(),
+              _isHovered ? (Matrix4.identity()..setTranslationRaw(0.0, -2.0, 0.0)) : Matrix4.identity(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

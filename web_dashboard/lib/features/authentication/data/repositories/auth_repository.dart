@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_dashboard/core/network/api_client.dart';
 import 'package:web_dashboard/features/authentication/data/models/admin_model.dart';
@@ -16,7 +17,7 @@ class AuthRepository {
   /// Returns an [AdminModel] on success.
   /// Throws an [Exception] on failure.
   Future<AdminModel> login(String email, String password) async {
-    print('DEBUG: Web Dashboard login attempt for $email');
+    debugPrint('DEBUG: Web Dashboard login attempt for $email');
     try {
       final response = await _apiClient.post(
         '/auth/login',
@@ -25,7 +26,7 @@ class AuthRepository {
           'password': password,
         },
       );
-      print('DEBUG: Web Dashboard login response: ${response.data}');
+      debugPrint('DEBUG: Web Dashboard login response: ${response.data}');
 
       final data = response.data['data'] ?? response.data;
       final userMap = Map<String, dynamic>.from(data['user'] ?? data);
@@ -36,7 +37,7 @@ class AuthRepository {
       await _saveSession(admin);
       return admin;
     } catch (e) {
-      print('DEBUG: Web Dashboard login ERROR: $e');
+      debugPrint('DEBUG: Web Dashboard login ERROR: $e');
       rethrow;
     }
   }
@@ -97,7 +98,7 @@ class AuthRepository {
         },
       );
     } catch (e) {
-      print('DEBUG: Web Dashboard update profile ERROR: $e');
+      debugPrint('DEBUG: Web Dashboard update profile ERROR: $e');
       rethrow;
     }
   }
@@ -114,7 +115,7 @@ class AuthRepository {
         },
       );
     } catch (e) {
-      print('DEBUG: Web Dashboard update password ERROR: $e');
+      debugPrint('DEBUG: Web Dashboard update password ERROR: $e');
       rethrow;
     }
   }

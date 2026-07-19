@@ -67,6 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       
       // Update the cubit with new data
+      if (!mounted) return;
       await context.read<AuthCubit>().checkAuthStatus();
 
       setState(() => _isSavingProfile = false);

@@ -22,9 +22,9 @@ class AppStrings {
   static const String profile = 'الملف الشخصي';
 
   // ── Free Trial ───────────────────────────────────────────────────────
-  static const String free_trial_stages = 'مراحل التجربة المجانية';
-  static const String free_trial_grades = 'صفوف التجربة المجانية';
-  static const String free_trial_subjects = 'مواد التجربة المجانية';
+  static const String freeTrialStages = 'مراحل التجربة المجانية';
+  static const String freeTrialGrades = 'صفوف التجربة المجانية';
+  static const String freeTrialSubjects = 'مواد التجربة المجانية';
   static const String subjectFiles = 'ملفات المادة';
 
   // ── Auth ─────────────────────────────────────────────────────────────

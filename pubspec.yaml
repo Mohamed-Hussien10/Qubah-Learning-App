@@ -65,6 +65,8 @@ dependencies:
   logger: ^2.5.0
   intl: ^0.20.2
   url_launcher: ^6.3.1
+  flutter_windowmanager_plus: ^1.0.0
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

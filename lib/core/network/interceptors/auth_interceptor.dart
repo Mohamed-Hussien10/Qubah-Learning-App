@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 
 import '../../storage/secure_storage.dart';
@@ -14,7 +15,7 @@ import '../api_endpoints.dart';
 class AuthInterceptor extends Interceptor {
   final SecureStorage _secureStorage;
   final Dio _refreshDio;
-  bool _isRefreshing = false;
+  Completer<String>? _refreshCompleter;
 
   AuthInterceptor({required SecureStorage secureStorage})
     : _secureStorage = secureStorage,
@@ -51,14 +52,28 @@ class AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // Only attempt refresh on 401 Unauthorized responses
-    if (err.response?.statusCode == 401 && !_isRefreshing) {
-      _isRefreshing = true;
+    if (err.response?.statusCode == 401) {
+      if (_refreshCompleter != null) {
+        // Wait for the ongoing refresh
+        try {
+          final newAccessToken = await _refreshCompleter!.future;
+          err.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+          final retryResponse = await _refreshDio.fetch(err.requestOptions);
+          handler.resolve(retryResponse);
+        } catch (e) {
+          handler.next(err);
+        }
+        return;
+      }
+
+      _refreshCompleter = Completer<String>();
 
       try {
         final refreshToken = await _secureStorage.getRefreshToken();
         if (refreshToken == null || refreshToken.isEmpty) {
           await _forceLogout();
-          _isRefreshing = false;
+          _refreshCompleter?.completeError(Exception('No refresh token'));
+          _refreshCompleter = null;
           handler.next(err);
           return;
         }
@@ -84,18 +99,23 @@ class AuthInterceptor extends Interceptor {
               'Bearer $newAccessToken';
 
           final retryResponse = await _refreshDio.fetch(err.requestOptions);
-          _isRefreshing = false;
+          
+          _refreshCompleter?.complete(newAccessToken);
+          _refreshCompleter = null;
+          
           handler.resolve(retryResponse);
           return;
         } else {
           await _forceLogout();
+          _refreshCompleter?.completeError(Exception('Refresh failed'));
+          _refreshCompleter = null;
         }
       } catch (e) {
         LoggerService.instance.error('Token refresh failed', error: e);
         await _forceLogout();
+        _refreshCompleter?.completeError(e);
+        _refreshCompleter = null;
       }
-
-      _isRefreshing = false;
     }
 
     handler.next(err);

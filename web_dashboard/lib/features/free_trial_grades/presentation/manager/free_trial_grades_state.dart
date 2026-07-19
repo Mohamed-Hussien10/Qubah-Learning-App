@@ -16,14 +16,14 @@ class FreeTrialGradesLoading extends FreeTrialGradesState {
 }
 
 class FreeTrialGradesLoaded extends FreeTrialGradesState {
-  final List<FreeTrialGradeModel> free_trial_grades;
+  final List<FreeTrialGradeModel> freeTrialGrades;
   final List<FreeTrialGradeModel> filteredFreeTrialGrades;
   final String searchQuery;
   final String stageId;
   final String stageName;
 
   const FreeTrialGradesLoaded({
-    required this.free_trial_grades,
+    required this.freeTrialGrades,
     required this.filteredFreeTrialGrades,
     this.searchQuery = '',
     required this.stageId,
@@ -32,17 +32,17 @@ class FreeTrialGradesLoaded extends FreeTrialGradesState {
 
   @override
   List<Object?> get props =>
-      [free_trial_grades, filteredFreeTrialGrades, searchQuery, stageId, stageName];
+      [freeTrialGrades, filteredFreeTrialGrades, searchQuery, stageId, stageName];
 
   FreeTrialGradesLoaded copyWith({
-    List<FreeTrialGradeModel>? free_trial_grades,
+    List<FreeTrialGradeModel>? freeTrialGrades,
     List<FreeTrialGradeModel>? filteredFreeTrialGrades,
     String? searchQuery,
     String? stageId,
     String? stageName,
   }) {
     return FreeTrialGradesLoaded(
-      free_trial_grades: free_trial_grades ?? this.free_trial_grades,
+      freeTrialGrades: freeTrialGrades ?? this.freeTrialGrades,
       filteredFreeTrialGrades: filteredFreeTrialGrades ?? this.filteredFreeTrialGrades,
       searchQuery: searchQuery ?? this.searchQuery,
       stageId: stageId ?? this.stageId,

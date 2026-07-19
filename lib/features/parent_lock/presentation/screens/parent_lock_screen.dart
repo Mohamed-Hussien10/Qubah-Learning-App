@@ -26,7 +26,7 @@ class ParentLockScreen extends StatefulWidget {
 
 class _ParentLockScreenState extends State<ParentLockScreen> {
   final _pinController = TextEditingController();
-  String _correctPin = '1234';
+  String _correctPin = '';
   bool _isLockEnabled = false;
   bool _isChecking = true;
 
@@ -83,16 +83,19 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
         );
       }
     } else {
-      // Enable with default PIN '1234' for now
-      await storage.saveParentPin('1234');
-      setState(() {
-        _isLockEnabled = true;
-        _correctPin = '1234';
-      });
-      if (mounted) {
+      final result = await context.push<bool>(AppRoutes.changePin);
+      if (result == true && mounted) {
+        final pin = await storage.getParentPin();
+        if (!mounted) return;
+        setState(() {
+          _isLockEnabled = true;
+          if (pin != null && pin.isNotEmpty) {
+            _correctPin = pin;
+          }
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('تم تفعيل الرقابة الأبوية (الرمز: 1234)'),
+            content: Text('تم تفعيل الرقابة الأبوية بنجاح'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -106,8 +109,23 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
     super.dispose();
   }
 
+  int _failedAttempts = 0;
+  DateTime? _lockoutUntil;
+
   void _handleUnlock() {
+    if (_lockoutUntil != null && DateTime.now().isBefore(_lockoutUntil!)) {
+      final remaining = _lockoutUntil!.difference(DateTime.now()).inMinutes + 1;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تم الإقفال مؤقتاً. حاول بعد $remaining دقيقة.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     if (_pinController.text == _correctPin) {
+      _failedAttempts = 0;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('تم السماح بالدخول!'),
@@ -117,12 +135,23 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
 
       _handleAutoUnlock();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('رمز PIN غير صحيح'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      _failedAttempts++;
+      if (_failedAttempts >= 5) {
+        _lockoutUntil = DateTime.now().add(const Duration(minutes: 5));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تجاوزت الحد المسموح. تم الإقفال لمدة 5 دقائق.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('رمز PIN غير صحيح. المحاولات المتبقية: ${5 - _failedAttempts}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
       _pinController.clear();
     }
   }
@@ -203,7 +232,7 @@ class _ParentLockScreenState extends State<ParentLockScreen> {
                           subtitle: Text(
                             _isLockEnabled
                                 ? 'سيتم تعطيل حماية التطبيق'
-                                : 'تفعيل القفل برمز 1234',
+                                : 'تفعيل القفل برمز مخصص',
                             style: GoogleFonts.cairo(
                               fontSize: 12,
                               color: Colors.grey.shade600,

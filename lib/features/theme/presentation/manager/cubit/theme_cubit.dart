@@ -7,18 +7,16 @@ class ThemeCubit extends Cubit<ThemeMode> {
 
   ThemeCubit({required SecureStorage secureStorage})
     : _secureStorage = secureStorage,
-      super(ThemeMode.system) {
+      super(ThemeMode.light) {
     _loadTheme();
   }
 
   Future<void> _loadTheme() async {
     final mode = await _secureStorage.getThemeMode();
-    if (mode == 'light') {
-      emit(ThemeMode.light);
-    } else if (mode == 'dark') {
+    if (mode == 'dark') {
       emit(ThemeMode.dark);
     } else {
-      emit(ThemeMode.system); // Default to system for modern apps
+      emit(ThemeMode.light); // Default to light
     }
   }
 

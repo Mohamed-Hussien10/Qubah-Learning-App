@@ -217,8 +217,8 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
         allowsInlineMediaPlayback: true,
 
         // ── File & Local Access ────────────────────────────────────────
-        allowFileAccessFromFileURLs: true,
-        allowUniversalAccessFromFileURLs: true,
+        allowFileAccessFromFileURLs: false,
+        allowUniversalAccessFromFileURLs: false,
         allowFileAccess: true,
         allowContentAccess: true,
 
@@ -234,7 +234,7 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
         displayZoomControls: false,
 
         // ── Security (local testing mode) ──────────────────────────────
-        mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+        mixedContentMode: MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
         allowsBackForwardNavigationGestures: true,
 
         // ── Performance ────────────────────────────────────────────────

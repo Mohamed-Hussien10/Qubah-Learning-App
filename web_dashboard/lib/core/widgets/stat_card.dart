@@ -71,7 +71,7 @@ class _StatCardState extends State<StatCard> {
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
           transform: _isHovered
-              ? (Matrix4.identity()..translate(0, -2, 0))
+              ? (Matrix4.identity()..setTranslationRaw(0.0, -2.0, 0.0))
               : Matrix4.identity(),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(

@@ -39,13 +39,22 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkAuth() async {
     final secureStorage = sl<SecureStorage>();
-    final isAuthenticated = await secureStorage.isAuthenticated();
-    final hasParentPin = await secureStorage.hasParentPin();
+    
+    // Optimize: run storage checks concurrently
+    final results = await Future.wait([
+      secureStorage.isAuthenticated(),
+      secureStorage.hasParentPin(),
+    ]);
+    if (!mounted) return;
+    
+    final isAuthenticated = results[0];
+    final hasParentPin = results[1];
 
     if (isAuthenticated) {
       try {
         final authRepo = sl<qubah_auth.AuthRepository>();
         final userEntity = await authRepo.fetchProfile();
+        if (!mounted) return;
 
         if (userEntity.subscriptionExpiry != null) {
           if (userEntity.subscriptionExpiry!.isBefore(DateTime.now())) {}
@@ -53,6 +62,8 @@ class _SplashScreenState extends State<SplashScreen> {
       } catch (_) {
         // If fetch fails (e.g. offline), fallback to cached data
         final userDataJson = await secureStorage.getUserData();
+        if (!mounted) return;
+        
         if (userDataJson != null && userDataJson.isNotEmpty) {
           try {
             final userData = jsonDecode(userDataJson);

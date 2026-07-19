@@ -251,7 +251,7 @@ class _LessonsView extends StatelessWidget {
                             onBackgroundImageError:
                                 (lesson.thumbnailUrl != null &&
                                         lesson.thumbnailUrl!.isNotEmpty)
-                                    ? (_, __) {}
+                                    ? (_, _) {}
                                     : null,
                             child:
                                 (lesson.thumbnailUrl == null ||
@@ -376,7 +376,7 @@ class _LessonsView extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           itemCount: 4,
           itemBuilder:
-              (_, __) => Padding(
+              (_, _) => Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Container(
                   height: 48,
@@ -717,7 +717,7 @@ class _LessonFormDialogState extends State<_LessonFormDialog> {
                         const Text('نشط'),
                         Switch.adaptive(
                           value: _isActive,
-                          activeColor: AppColors.success,
+                          activeTrackColor: AppColors.success,
                           onChanged:
                               _isSaving
                                   ? null
@@ -767,7 +767,7 @@ String resolveImageUrl(String path) {
   if (path.isEmpty) return '';
   if (path.contains('thumbnails/')) {
     final fileName = path.split('thumbnails/').last;
-    return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+    return 'https://qubahom.com/api/v1/thumbnails/$fileName';
   }
   if (path.startsWith('http')) return path;
   const baseUrl = 'https://qubahom.com';

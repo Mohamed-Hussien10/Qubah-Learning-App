@@ -14,7 +14,7 @@ import 'package:web_dashboard/features/free_trial_stages/presentation/manager/fr
 import 'package:web_dashboard/core/services/dependency_injection.dart';
 import 'package:web_dashboard/features/free_trial_stages/presentation/widgets/free_trial_stage_form_dialog.dart';
 
-/// Full management screen for educational free_trial_stages.
+/// Full management screen for educational freeTrialStages.
 class FreeTrialStagesScreen extends StatelessWidget {
   const FreeTrialStagesScreen({super.key});
 
@@ -67,7 +67,7 @@ class _FreeTrialStagesView extends StatelessWidget {
             color: AppColors.primary, size: 28),
         const SizedBox(width: 12),
         Text(
-          AppStrings.free_trial_stages,
+          AppStrings.freeTrialStages,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: isDark
@@ -136,7 +136,7 @@ class _FreeTrialStagesView extends StatelessWidget {
   // ── Data Table ─────────────────────────────────────────────────────────
 
   Widget _buildTable(
-      BuildContext context, List<FreeTrialStageModel> free_trial_stages, bool isDark) {
+      BuildContext context, List<FreeTrialStageModel> freeTrialStages, bool isDark) {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.cardDark : AppColors.cardLight,
@@ -175,33 +175,33 @@ class _FreeTrialStagesView extends StatelessWidget {
             DataColumn2(label: Text('الصفوف'), fixedWidth: 90),
             DataColumn2(label: Text(AppStrings.actions), fixedWidth: 200),
           ],
-          rows: free_trial_stages.asMap().entries.map((entry) {
-            final free_trial_stage = entry.value;
+          rows: freeTrialStages.asMap().entries.map((entry) {
+            final freeTrialStage = entry.value;
             return DataRow2(
-              onTap: () => _navigateToGrades(context, free_trial_stage),
+              onTap: () => _navigateToGrades(context, freeTrialStage),
               cells: [
-                DataCell(Text('${free_trial_stage.order}')),
+                DataCell(Text('${freeTrialStage.order}')),
                 DataCell(
                   Row(
                     children: [
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
-                          backgroundImage: (free_trial_stage.thumbnailUrl != null &&
-                                  free_trial_stage.thumbnailUrl!.isNotEmpty)
-                              ? NetworkImage(resolveImageUrl(free_trial_stage.thumbnailUrl!))
+                        backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
+                          backgroundImage: (freeTrialStage.thumbnailUrl != null &&
+                                  freeTrialStage.thumbnailUrl!.isNotEmpty)
+                              ? NetworkImage(resolveImageUrl(freeTrialStage.thumbnailUrl!))
                               : null,
-                        onBackgroundImageError: (free_trial_stage.thumbnailUrl != null && free_trial_stage.thumbnailUrl!.isNotEmpty) 
-                            ? (_, __) {} 
+                        onBackgroundImageError: (freeTrialStage.thumbnailUrl != null && freeTrialStage.thumbnailUrl!.isNotEmpty) 
+                            ? (_, _) {} 
                             : null,
-                        child: (free_trial_stage.thumbnailUrl == null || free_trial_stage.thumbnailUrl!.isEmpty)
+                        child: (freeTrialStage.thumbnailUrl == null || freeTrialStage.thumbnailUrl!.isEmpty)
                             ? const Icon(Icons.school, size: 18, color: AppColors.primary)
                             : null,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          free_trial_stage.title,
+                          freeTrialStage.title,
                           style: const TextStyle(fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -210,11 +210,11 @@ class _FreeTrialStagesView extends StatelessWidget {
                   ),
                 ),
                 DataCell(Text(
-                  free_trial_stage.description ?? '—',
+                  freeTrialStage.description ?? '—',
                   overflow: TextOverflow.ellipsis,
                 )),
-                DataCell(_StatusBadge(isActive: free_trial_stage.isActive)),
-                DataCell(Text('${free_trial_stage.gradesCount}')),
+                DataCell(_StatusBadge(isActive: freeTrialStage.isActive)),
+                DataCell(Text('${freeTrialStage.gradesCount}')),
                 DataCell(
                   Row(
                     mainAxisSize: MainAxisSize.min,
@@ -223,14 +223,14 @@ class _FreeTrialStagesView extends StatelessWidget {
                         icon: Icons.edit_rounded,
                         tooltip: AppStrings.edit,
                         color: AppColors.warning,
-                        onTap: () => _showForm(context, free_trial_stage: free_trial_stage),
+                        onTap: () => _showForm(context, freeTrialStage: freeTrialStage),
                       ),
                       _ActionIcon(
                         icon: Icons.delete_outline_rounded,
                         tooltip: AppStrings.delete,
                         color: AppColors.error,
                         onTap: () =>
-                            _confirmDelete(context, free_trial_stage),
+                            _confirmDelete(context, freeTrialStage),
                       ),
                     ],
                   ),
@@ -317,7 +317,7 @@ class _FreeTrialStagesView extends StatelessWidget {
         child: ListView.builder(
           padding: const EdgeInsets.all(20),
           itemCount: 5,
-          itemBuilder: (_, __) => Padding(
+          itemBuilder: (_, _) => Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Container(
               height: 48,
@@ -334,13 +334,13 @@ class _FreeTrialStagesView extends StatelessWidget {
 
   // ── Actions ────────────────────────────────────────────────────────────
 
-  void _showForm(BuildContext context, {FreeTrialStageModel? free_trial_stage}) {
+  void _showForm(BuildContext context, {FreeTrialStageModel? freeTrialStage}) {
     final cubit = context.read<FreeTrialStagesCubit>();
     FreeTrialStageFormDialog.show(
       context,
-      free_trial_stage: free_trial_stage,
+      freeTrialStage: freeTrialStage,
       onSave: (s, {imageBytes, imageName, bgImageBytes, bgImageName}) async {
-        if (free_trial_stage != null) {
+        if (freeTrialStage != null) {
           await cubit.updateFreeTrialStage(s, imageBytes: imageBytes, imageName: imageName, bgImageBytes: bgImageBytes, bgImageName: bgImageName);
         } else {
           await cubit.createFreeTrialStage(s, imageBytes: imageBytes, imageName: imageName, bgImageBytes: bgImageBytes, bgImageName: bgImageName);
@@ -349,7 +349,7 @@ class _FreeTrialStagesView extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, FreeTrialStageModel free_trial_stage) {
+  void _confirmDelete(BuildContext context, FreeTrialStageModel freeTrialStage) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -361,7 +361,7 @@ class _FreeTrialStagesView extends StatelessWidget {
             Text('تأكيد الحذف'),
           ],
         ),
-        content: Text('هل أنت متأكد من حذف "${free_trial_stage.title}"؟'),
+        content: Text('هل أنت متأكد من حذف "${freeTrialStage.title}"؟'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -370,7 +370,7 @@ class _FreeTrialStagesView extends StatelessWidget {
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<FreeTrialStagesCubit>().deleteFreeTrialStage(free_trial_stage.id);
+              context.read<FreeTrialStagesCubit>().deleteFreeTrialStage(freeTrialStage.id);
             },
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             child: const Text(AppStrings.delete),
@@ -380,8 +380,8 @@ class _FreeTrialStagesView extends StatelessWidget {
     );
   }
 
-  void _navigateToGrades(BuildContext context, FreeTrialStageModel free_trial_stage) {
-    context.push('/free-trial-grades/${free_trial_stage.id}').then((_) {
+  void _navigateToGrades(BuildContext context, FreeTrialStageModel freeTrialStage) {
+    context.push('/free-trial-grades/${freeTrialStage.id}').then((_) {
       if (context.mounted) {
         context.read<FreeTrialStagesCubit>().loadFreeTrialStages();
       }
@@ -392,7 +392,7 @@ class _FreeTrialStagesView extends StatelessWidget {
     if (path.isEmpty) return '';
     if (path.contains('thumbnails/')) {
       final fileName = path.split('thumbnails/').last;
-      return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+      return 'https://qubahom.com/api/v1/thumbnails/$fileName';
     }
     if (path.startsWith('http')) return path;
     const baseUrl = 'https://qubahom.com';

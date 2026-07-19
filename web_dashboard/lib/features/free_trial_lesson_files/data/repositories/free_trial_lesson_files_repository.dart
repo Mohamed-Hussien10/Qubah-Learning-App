@@ -1,4 +1,5 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:web_dashboard/core/network/api_client.dart';
 import 'package:web_dashboard/features/free_trial_lesson_files/data/models/free_trial_lesson_file_model.dart';
 
@@ -95,7 +96,7 @@ class FreeTrialLessonFilesRepository {
     required String thumbnailFileName,
   }) async {
     try {
-      print('DEBUG: Starting thumbnail upload for fileId: $fileId');
+      debugPrint('DEBUG: Starting thumbnail upload for fileId: $fileId');
       
       // 1. Upload thumbnail to generic thumbnail endpoint
       final uploadResponse = await _apiClient.uploadFileBytes(
@@ -105,23 +106,23 @@ class FreeTrialLessonFilesRepository {
         fileFieldName: 'thumbnail',
         additionalFields: {'folder': 'files'},
       );
-      print('DEBUG: Upload response: ${uploadResponse.data}');
+      debugPrint('DEBUG: Upload response: ${uploadResponse.data}');
       
       final uploadData = uploadResponse.data['data'] ?? uploadResponse.data;
       final String thumbnailPath = uploadData['path'];
-      print('DEBUG: Thumbnail path received: $thumbnailPath');
+      debugPrint('DEBUG: Thumbnail path received: $thumbnailPath');
 
       // 2. Fetch current file
       final fileModel = await getById(fileId);
-      print('DEBUG: Fetched current file: ${fileModel.toJson()}');
+      debugPrint('DEBUG: Fetched current file: ${fileModel.toJson()}');
 
       // 3. Update file with new thumbnail path
       final updatedModel = fileModel.copyWith(thumbnailUrl: thumbnailPath);
       final updateResult = await update(updatedModel);
-      print('DEBUG: Update successful');
+      debugPrint('DEBUG: Update successful');
       return updateResult;
     } catch (e) {
-      print('DEBUG: Error in uploadThumbnail: $e');
+      debugPrint('DEBUG: Error in uploadThumbnail: $e');
       rethrow;
     }
   }

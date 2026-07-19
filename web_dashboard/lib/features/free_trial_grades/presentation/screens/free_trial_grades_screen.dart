@@ -110,7 +110,7 @@ class _FreeTrialGradesView extends StatelessWidget {
                 ? AppColors.textTertiaryDark
                 : AppColors.textTertiaryLight),
         Text(
-          AppStrings.free_trial_grades,
+          AppStrings.freeTrialGrades,
           style: TextStyle(
             fontSize: 14,
             color: isDark
@@ -128,7 +128,7 @@ class _FreeTrialGradesView extends StatelessWidget {
         Icon(Icons.class_rounded, color: AppColors.primary, size: 28),
         const SizedBox(width: 12),
         Text(
-          AppStrings.free_trial_grades,
+          AppStrings.freeTrialGrades,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: isDark
@@ -189,7 +189,7 @@ class _FreeTrialGradesView extends StatelessWidget {
   }
 
   Widget _buildTable(
-      BuildContext context, List<FreeTrialGradeModel> free_trial_grades, bool isDark) {
+      BuildContext context, List<FreeTrialGradeModel> freeTrialGrades, bool isDark) {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.cardDark : AppColors.cardLight,
@@ -221,31 +221,31 @@ class _FreeTrialGradesView extends StatelessWidget {
             DataColumn2(label: Text(AppStrings.subjects), fixedWidth: 90),
             DataColumn2(label: Text(AppStrings.actions), fixedWidth: 200),
           ],
-          rows: free_trial_grades.map((free_trial_grade) {
+          rows: freeTrialGrades.map((freeTrialGrade) {
             return DataRow2(
-              onTap: () => _navigateToSubjects(context, free_trial_grade),
+              onTap: () => _navigateToSubjects(context, freeTrialGrade),
               cells: [
-                DataCell(Text('${free_trial_grade.order}')),
+                DataCell(Text('${freeTrialGrade.order}')),
                 DataCell(
                   Row(
                     children: [
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
-                          backgroundImage: (free_trial_grade.thumbnailUrl != null &&
-                                  free_trial_grade.thumbnailUrl!.isNotEmpty)
-                              ? NetworkImage(resolveImageUrl(free_trial_grade.thumbnailUrl!))
+                        backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
+                          backgroundImage: (freeTrialGrade.thumbnailUrl != null &&
+                                  freeTrialGrade.thumbnailUrl!.isNotEmpty)
+                              ? NetworkImage(resolveImageUrl(freeTrialGrade.thumbnailUrl!))
                               : null,
-                        onBackgroundImageError: (free_trial_grade.thumbnailUrl != null && free_trial_grade.thumbnailUrl!.isNotEmpty) 
-                            ? (_, __) {} 
+                        onBackgroundImageError: (freeTrialGrade.thumbnailUrl != null && freeTrialGrade.thumbnailUrl!.isNotEmpty) 
+                            ? (_, _) {} 
                             : null,
-                        child: (free_trial_grade.thumbnailUrl == null || free_trial_grade.thumbnailUrl!.isEmpty)
+                        child: (freeTrialGrade.thumbnailUrl == null || freeTrialGrade.thumbnailUrl!.isEmpty)
                             ? const Icon(Icons.class_rounded, size: 18, color: AppColors.primary)
                             : null,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(free_trial_grade.title,
+                        child: Text(freeTrialGrade.title,
                             style:
                                 const TextStyle(fontWeight: FontWeight.w600),
                             overflow: TextOverflow.ellipsis),
@@ -253,10 +253,10 @@ class _FreeTrialGradesView extends StatelessWidget {
                     ],
                   ),
                 ),
-                DataCell(Text(free_trial_grade.description ?? '—',
+                DataCell(Text(freeTrialGrade.description ?? '—',
                     overflow: TextOverflow.ellipsis)),
-                DataCell(_StatusBadge(isActive: free_trial_grade.isActive)),
-                DataCell(Text('${free_trial_grade.subjectsCount}')),
+                DataCell(_StatusBadge(isActive: freeTrialGrade.isActive)),
+                DataCell(Text('${freeTrialGrade.subjectsCount}')),
                 DataCell(Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -264,13 +264,13 @@ class _FreeTrialGradesView extends StatelessWidget {
                       icon: Icons.edit_rounded,
                       tooltip: AppStrings.edit,
                       color: AppColors.warning,
-                      onTap: () => _showForm(context, free_trial_grade: free_trial_grade),
+                      onTap: () => _showForm(context, freeTrialGrade: freeTrialGrade),
                     ),
                     _ActionIcon(
                       icon: Icons.delete_outline_rounded,
                       tooltip: AppStrings.delete,
                       color: AppColors.error,
-                      onTap: () => _confirmDelete(context, free_trial_grade),
+                      onTap: () => _confirmDelete(context, freeTrialGrade),
                     ),
                   ],
                 )),
@@ -342,7 +342,7 @@ class _FreeTrialGradesView extends StatelessWidget {
         child: ListView.builder(
           padding: const EdgeInsets.all(20),
           itemCount: 5,
-          itemBuilder: (_, __) => Padding(
+          itemBuilder: (_, _) => Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Container(
               height: 48,
@@ -356,16 +356,16 @@ class _FreeTrialGradesView extends StatelessWidget {
     );
   }
 
-  void _showForm(BuildContext context, {FreeTrialGradeModel? free_trial_grade}) {
+  void _showForm(BuildContext context, {FreeTrialGradeModel? freeTrialGrade}) {
     final cubit = context.read<FreeTrialGradesCubit>();
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => _FreeTrialGradeFormDialog(
-        free_trial_grade: free_trial_grade,
+        freeTrialGrade: freeTrialGrade,
         stageId: stageId,
         onSave: (g, {imageBytes, imageName}) async {
-          if (free_trial_grade != null) {
+          if (freeTrialGrade != null) {
             await cubit.updateFreeTrialGrade(g, imageBytes: imageBytes, imageName: imageName);
           } else {
             await cubit.createFreeTrialGrade(g, imageBytes: imageBytes, imageName: imageName);
@@ -375,7 +375,7 @@ class _FreeTrialGradesView extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, FreeTrialGradeModel free_trial_grade) {
+  void _confirmDelete(BuildContext context, FreeTrialGradeModel freeTrialGrade) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -388,7 +388,7 @@ class _FreeTrialGradesView extends StatelessWidget {
             Text('تأكيد الحذف'),
           ],
         ),
-        content: Text('هل أنت متأكد من حذف "${free_trial_grade.title}"؟'),
+        content: Text('هل أنت متأكد من حذف "${freeTrialGrade.title}"؟'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -396,7 +396,7 @@ class _FreeTrialGradesView extends StatelessWidget {
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<FreeTrialGradesCubit>().deleteFreeTrialGrade(free_trial_grade.id);
+              context.read<FreeTrialGradesCubit>().deleteFreeTrialGrade(freeTrialGrade.id);
             },
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             child: const Text(AppStrings.delete),
@@ -406,10 +406,10 @@ class _FreeTrialGradesView extends StatelessWidget {
     );
   }
 
-  void _navigateToSubjects(BuildContext context, FreeTrialGradeModel free_trial_grade) {
-    context.push('/free-trial-subjects/${free_trial_grade.id}').then((_) {
+  void _navigateToSubjects(BuildContext context, FreeTrialGradeModel freeTrialGrade) {
+    context.push('/free-trial-subjects/${freeTrialGrade.id}').then((_) {
       if (context.mounted) {
-        context.read<FreeTrialGradesCubit>().loadFreeTrialGrades(free_trial_grade.stageId);
+        context.read<FreeTrialGradesCubit>().loadFreeTrialGrades(freeTrialGrade.stageId);
       }
     });
   }
@@ -472,12 +472,12 @@ class _ActionIcon extends StatelessWidget {
 // ── FreeTrialGrade Form Dialog ────────────────────────────────────────────────────────
 
 class _FreeTrialGradeFormDialog extends StatefulWidget {
-  final FreeTrialGradeModel? free_trial_grade;
+  final FreeTrialGradeModel? freeTrialGrade;
   final String stageId;
   final Future<void> Function(FreeTrialGradeModel, {List<int>? imageBytes, String? imageName}) onSave;
 
   const _FreeTrialGradeFormDialog({
-    this.free_trial_grade,
+    this.freeTrialGrade,
     required this.stageId,
     required this.onSave,
   });
@@ -497,17 +497,17 @@ class _FreeTrialGradeFormDialogState extends State<_FreeTrialGradeFormDialog> {
   List<int>? _selectedFileBytes;
   late TextEditingController _thumbCtrl;
 
-  bool get _isEditing => widget.free_trial_grade != null;
+  bool get _isEditing => widget.freeTrialGrade != null;
 
   @override
   void initState() {
     super.initState();
-    _titleCtrl = TextEditingController(text: widget.free_trial_grade?.title ?? '');
-    _descCtrl = TextEditingController(text: widget.free_trial_grade?.description ?? '');
-    _thumbCtrl = TextEditingController(text: widget.free_trial_grade?.thumbnailUrl ?? '');
+    _titleCtrl = TextEditingController(text: widget.freeTrialGrade?.title ?? '');
+    _descCtrl = TextEditingController(text: widget.freeTrialGrade?.description ?? '');
+    _thumbCtrl = TextEditingController(text: widget.freeTrialGrade?.thumbnailUrl ?? '');
     _orderCtrl =
-        TextEditingController(text: widget.free_trial_grade?.order.toString() ?? '0');
-    _isActive = widget.free_trial_grade?.isActive ?? true;
+        TextEditingController(text: widget.freeTrialGrade?.order.toString() ?? '0');
+    _isActive = widget.freeTrialGrade?.isActive ?? true;
   }
 
   @override
@@ -537,8 +537,8 @@ class _FreeTrialGradeFormDialogState extends State<_FreeTrialGradeFormDialog> {
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
-    final free_trial_grade = FreeTrialGradeModel(
-      id: widget.free_trial_grade?.id ?? '',
+    final freeTrialGrade = FreeTrialGradeModel(
+      id: widget.freeTrialGrade?.id ?? '',
       stageId: widget.stageId,
       title: _titleCtrl.text.trim(),
       description:
@@ -546,11 +546,11 @@ class _FreeTrialGradeFormDialogState extends State<_FreeTrialGradeFormDialog> {
       isActive: _isActive,
       thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
-      subjectsCount: widget.free_trial_grade?.subjectsCount ?? 0,
-      createdAt: widget.free_trial_grade?.createdAt,
+      subjectsCount: widget.freeTrialGrade?.subjectsCount ?? 0,
+      createdAt: widget.freeTrialGrade?.createdAt,
     );
     try {
-      await widget.onSave(free_trial_grade, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
+      await widget.onSave(freeTrialGrade, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -661,7 +661,7 @@ class _FreeTrialGradeFormDialogState extends State<_FreeTrialGradeFormDialog> {
                         const Text('نشط'),
                         Switch.adaptive(
                           value: _isActive,
-                          activeColor: AppColors.success,
+                          activeTrackColor: AppColors.success,
                           onChanged: _isSaving
                               ? null
                               : (v) => setState(() => _isActive = v),
@@ -707,7 +707,7 @@ String resolveImageUrl(String path) {
   if (path.isEmpty) return '';
   if (path.contains('thumbnails/')) {
     final fileName = path.split('thumbnails/').last;
-    return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+    return 'https://qubahom.com/api/v1/thumbnails/$fileName';
   }
   if (path.startsWith('http')) return path;
   const baseUrl = 'https://qubahom.com';

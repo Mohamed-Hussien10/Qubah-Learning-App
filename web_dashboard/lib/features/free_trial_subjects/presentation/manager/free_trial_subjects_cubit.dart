@@ -20,7 +20,7 @@ class FreeTrialSubjectsCubit extends Cubit<FreeTrialSubjectsState> {
     _gradeId = gradeId;
     emit(const FreeTrialSubjectsLoading());
     try {
-      final free_trial_subjects = await _repository.getByGradeId(gradeId);
+      final freeTrialSubjects = await _repository.getByGradeId(gradeId);
       final gradeName = FreeTrialGradeModel.dummyMap.values
               .expand((e) => e)
               .where((g) => g.id == gradeId)
@@ -29,7 +29,7 @@ class FreeTrialSubjectsCubit extends Cubit<FreeTrialSubjectsState> {
           'الصف';
       
       List<FreeTrialSubjectModel> updatedSubjects = [];
-      for (final subject in free_trial_subjects) {
+      for (final subject in freeTrialSubjects) {
         try {
           final files = await sl<FreeTrialLessonFilesRepository>().getBySubjectId(subject.id);
           updatedSubjects.add(subject.copyWith(lessonFilesCount: files.length));
@@ -39,7 +39,7 @@ class FreeTrialSubjectsCubit extends Cubit<FreeTrialSubjectsState> {
       }
 
       emit(FreeTrialSubjectsLoaded(
-        free_trial_subjects: updatedSubjects,
+        freeTrialSubjects: updatedSubjects,
         filteredFreeTrialSubjects: updatedSubjects,
         gradeId: gradeId,
         gradeName: gradeName,
@@ -49,18 +49,18 @@ class FreeTrialSubjectsCubit extends Cubit<FreeTrialSubjectsState> {
     }
   }
 
-  Future<void> createFreeTrialSubject(FreeTrialSubjectModel free_trial_subject, {List<int>? imageBytes, String? imageName}) async {
+  Future<void> createFreeTrialSubject(FreeTrialSubjectModel freeTrialSubject, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.create(free_trial_subject, imageBytes: imageBytes, imageName: imageName);
+      await _repository.create(freeTrialSubject, imageBytes: imageBytes, imageName: imageName);
       await loadFreeTrialSubjects(_gradeId);
     } catch (e) {
       emit(FreeTrialSubjectsError(ErrorHandler.handle(e)));
     }
   }
 
-  Future<void> updateFreeTrialSubject(FreeTrialSubjectModel free_trial_subject, {List<int>? imageBytes, String? imageName}) async {
+  Future<void> updateFreeTrialSubject(FreeTrialSubjectModel freeTrialSubject, {List<int>? imageBytes, String? imageName}) async {
     try {
-      await _repository.update(free_trial_subject, imageBytes: imageBytes, imageName: imageName);
+      await _repository.update(freeTrialSubject, imageBytes: imageBytes, imageName: imageName);
       await loadFreeTrialSubjects(_gradeId);
     } catch (e) {
       emit(FreeTrialSubjectsError(ErrorHandler.handle(e)));
@@ -80,11 +80,11 @@ class FreeTrialSubjectsCubit extends Cubit<FreeTrialSubjectsState> {
     if (state is FreeTrialSubjectsLoaded) {
       final currentState = state as FreeTrialSubjectsLoaded;
       if (query.isEmpty) {
-        emit(currentState.copyWith(filteredFreeTrialSubjects: currentState.free_trial_subjects));
+        emit(currentState.copyWith(filteredFreeTrialSubjects: currentState.freeTrialSubjects));
         return;
       }
-      final filtered = currentState.free_trial_subjects.where((free_trial_subject) {
-        return free_trial_subject.title.toLowerCase().contains(query.toLowerCase());
+      final filtered = currentState.freeTrialSubjects.where((freeTrialSubject) {
+        return freeTrialSubject.title.toLowerCase().contains(query.toLowerCase());
       }).toList();
       emit(currentState.copyWith(filteredFreeTrialSubjects: filtered));
     }

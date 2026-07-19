@@ -41,7 +41,6 @@ class AppConstants {
 
   // ── Parent Lock ───────────────────────────────────────────────────────
   static const int parentPinLength = 4;
-  static const String defaultParentPin = '1234';
 
   // ── Subscription ──────────────────────────────────────────────────────
   static const int trialDurationDays = 7;

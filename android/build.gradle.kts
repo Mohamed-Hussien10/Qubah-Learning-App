@@ -19,6 +19,23 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+subprojects {
+    plugins.withId("com.android.application") {
+        configure<com.android.build.gradle.BaseExtension> {
+            if (namespace == null) {
+                namespace = "com.qubah.learning.${project.name.replace("-", ".")}"
+            }
+        }
+    }
+    plugins.withId("com.android.library") {
+        configure<com.android.build.gradle.BaseExtension> {
+            if (namespace == null) {
+                namespace = "com.qubah.learning.${project.name.replace("-", ".")}"
+            }
+        }
+    }
+}
+
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }

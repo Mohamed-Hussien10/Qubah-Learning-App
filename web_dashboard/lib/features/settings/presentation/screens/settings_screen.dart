@@ -275,7 +275,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
                     const SizedBox(width: 24),
                     Switch.adaptive(
                       value: _maintenanceMode,
-                      activeColor: AppColors.error,
+                      activeTrackColor: AppColors.error,
                       onChanged: (val) {
                         setState(() {
                           _maintenanceMode = val;

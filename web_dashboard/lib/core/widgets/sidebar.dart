@@ -84,19 +84,19 @@ final List<SidebarSection> sidebarSections = [
     label: 'التجربة المجانية',
     items: [
       SidebarItem(
-        label: AppStrings.free_trial_stages,
+        label: AppStrings.freeTrialStages,
         icon: Icons.card_giftcard_outlined,
         activeIcon: Icons.card_giftcard_rounded,
         route: '/free-trial-stages',
       ),
       SidebarItem(
-        label: AppStrings.free_trial_grades,
+        label: AppStrings.freeTrialGrades,
         icon: Icons.stars_outlined,
         activeIcon: Icons.stars_rounded,
         route: '/free-trial-grades',
       ),
       SidebarItem(
-        label: AppStrings.free_trial_subjects,
+        label: AppStrings.freeTrialSubjects,
         icon: Icons.menu_book_outlined,
         activeIcon: Icons.menu_book_rounded,
         route: '/free-trial-subjects',

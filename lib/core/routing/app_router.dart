@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../services/dependency_injection.dart';
+import '../storage/secure_storage.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/authentication/presentation/screens/login/login_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
@@ -23,7 +26,6 @@ import '../../features/parent_lock/presentation/screens/parent_settings_screen.d
 import '../../features/parent_lock/presentation/screens/change_pin_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_expired_screen.dart';
 import '../../features/settings/presentation/screens/support_screen.dart';
-import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
 import '../../features/splash/presentation/screens/maintenance_screen.dart';
 import '../../features/free_trial/presentation/screens/free_trial_screens.dart';
 
@@ -55,7 +57,6 @@ class AppRoutes {
   static const String appEntryLock = '/app-entry-lock';
   static const String appExitLock = '/app-exit-lock';
   static const String support = '/support';
-  static const String privacy = '/privacy';
   static const String maintenance = '/maintenance';
   static const String freeTrialSubjects = '/free-trial-subjects/:gradeId';
   static const String freeTrialLessonFiles = '/free-trial-lesson-files/:subjectId';
@@ -71,7 +72,26 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: kDebugMode,
+    redirect: (context, state) async {
+      final protectedRoutes = [
+        AppRoutes.home,
+        AppRoutes.stages,
+        AppRoutes.profile,
+        AppRoutes.subscription,
+        AppRoutes.settings,
+        AppRoutes.notifications,
+      ];
+      
+      final isProtected = protectedRoutes.any((r) => state.matchedLocation.startsWith(r));
+      if (isProtected) {
+        final secureStorage = sl<SecureStorage>();
+        final isAuth = await secureStorage.isAuthenticated();
+        final isGuest = await secureStorage.isGuest();
+        if (!isAuth && !isGuest) return AppRoutes.login;
+      }
+      return null;
+    },
     routes: [
       GoRoute(
         path: AppRoutes.splash,
@@ -291,11 +311,6 @@ class AppRouter {
             initialContactPhone: extra['contactPhone']?.toString(),
           );
         },
-      ),
-      GoRoute(
-        path: AppRoutes.privacy,
-        name: 'privacy',
-        builder: (context, state) => const PrivacyPolicyScreen(),
       ),
       GoRoute(
         path: AppRoutes.freeTrialSubjects,

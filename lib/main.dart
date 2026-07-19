@@ -51,7 +51,7 @@ void main() async {
   };
 
   // Platform-specific WebView initialization
-  if (!kIsWeb && Platform.isAndroid) {
+  if (!kIsWeb && Platform.isAndroid && kDebugMode) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 
@@ -118,7 +118,8 @@ class QubahLearningApp extends StatelessWidget {
 
               // Themes
               theme: AppTheme.lightTheme,
-              themeMode: ThemeMode.light,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeMode,
 
               // Routing
               routerConfig: AppRouter.router,

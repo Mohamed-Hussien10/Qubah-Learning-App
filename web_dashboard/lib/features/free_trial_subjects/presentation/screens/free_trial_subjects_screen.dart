@@ -103,7 +103,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
             color: isDark
                 ? AppColors.textTertiaryDark
                 : AppColors.textTertiaryLight),
-        Text(AppStrings.free_trial_subjects,
+        Text(AppStrings.freeTrialSubjects,
             style: TextStyle(
                 fontSize: 14,
                 color: isDark
@@ -119,7 +119,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
         Icon(Icons.menu_book_rounded,
             color: AppColors.primary, size: 28),
         const SizedBox(width: 12),
-        Text(AppStrings.free_trial_subjects,
+        Text(AppStrings.freeTrialSubjects,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: isDark
@@ -180,7 +180,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
   }
 
   Widget _buildTable(
-      BuildContext context, List<FreeTrialSubjectModel> free_trial_subjects, bool isDark) {
+      BuildContext context, List<FreeTrialSubjectModel> freeTrialSubjects, bool isDark) {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.cardDark : AppColors.cardLight,
@@ -210,39 +210,39 @@ class _FreeTrialSubjectsView extends StatelessWidget {
             DataColumn2(label: Text('الملفات'), fixedWidth: 90),
             DataColumn2(label: Text(AppStrings.actions), fixedWidth: 200),
           ],
-          rows: free_trial_subjects.map((free_trial_subject) {
+          rows: freeTrialSubjects.map((freeTrialSubject) {
             return DataRow2(
-              onTap: () => _navigateToLessonFiles(context, free_trial_subject),
+              onTap: () => _navigateToLessonFiles(context, freeTrialSubject),
               cells: [
-                DataCell(Text('${free_trial_subject.order}')),
+                DataCell(Text('${freeTrialSubject.order}')),
                 DataCell(Row(
                   children: [
                     CircleAvatar(
                         radius: 18,
-                        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
-                          backgroundImage: (free_trial_subject.thumbnailUrl != null &&
-                                  free_trial_subject.thumbnailUrl!.isNotEmpty)
-                              ? NetworkImage(resolveImageUrl(free_trial_subject.thumbnailUrl!))
+                        backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
+                          backgroundImage: (freeTrialSubject.thumbnailUrl != null &&
+                                  freeTrialSubject.thumbnailUrl!.isNotEmpty)
+                              ? NetworkImage(resolveImageUrl(freeTrialSubject.thumbnailUrl!))
                               : null,
-                        onBackgroundImageError: (free_trial_subject.thumbnailUrl != null && free_trial_subject.thumbnailUrl!.isNotEmpty) 
-                            ? (_, __) {} 
+                        onBackgroundImageError: (freeTrialSubject.thumbnailUrl != null && freeTrialSubject.thumbnailUrl!.isNotEmpty) 
+                            ? (_, _) {} 
                             : null,
-                        child: (free_trial_subject.thumbnailUrl == null || free_trial_subject.thumbnailUrl!.isEmpty)
+                        child: (freeTrialSubject.thumbnailUrl == null || freeTrialSubject.thumbnailUrl!.isEmpty)
                             ? const Icon(Icons.menu_book_rounded, size: 18, color: AppColors.primary)
                             : null,
                       ),
                     const SizedBox(width: 10),
                     Expanded(
-                        child: Text(free_trial_subject.title,
+                        child: Text(freeTrialSubject.title,
                             style:
                                 const TextStyle(fontWeight: FontWeight.w600),
                             overflow: TextOverflow.ellipsis)),
                   ],
                 )),
-                DataCell(Text(free_trial_subject.description ?? '—',
+                DataCell(Text(freeTrialSubject.description ?? '—',
                     overflow: TextOverflow.ellipsis)),
-                DataCell(_StatusBadge(isActive: free_trial_subject.isActive)),
-                DataCell(Text('${free_trial_subject.lessonFilesCount}')),
+                DataCell(_StatusBadge(isActive: freeTrialSubject.isActive)),
+                DataCell(Text('${freeTrialSubject.lessonFilesCount}')),
                 DataCell(Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -251,13 +251,13 @@ class _FreeTrialSubjectsView extends StatelessWidget {
                         tooltip: AppStrings.edit,
                         color: AppColors.warning,
                         onTap: () =>
-                            _showForm(context, free_trial_subject: free_trial_subject)),
+                            _showForm(context, freeTrialSubject: freeTrialSubject)),
                     _ActionIcon(
                         icon: Icons.delete_outline_rounded,
                         tooltip: AppStrings.delete,
                         color: AppColors.error,
                         onTap: () =>
-                            _confirmDelete(context, free_trial_subject)),
+                            _confirmDelete(context, freeTrialSubject)),
                   ],
                 )),
               ],
@@ -328,7 +328,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
         child: ListView.builder(
           padding: const EdgeInsets.all(20),
           itemCount: 4,
-          itemBuilder: (_, __) => Padding(
+          itemBuilder: (_, _) => Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Container(
                 height: 48,
@@ -341,16 +341,16 @@ class _FreeTrialSubjectsView extends StatelessWidget {
     );
   }
 
-  void _showForm(BuildContext context, {FreeTrialSubjectModel? free_trial_subject}) {
+  void _showForm(BuildContext context, {FreeTrialSubjectModel? freeTrialSubject}) {
     final cubit = context.read<FreeTrialSubjectsCubit>();
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => _FreeTrialSubjectFormDialog(
-        free_trial_subject: free_trial_subject,
+        freeTrialSubject: freeTrialSubject,
         gradeId: gradeId,
         onSave: (s, {imageBytes, imageName}) async {
-          if (free_trial_subject != null) {
+          if (freeTrialSubject != null) {
             await cubit.updateFreeTrialSubject(s, imageBytes: imageBytes, imageName: imageName);
           } else {
             await cubit.createFreeTrialSubject(s, imageBytes: imageBytes, imageName: imageName);
@@ -360,7 +360,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, FreeTrialSubjectModel free_trial_subject) {
+  void _confirmDelete(BuildContext context, FreeTrialSubjectModel freeTrialSubject) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -371,7 +371,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
           SizedBox(width: 8),
           Text('تأكيد الحذف'),
         ]),
-        content: Text('هل أنت متأكد من حذف "${free_trial_subject.title}"؟'),
+        content: Text('هل أنت متأكد من حذف "${freeTrialSubject.title}"؟'),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -379,7 +379,7 @@ class _FreeTrialSubjectsView extends StatelessWidget {
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<FreeTrialSubjectsCubit>().deleteFreeTrialSubject(free_trial_subject.id);
+              context.read<FreeTrialSubjectsCubit>().deleteFreeTrialSubject(freeTrialSubject.id);
             },
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             child: const Text(AppStrings.delete),
@@ -389,10 +389,10 @@ class _FreeTrialSubjectsView extends StatelessWidget {
     );
   }
 
-  void _navigateToLessonFiles(BuildContext context, FreeTrialSubjectModel free_trial_subject) {
-    context.push('/free-trial-lesson-files/${free_trial_subject.id}').then((_) {
+  void _navigateToLessonFiles(BuildContext context, FreeTrialSubjectModel freeTrialSubject) {
+    context.push('/free-trial-lesson-files/${freeTrialSubject.id}').then((_) {
       if (context.mounted) {
-        context.read<FreeTrialSubjectsCubit>().loadFreeTrialSubjects(free_trial_subject.gradeId);
+        context.read<FreeTrialSubjectsCubit>().loadFreeTrialSubjects(freeTrialSubject.gradeId);
       }
     });
   }
@@ -445,11 +445,11 @@ class _ActionIcon extends StatelessWidget {
 }
 
 class _FreeTrialSubjectFormDialog extends StatefulWidget {
-  final FreeTrialSubjectModel? free_trial_subject;
+  final FreeTrialSubjectModel? freeTrialSubject;
   final String gradeId;
   final Future<void> Function(FreeTrialSubjectModel, {List<int>? imageBytes, String? imageName}) onSave;
   const _FreeTrialSubjectFormDialog(
-      {this.free_trial_subject, required this.gradeId, required this.onSave});
+      {this.freeTrialSubject, required this.gradeId, required this.onSave});
   @override
   State<_FreeTrialSubjectFormDialog> createState() => _FreeTrialSubjectFormDialogState();
 }
@@ -464,17 +464,17 @@ class _FreeTrialSubjectFormDialogState extends State<_FreeTrialSubjectFormDialog
   String? _selectedFileName;
   List<int>? _selectedFileBytes;
   late TextEditingController _thumbCtrl;
-  bool get _isEditing => widget.free_trial_subject != null;
+  bool get _isEditing => widget.freeTrialSubject != null;
 
   @override
   void initState() {
     super.initState();
-    _titleCtrl = TextEditingController(text: widget.free_trial_subject?.title ?? '');
-    _descCtrl = TextEditingController(text: widget.free_trial_subject?.description ?? '');
-    _thumbCtrl = TextEditingController(text: widget.free_trial_subject?.thumbnailUrl ?? '');
+    _titleCtrl = TextEditingController(text: widget.freeTrialSubject?.title ?? '');
+    _descCtrl = TextEditingController(text: widget.freeTrialSubject?.description ?? '');
+    _thumbCtrl = TextEditingController(text: widget.freeTrialSubject?.thumbnailUrl ?? '');
     _orderCtrl =
-        TextEditingController(text: widget.free_trial_subject?.order.toString() ?? '0');
-    _isActive = widget.free_trial_subject?.isActive ?? true;
+        TextEditingController(text: widget.freeTrialSubject?.order.toString() ?? '0');
+    _isActive = widget.freeTrialSubject?.isActive ?? true;
   }
 
   @override
@@ -504,8 +504,8 @@ class _FreeTrialSubjectFormDialogState extends State<_FreeTrialSubjectFormDialog
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSaving = true);
-    final free_trial_subject = FreeTrialSubjectModel(
-      id: widget.free_trial_subject?.id ?? '',
+    final freeTrialSubject = FreeTrialSubjectModel(
+      id: widget.freeTrialSubject?.id ?? '',
       gradeId: widget.gradeId,
       title: _titleCtrl.text.trim(),
       description:
@@ -513,11 +513,11 @@ class _FreeTrialSubjectFormDialogState extends State<_FreeTrialSubjectFormDialog
       isActive: _isActive,
       thumbnailUrl: _thumbCtrl.text,
       order: int.tryParse(_orderCtrl.text) ?? 0,
-      lessonFilesCount: widget.free_trial_subject?.lessonFilesCount ?? 0,
-      createdAt: widget.free_trial_subject?.createdAt,
+      lessonFilesCount: widget.freeTrialSubject?.lessonFilesCount ?? 0,
+      createdAt: widget.freeTrialSubject?.createdAt,
     );
     try {
-      await widget.onSave(free_trial_subject, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
+      await widget.onSave(freeTrialSubject, imageBytes: _selectedFileBytes, imageName: _selectedFileName);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
       if (mounted) setState(() => _isSaving = false);
@@ -621,7 +621,7 @@ class _FreeTrialSubjectFormDialogState extends State<_FreeTrialSubjectFormDialog
                     const Text('نشط'),
                     Switch.adaptive(
                         value: _isActive,
-                        activeColor: AppColors.success,
+                        activeTrackColor: AppColors.success,
                         onChanged: _isSaving
                             ? null
                             : (v) => setState(() => _isActive = v)),
@@ -660,7 +660,7 @@ String resolveImageUrl(String path) {
   if (path.isEmpty) return '';
   if (path.contains('thumbnails/')) {
     final fileName = path.split('thumbnails/').last;
-    return 'https://qubahom.com/api/v1/thumbnails/' + fileName;
+    return 'https://qubahom.com/api/v1/thumbnails/$fileName';
   }
   if (path.startsWith('http')) return path;
   const baseUrl = 'https://qubahom.com';

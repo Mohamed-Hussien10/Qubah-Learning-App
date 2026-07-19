@@ -320,7 +320,7 @@ class _AnalyticsView extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: lessons.length,
-              separatorBuilder: (_, __) => Divider(
+              separatorBuilder: (_, _) => Divider(
                 color: isDark ? AppColors.borderDark : AppColors.borderLight,
               ),
               itemBuilder: (context, index) {

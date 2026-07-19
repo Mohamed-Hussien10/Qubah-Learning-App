@@ -1,5 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/services/dependency_injection.dart';
+import '../../../../core/network/dio_client.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -66,8 +67,8 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
 
       setState(() => _status = 'جاري تحميل المحتوى...');
 
-      final dio = Dio();
-      await dio.download(
+      final dioClient = sl<DioClient>();
+      await dioClient.download(
         widget.contentUrl,
         savePath,
         onReceiveProgress: (count, total) {

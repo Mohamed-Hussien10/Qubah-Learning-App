@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:qubah_learning_app/core/services/logger_service.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/errors/exceptions.dart';
@@ -14,13 +16,17 @@ class AuthApiService {
     required String email,
     required String password,
   }) async {
-    print('DEBUG: Attempting login with email: $email');
+    if (kDebugMode) {
+      LoggerService.instance.debug('Login attempt (email masked)');
+    }
     try {
       final response = await _dioClient.post(
         ApiEndpoints.login,
         data: {'email': email, 'password': password},
       );
-      print('DEBUG: Login response data: ${response.data}');
+      if (kDebugMode) {
+        LoggerService.instance.debug('Login response received successfully');
+      }
       final data = response.data as Map<String, dynamic>;
       return {
         'user': UserModel.fromJson(
@@ -30,7 +36,9 @@ class AuthApiService {
         'refresh_token': data['data']['refresh_token'] as String,
       };
     } catch (e) {
-      print('DEBUG: Login ERROR: $e');
+      if (kDebugMode) {
+        LoggerService.instance.error('Login ERROR', error: e);
+      }
       if (e is ServerException ||
           e is NetworkException ||
           e is AuthenticationException)

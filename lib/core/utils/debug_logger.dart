@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'package:flutter/foundation.dart';
 
 /// ──────────────────────────────────────────────────────────────────────────────
 /// Debug logger for SCORM player operations.
@@ -9,40 +10,46 @@ class DebugLogger {
 
   static const String _tag = '[SCORM]';
 
+  static void _log(String message) {
+    if (kDebugMode) {
+      print(message);
+    }
+  }
+
   /// General info log.
   static void info(String message) {
-    print('$_tag ℹ️  $message');
+    _log('$_tag ℹ️  $message');
   }
 
   /// Success / positive event.
   static void success(String message) {
-    print('$_tag ✅ $message');
+    _log('$_tag ✅ $message');
   }
 
   /// Warning.
   static void warning(String message) {
-    print('$_tag ⚠️  $message');
+    _log('$_tag ⚠️  $message');
   }
 
   /// Error with optional stack trace.
   static void error(String message, [Object? error, StackTrace? stackTrace]) {
-    print('$_tag ❌ $message');
-    if (error != null) print('$_tag    Error: $error');
-    if (stackTrace != null) print('$_tag    StackTrace: $stackTrace');
+    _log('$_tag ❌ $message');
+    if (error != null) _log('$_tag    Error: $error');
+    if (stackTrace != null) _log('$_tag    StackTrace: $stackTrace');
   }
 
   /// WebView-specific logs.
   static void webView(String message) {
-    print('$_tag 🌐 $message');
+    _log('$_tag 🌐 $message');
   }
 
   /// JavaScript console messages forwarded from WebView.
   static void jsConsole(String message) {
-    print('$_tag 📜 JS: $message');
+    _log('$_tag 📜 JS: $message');
   }
 
   /// File system operations.
   static void fileSystem(String message) {
-    print('$_tag 📂 $message');
+    _log('$_tag 📂 $message');
   }
 }

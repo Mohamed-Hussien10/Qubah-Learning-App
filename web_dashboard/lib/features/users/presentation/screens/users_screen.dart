@@ -1,4 +1,6 @@
-import 'dart:html' as html;
+import 'dart:js_interop';
+import 'dart:typed_data';
+import 'package:web/web.dart' as web;
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -161,16 +163,20 @@ class _UsersScreenState extends State<_UsersScreenBody> {
 
     final bytes = excel.encode();
     if (bytes != null) {
-      final blob = html.Blob([bytes], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.document.createElement('a') as html.AnchorElement
+      final jsData = Uint8List.fromList(bytes).buffer.toJS;
+      final blob = web.Blob(
+        [jsData].toJS,
+        web.BlobPropertyBag(type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+      );
+      final url = web.URL.createObjectURL(blob);
+      final anchor = web.document.createElement('a') as web.HTMLAnchorElement
         ..href = url
         ..style.display = 'none'
         ..download = 'users_export_${DateTime.now().millisecondsSinceEpoch}.xlsx';
-      html.document.body!.children.add(anchor);
+      web.document.body!.appendChild(anchor);
       anchor.click();
-      html.document.body!.children.remove(anchor);
-      html.Url.revokeObjectUrl(url);
+      web.document.body!.removeChild(anchor);
+      web.URL.revokeObjectURL(url);
     }
   }
 
@@ -434,7 +440,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                         onSelectChanged: (_) => context.read<UsersCubit>().toggleSelection(user.id),
                         color: WidgetStateProperty.resolveWith((states) {
                           if (states.contains(WidgetState.selected)) {
-                            return AppColors.primary.withOpacity(0.05);
+                            return AppColors.primary.withValues(alpha: 0.05);
                           }
                           return null;
                         }),
@@ -451,7 +457,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                               children: [
                                 CircleAvatar(
                                   radius: 18,
-                                  backgroundColor: AppColors.primary.withOpacity(0.1),
+                                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                                   child: Text(
                                     user.name.isNotEmpty ? user.name[0] : '?',
                                     style: GoogleFonts.cairo(
@@ -542,7 +548,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -701,7 +707,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 80, color: AppColors.error.withOpacity(0.5)),
+          Icon(Icons.error_outline, size: 80, color: AppColors.error.withValues(alpha: 0.5)),
           const SizedBox(height: 16),
           Text(
             message,

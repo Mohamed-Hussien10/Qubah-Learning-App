@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:web_dashboard/core/network/api_client.dart';
 import 'package:web_dashboard/features/users/data/models/user_model.dart';
 
@@ -47,16 +48,16 @@ class UsersRepository {
       if (subscriptionExpiry != null) 'subscription_expiry': subscriptionExpiry.toIso8601String().split('T').first,
     };
     
-    print('DEBUG: Creating user with payload: $payload');
+    debugPrint('DEBUG: Creating user with payload: $payload');
     
     try {
       final response = await _apiClient.post('/users', data: payload);
-      print('DEBUG: Create user response data: ${response.data}');
+      debugPrint('DEBUG: Create user response data: ${response.data}');
       
       final data = response.data['data'] ?? response.data;
       return UserModel.fromJson(data as Map<String, dynamic>);
     } catch (e) {
-      print('DEBUG: Create user ERROR: $e');
+      debugPrint('DEBUG: Create user ERROR: $e');
       rethrow;
     }
   }

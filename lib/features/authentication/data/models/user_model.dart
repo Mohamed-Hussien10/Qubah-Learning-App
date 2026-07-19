@@ -13,6 +13,13 @@ bool _parseBool(dynamic value) {
   return true;
 }
 
+String _parseDate(dynamic value) {
+  if (value == null || value.toString().isEmpty) {
+    return DateTime.now().toIso8601String();
+  }
+  return value.toString();
+}
+
 /// Data layer model for API serialization/deserialization.
 @JsonSerializable()
 class UserModel {
@@ -38,7 +45,7 @@ class UserModel {
   final String? subscriptionExpiry;
   @JsonKey(name: 'is_active', fromJson: _parseBool)
   final bool isActive;
-  @JsonKey(name: 'created_at', fromJson: _parseString)
+  @JsonKey(name: 'created_at', fromJson: _parseDate)
   final String createdAt;
 
   const UserModel({

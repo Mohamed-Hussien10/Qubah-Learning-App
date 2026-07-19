@@ -58,6 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
             listener: (context, state) {
               if (state is AuthAuthenticated) {
                 sl<SecureStorage>().hasParentPin().then((hasPin) {
+                  if (!context.mounted) return;
                   if (hasPin) {
                     context.go(AppRoutes.appEntryLock);
                   } else {

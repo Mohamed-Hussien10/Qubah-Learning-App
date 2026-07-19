@@ -27,7 +27,7 @@ class NetworkAvatar extends StatelessWidget {
     if (imageUrl == null || imageUrl!.isEmpty) {
       return CircleAvatar(
         radius: radius,
-        backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+        backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
         child: Icon(defaultIcon, size: radius, color: AppColors.primary),
       );
     }
@@ -36,20 +36,20 @@ class NetworkAvatar extends StatelessWidget {
       child: Container(
         width: radius * 2,
         height: radius * 2,
-        color: AppColors.primaryLight.withOpacity(0.2),
+        color: AppColors.primaryLight.withValues(alpha: 0.2),
         child: Image.network(
           _resolveImageUrl(imageUrl!),
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) => CircleAvatar(
             radius: radius,
-            backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+            backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
             child: Icon(defaultIcon, size: radius, color: AppColors.primary),
           ),
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
             return CircleAvatar(
               radius: radius,
-              backgroundColor: AppColors.primaryLight.withOpacity(0.2),
+              backgroundColor: AppColors.primaryLight.withValues(alpha: 0.2),
               child: SizedBox(
                 width: radius,
                 height: radius,
