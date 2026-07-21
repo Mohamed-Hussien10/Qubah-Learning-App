@@ -11,6 +11,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
 import '../../../../core/storage/secure_storage.dart';
 import '../../../../core/services/dependency_injection.dart';
+import '../../../../core/utils/helpers.dart';
+import '../../../authentication/domain/repositories/auth_repository.dart';
 
 /// Main home screen with navigation to educational stages, profile, settings.
 class HomeScreen extends StatefulWidget {
@@ -23,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isGuest = false;
   String? _imagePath;
+  String? _avatarUrl;
 
   @override
   void initState() {
@@ -32,10 +35,35 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadImage() async {
+    final user = await sl<AuthRepository>().getCachedUser();
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _imagePath = prefs.getString('user_profile_image');
-    });
+    final userId = user?.id ?? await sl<SecureStorage>().getUserId() ?? 'guest';
+
+    String? path = prefs.getString('user_profile_image_$userId');
+    if (path == null && prefs.containsKey('user_profile_image')) {
+      final oldPath = prefs.getString('user_profile_image');
+      if (oldPath != null && File(oldPath).existsSync()) {
+        path = oldPath;
+        await prefs.setString('user_profile_image_$userId', oldPath);
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _imagePath = (path != null && File(path).existsSync()) ? path : null;
+        _avatarUrl = user?.avatarUrl;
+      });
+    }
+  }
+
+  ImageProvider? _getAvatarImage() {
+    if (_imagePath != null && File(_imagePath!).existsSync()) {
+      return FileImage(File(_imagePath!));
+    }
+    if (_avatarUrl != null && _avatarUrl!.isNotEmpty) {
+      return NetworkImage(AppHelpers.resolveMediaUrl(_avatarUrl!));
+    }
+    return null;
   }
 
   Future<void> _checkGuestStatus() async {
@@ -188,22 +216,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Profile Avatar
                     if (!_isGuest) ...[
                       const SizedBox(width: 4),
-                      GestureDetector(
-                        onTap: () async {
-                          await context.push(AppRoutes.profile);
-                          _loadImage();
+                      Builder(
+                        builder: (context) {
+                          final avatarImage = _getAvatarImage();
+                          return GestureDetector(
+                            onTap: () async {
+                              await context.push(AppRoutes.profile);
+                              _loadImage();
+                            },
+                            child: CircleAvatar(
+                              radius: 22,
+                              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                              backgroundImage: avatarImage,
+                              child: avatarImage == null
+                                  ? const Icon(
+                                      Icons.person_rounded,
+                                      color: AppColors.primary,
+                                    )
+                                  : null,
+                            ),
+                          );
                         },
-                        child: CircleAvatar(
-                          radius: 22,
-                          backgroundColor: AppColors.primary.withOpacity(0.2),
-                          backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
-                          child: _imagePath == null
-                              ? const Icon(
-                                  Icons.person_rounded,
-                                  color: AppColors.primary,
-                                )
-                              : null,
-                        ),
                       ),
                     ],
                   ],

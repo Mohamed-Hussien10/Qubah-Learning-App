@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/network/dio_client.dart';
-import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/utils/helpers.dart';
@@ -71,15 +70,12 @@ class _FreeTrialSubjectsScreenState extends State<FreeTrialSubjectsScreen> {
   }
 
   /// Resolve the thumbnail URL returned by FreeTrialSubject model.
-  /// Backend appends `thumbnail_url` (full URL) and also exposes `thumbnail_path`.
   String? _resolveImage(dynamic item) {
-    // Prefer the appended full URL from the backend model
     final thumbUrl = item['thumbnail_url'] as String?;
-    if (thumbUrl != null && thumbUrl.isNotEmpty) return thumbUrl;
-    // Fallback: build from thumbnail_path
+    if (thumbUrl != null && thumbUrl.isNotEmpty) return AppHelpers.resolveMediaUrl(thumbUrl);
     final thumbPath = item['thumbnail_path'] as String?;
     if (thumbPath != null && thumbPath.isNotEmpty) {
-      return '${ApiEndpoints.domainUrl}/storage/$thumbPath';
+      return AppHelpers.resolveMediaUrl('storage/$thumbPath');
     }
     return null;
   }
@@ -247,18 +243,18 @@ class _FreeTrialLessonFilesScreenState
   /// Resolve thumbnail: prefer backend-appended `thumbnail_url`, else build from `thumbnail_path`.
   String? _resolveThumbnail(dynamic file) {
     final thumbUrl = file['thumbnail_url'] as String?;
-    if (thumbUrl != null && thumbUrl.isNotEmpty) return thumbUrl;
+    if (thumbUrl != null && thumbUrl.isNotEmpty) return AppHelpers.resolveMediaUrl(thumbUrl);
     final thumbPath = file['thumbnail_path'] as String?;
     if (thumbPath != null && thumbPath.isNotEmpty) {
-      return '${ApiEndpoints.domainUrl}/storage/$thumbPath';
+      return AppHelpers.resolveMediaUrl('storage/$thumbPath');
     }
     return null;
   }
 
-  /// Resolve file URL: prefer backend-appended `file_url`, else build from `file_path`.
+  /// Resolve file URL: ensure URL passes through AppHelpers.resolveMediaUrl to bypass CORS/403.
   String _resolveFileUrl(dynamic file) {
     final fileUrl = file['file_url'] as String?;
-    if (fileUrl != null && fileUrl.isNotEmpty) return fileUrl;
+    if (fileUrl != null && fileUrl.isNotEmpty) return AppHelpers.resolveMediaUrl(fileUrl);
     final filePath = file['file_path'] as String?;
     if (filePath == null || filePath.isEmpty) return '';
     return AppHelpers.resolveMediaUrl(filePath);
@@ -270,21 +266,22 @@ class _FreeTrialLessonFilesScreenState
 
     final title = file['title'] as String? ?? '';
     final type = (file['type'] as String? ?? '').toLowerCase();
+    final lowerUrl = fileUrl.toLowerCase();
     final coverUrl = _resolveThumbnail(file);
 
-    if (type == 'video' || type == 'mp4') {
+    if (type == 'video' || type == 'mp4' || lowerUrl.endsWith('.mp4') || lowerUrl.endsWith('.mkv') || lowerUrl.endsWith('.mov') || lowerUrl.endsWith('.webm')) {
       context.push(AppRoutes.videoPlayer,
           extra: {'videoUrl': fileUrl, 'title': title});
-    } else if (type == 'audio' || type == 'mp3') {
+    } else if (type == 'audio' || type == 'mp3' || lowerUrl.endsWith('.mp3') || lowerUrl.endsWith('.m4a') || lowerUrl.endsWith('.wav') || lowerUrl.endsWith('.aac')) {
       context.push(AppRoutes.audioPlayer, extra: {
         'audioUrl': fileUrl,
         'title': title,
         'coverImageUrl': coverUrl,
       });
-    } else if (type == 'pdf') {
+    } else if (type == 'pdf' || lowerUrl.endsWith('.pdf')) {
       context.push(AppRoutes.pdfViewer,
           extra: {'pdfUrl': fileUrl, 'title': title});
-    } else if (type == 'scorm' || type == 'interactive') {
+    } else if (type == 'scorm' || type == 'interactive' || lowerUrl.endsWith('.zip')) {
       context.push(AppRoutes.interactiveViewer,
           extra: {'contentUrl': fileUrl, 'title': title});
     } else {

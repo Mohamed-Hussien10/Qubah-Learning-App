@@ -4,6 +4,7 @@ import 'package:video_player/video_player.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/helpers.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
@@ -32,8 +33,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   Future<void> _initializePlayer() async {
     try {
+      final resolvedUrl = AppHelpers.resolveMediaUrl(widget.videoUrl);
       _videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse(Uri.encodeFull(Uri.decodeFull(widget.videoUrl))),
+        Uri.parse(Uri.encodeFull(Uri.decodeFull(resolvedUrl))),
       );
       await _videoPlayerController.initialize();
 

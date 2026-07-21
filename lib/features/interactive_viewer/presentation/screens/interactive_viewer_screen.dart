@@ -4,6 +4,7 @@ import '../../../../core/network/dio_client.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/helpers.dart';
 import '../../../scorm_player/domain/scorm_package.dart';
 import '../../../scorm_player/services/scorm_extractor_service.dart';
 import '../../../scorm_player/presentation/scorm_player_screen.dart';
@@ -38,7 +39,8 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
 
   Future<void> _downloadAndExtract() async {
     try {
-      if (!widget.contentUrl.toLowerCase().endsWith('.zip')) {
+      final resolvedUrl = AppHelpers.resolveMediaUrl(widget.contentUrl);
+      if (!resolvedUrl.toLowerCase().endsWith('.zip') && !widget.contentUrl.toLowerCase().endsWith('.zip')) {
         setState(() {
           _error = 'صيغة الملف غير مدعومة. ندعم ملفات zip التفاعلية فقط.';
           _isLoading = false;
@@ -47,7 +49,7 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
       }
 
       final tempDir = await getTemporaryDirectory();
-      final zipFileName = widget.contentUrl.split('/').last;
+      final zipFileName = resolvedUrl.split('/').last;
       final savePath = '${tempDir.path}/$zipFileName';
       
       // Deterministic ID based on filename
@@ -69,7 +71,7 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
 
       final dioClient = sl<DioClient>();
       await dioClient.download(
-        widget.contentUrl,
+        resolvedUrl,
         savePath,
         onReceiveProgress: (count, total) {
           if (total > 0) {

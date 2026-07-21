@@ -8,7 +8,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/services/dependency_injection.dart';
+import '../../../../core/storage/secure_storage.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/qubah_button.dart';
 import '../../../authentication/presentation/manager/cubit/auth_cubit.dart';
 import '../../../authentication/presentation/manager/state/auth_state.dart';
@@ -256,6 +258,8 @@ class _ProfileAvatarWidget extends StatefulWidget {
 
 class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
   String? _imagePath;
+  String? _avatarUrl;
+  String? _userId;
 
   @override
   void initState() {
@@ -264,10 +268,26 @@ class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
   }
 
   Future<void> _loadImage() async {
+    final user = await sl<AuthRepository>().getCachedUser();
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _imagePath = prefs.getString('user_profile_image');
-    });
+    final userId = user?.id ?? await sl<SecureStorage>().getUserId() ?? 'guest';
+
+    String? path = prefs.getString('user_profile_image_$userId');
+    if (path == null && prefs.containsKey('user_profile_image')) {
+      final oldPath = prefs.getString('user_profile_image');
+      if (oldPath != null && File(oldPath).existsSync()) {
+        path = oldPath;
+        await prefs.setString('user_profile_image_$userId', oldPath);
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _userId = userId;
+        _imagePath = (path != null && File(path).existsSync()) ? path : null;
+        _avatarUrl = user?.avatarUrl;
+      });
+    }
   }
 
   Future<void> _pickImage() async {
@@ -275,15 +295,29 @@ class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
     if (result != null && result.files.single.path != null) {
       final path = result.files.single.path!;
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('user_profile_image', path);
-      setState(() {
-        _imagePath = path;
-      });
+      final userId = _userId ?? (await sl<AuthRepository>().getCachedUser())?.id ?? await sl<SecureStorage>().getUserId() ?? 'guest';
+      await prefs.setString('user_profile_image_$userId', path);
+      if (mounted) {
+        setState(() {
+          _imagePath = path;
+        });
+      }
     }
+  }
+
+  ImageProvider? _getAvatarImage() {
+    if (_imagePath != null && File(_imagePath!).existsSync()) {
+      return FileImage(File(_imagePath!));
+    }
+    if (_avatarUrl != null && _avatarUrl!.isNotEmpty) {
+      return NetworkImage(AppHelpers.resolveMediaUrl(_avatarUrl!));
+    }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final avatarImage = _getAvatarImage();
     return Center(
       child: Stack(
         children: [
@@ -294,8 +328,8 @@ class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
               backgroundColor: AppColors.primary.withValues(
                 alpha: 0.1,
               ),
-              backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
-              child: _imagePath == null
+              backgroundImage: avatarImage,
+              child: avatarImage == null
                   ? const Icon(
                       Icons.person_rounded,
                       size: 70,

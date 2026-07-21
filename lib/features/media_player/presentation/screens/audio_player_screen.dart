@@ -38,7 +38,8 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   Future<void> _init() async {
     try {
-      await _player.setUrl(Uri.encodeFull(Uri.decodeFull(widget.audioUrl)));
+      final resolvedUrl = AppHelpers.resolveMediaUrl(widget.audioUrl);
+      await _player.setUrl(Uri.encodeFull(Uri.decodeFull(resolvedUrl)));
       _subscriptions.add(_player.durationStream.listen(
         (d) {
           if (mounted) setState(() => _duration = d ?? Duration.zero);

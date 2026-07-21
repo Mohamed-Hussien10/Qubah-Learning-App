@@ -34,12 +34,14 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
 
   void _openFile(BuildContext context, dynamic file) {
     final fileUrl = AppHelpers.resolveMediaUrl(file.filePath);
-    if (file.type == 'video' || file.type == 'mp4') {
+    final type = (file.type ?? '').toString().toLowerCase();
+    final lowerUrl = fileUrl.toLowerCase();
+    if (type == 'video' || type == 'mp4' || lowerUrl.endsWith('.mp4') || lowerUrl.endsWith('.mkv') || lowerUrl.endsWith('.mov') || lowerUrl.endsWith('.webm')) {
       context.push(
         AppRoutes.videoPlayer,
         extra: {'videoUrl': fileUrl, 'title': file.name},
       );
-    } else if (file.type == 'audio' || file.type == 'mp3') {
+    } else if (type == 'audio' || type == 'mp3' || lowerUrl.endsWith('.mp3') || lowerUrl.endsWith('.m4a') || lowerUrl.endsWith('.wav') || lowerUrl.endsWith('.aac')) {
       context.push(
         AppRoutes.audioPlayer,
         extra: {
@@ -48,12 +50,12 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
           'coverImageUrl': file.imageUrl != null ? AppHelpers.resolveMediaUrl(file.imageUrl!) : null,
         },
       );
-    } else if (file.type == 'pdf') {
+    } else if (type == 'pdf' || lowerUrl.endsWith('.pdf')) {
       context.push(
         AppRoutes.pdfViewer,
         extra: {'pdfUrl': fileUrl, 'title': file.name},
       );
-    } else if (file.type == 'scorm' || file.type == 'interactive') {
+    } else if (type == 'scorm' || type == 'interactive' || lowerUrl.endsWith('.zip')) {
       context.push(
         AppRoutes.interactiveViewer,
         extra: {'contentUrl': fileUrl, 'title': file.name},
