@@ -34,6 +34,7 @@ class UsersCubit extends Cubit<UsersState> {
     bool isActive = true,
     int? stageId,
     int? gradeId,
+    int? packageId,
     DateTime? subscriptionExpiry,
   }) async {
     try {
@@ -45,6 +46,7 @@ class UsersCubit extends Cubit<UsersState> {
         isActive: isActive,
         stageId: stageId,
         gradeId: gradeId,
+        packageId: packageId,
         subscriptionExpiry: subscriptionExpiry,
       );
       await loadUsers();

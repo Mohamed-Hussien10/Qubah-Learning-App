@@ -22,6 +22,23 @@ class AppStrings {
   static const String profile = 'الملف الشخصي';
 
   // ── Free Trial ───────────────────────────────────────────────────────
+  static const String packages = 'باقات الاشتراك';
+  static const String package = 'باقة';
+  static const String addPackage = 'إضافة باقة جديدة';
+  static const String editPackage = 'تعديل الباقة';
+  static const String deletePackage = 'حذف الباقة';
+  static const String packageName = 'اسم الباقة';
+  static const String packagePrice = 'سعر الباقة';
+  static const String currency = 'ريال عماني';
+  static const String currencySymbol = 'ر.ع.';
+  static const String packageScope = 'نطاق الباقة';
+  static const String selectStageRequired = 'اختر المرحلة التعليمية (مطلوب)';
+  static const String selectGradeOptional = 'اختر الصف (اختياري - يمكنك التوقف هنا)';
+  static const String selectSectionOptional = 'اختر الفصل (اختياري - يمكنك التوقف هنا)';
+  static const String selectSubjectOptional = 'اختر المادة (اختياري - يمكنك التوقف هنا)';
+  static const String allGradesInStage = 'جميع صفوف المرحلة';
+  static const String allSectionsInGrade = 'جميع فصول الصف';
+  static const String allSubjectsInSection = 'جميع مواد الفصل';
   static const String freeTrialStages = 'مراحل التجربة المجانية';
   static const String freeTrialGrades = 'صفوف التجربة المجانية';
   static const String freeTrialSubjects = 'مواد التجربة المجانية';

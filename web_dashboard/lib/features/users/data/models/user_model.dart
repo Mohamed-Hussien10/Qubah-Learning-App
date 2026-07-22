@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:web_dashboard/features/packages/data/models/package_model.dart';
 
 enum UserRole { admin, student }
 
@@ -10,6 +11,8 @@ class UserModel extends Equatable {
   final bool isActive;
   final int? stageId;
   final int? gradeId;
+  final int? packageId;
+  final PackageModel? package;
   final DateTime createdAt;
   final DateTime? lastLogin;
   final DateTime? subscriptionExpiry;
@@ -22,6 +25,8 @@ class UserModel extends Equatable {
     required this.isActive,
     this.stageId,
     this.gradeId,
+    this.packageId,
+    this.package,
     required this.createdAt,
     this.lastLogin,
     this.subscriptionExpiry,
@@ -38,6 +43,13 @@ class UserModel extends Equatable {
 
   String get statusLabel => isActive ? 'نشط' : 'غير نشط';
 
+  String get packageName {
+    if (package != null && package!.name.isNotEmpty) {
+      return package!.name;
+    }
+    return 'بدون باقة';
+  }
+
   UserModel copyWith({
     int? id,
     String? name,
@@ -46,6 +58,8 @@ class UserModel extends Equatable {
     bool? isActive,
     int? stageId,
     int? gradeId,
+    int? packageId,
+    PackageModel? package,
     DateTime? createdAt,
     DateTime? lastLogin,
     DateTime? subscriptionExpiry,
@@ -58,6 +72,8 @@ class UserModel extends Equatable {
       isActive: isActive ?? this.isActive,
       stageId: stageId ?? this.stageId,
       gradeId: gradeId ?? this.gradeId,
+      packageId: packageId ?? this.packageId,
+      package: package ?? this.package,
       createdAt: createdAt ?? this.createdAt,
       lastLogin: lastLogin ?? this.lastLogin,
       subscriptionExpiry: subscriptionExpiry ?? this.subscriptionExpiry,
@@ -65,18 +81,26 @@ class UserModel extends Equatable {
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    PackageModel? pkg;
+    if (json['package'] != null && json['package'] is Map<String, dynamic>) {
+      pkg = PackageModel.fromJson(json['package'] as Map<String, dynamic>);
+    }
+
     return UserModel(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      email: json['email'] as String,
+      id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+      name: json['name'] as String? ?? '',
+      email: json['email'] as String? ?? '',
       role: UserRole.values.firstWhere(
         (e) => e.name == json['role'],
         orElse: () => UserRole.student,
       ),
       isActive: json['is_active'] == 1 || json['is_active'] == true,
-      stageId: json['stage_id'] as int?,
-      gradeId: json['grade_id'] as int?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      stageId: int.tryParse(json['stage_id']?.toString() ?? ''),
+      gradeId: int.tryParse(json['grade_id']?.toString() ?? ''),
+      packageId: int.tryParse(json['package_id']?.toString() ?? ''),
+      package: pkg,
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
       lastLogin: json['last_login'] != null
           ? DateTime.tryParse(json['last_login'] as String)
           : null,
@@ -95,6 +119,7 @@ class UserModel extends Equatable {
       'is_active': isActive,
       'stage_id': stageId,
       'grade_id': gradeId,
+      'package_id': packageId,
       'created_at': createdAt.toIso8601String(),
       'last_login': lastLogin?.toIso8601String(),
       'subscription_expiry': subscriptionExpiry?.toIso8601String(),
@@ -115,5 +140,18 @@ class UserModel extends Equatable {
   ];
 
   @override
-  List<Object?> get props => [id, name, email, role, isActive, stageId, gradeId, createdAt, lastLogin, subscriptionExpiry];
+  List<Object?> get props => [
+        id,
+        name,
+        email,
+        role,
+        isActive,
+        stageId,
+        gradeId,
+        packageId,
+        package,
+        createdAt,
+        lastLogin,
+        subscriptionExpiry
+      ];
 }

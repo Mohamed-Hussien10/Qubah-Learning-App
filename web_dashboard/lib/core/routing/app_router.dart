@@ -19,6 +19,7 @@ import 'package:web_dashboard/features/free_trial_stages/presentation/screens/fr
 import 'package:web_dashboard/features/free_trial_grades/presentation/screens/free_trial_grades_screen.dart';
 import 'package:web_dashboard/features/free_trial_subjects/presentation/screens/free_trial_subjects_screen.dart';
 import 'package:web_dashboard/features/free_trial_lesson_files/presentation/screens/free_trial_lesson_files_screen.dart';
+import 'package:web_dashboard/features/packages/presentation/screens/packages_screen.dart';
 import 'package:web_dashboard/core/widgets/dashboard_shell.dart';
 
 class NavigationState {
@@ -131,6 +132,10 @@ final GoRouter appRouter = GoRouter(
             NavigationState.lastLessonId = lessonId;
             return LessonFilesScreen(lessonId: lessonId);
           },
+        ),
+        GoRoute(
+          path: '/packages',
+          builder: (context, state) => const PackagesScreen(),
         ),
         GoRoute(
           path: '/free-trial-stages',

@@ -37,6 +37,10 @@ class ApiEndpoints {
   static const String lessons = '/lessons';
   static String lesson(int id) => '/lessons/$id';
 
+  // ── Packages (الباقات) ──────────────────────────────────────────────────
+  static const String packages = '/packages';
+  static String package(String id) => '/packages/$id';
+
   // ── Lesson Files (ملفات الدروس) ──────────────────────────────────────
   static const String lessonFiles = '/lesson-files';
   static String lessonFile(int id) => '/lesson-files/$id';

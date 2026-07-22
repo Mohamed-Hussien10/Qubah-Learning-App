@@ -119,6 +119,12 @@ final List<SidebarSection> sidebarSections = [
         activeIcon: Icons.groups_rounded,
         route: '/users',
       ),
+      SidebarItem(
+        label: AppStrings.packages,
+        icon: Icons.card_membership_outlined,
+        activeIcon: Icons.card_membership_rounded,
+        route: '/packages',
+      ),
     ],
   ),
   // Reports & Settings
