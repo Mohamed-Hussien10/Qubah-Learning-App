@@ -387,6 +387,63 @@ class _UserFormDialogState extends State<UserFormDialog> {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 12),
+                    Text(
+                      'تاريخ انتهاء الاشتراك',
+                      style: GoogleFonts.cairo(
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimaryLight,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: () async {
+                        final selected = await showDatePicker(
+                          context: context,
+                          initialDate: _subscriptionExpiry ??
+                              DateTime.now().add(const Duration(days: 30)),
+                          firstDate: DateTime.now()
+                              .subtract(const Duration(days: 365)),
+                          lastDate: DateTime.now()
+                              .add(const Duration(days: 3650)),
+                        );
+                        if (selected != null) {
+                          setState(() => _subscriptionExpiry = selected);
+                        }
+                      },
+                      child: InputDecorator(
+                        decoration: _inputDecoration(
+                          'اضغط لاختيار تاريخ الانتهاء',
+                          isDark,
+                        ).copyWith(
+                          prefixIcon: const Icon(Icons.event_outlined, color: AppColors.primary),
+                          suffixIcon: _subscriptionExpiry != null
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear, size: 20),
+                                  onPressed: () {
+                                    setState(() => _subscriptionExpiry = null);
+                                  },
+                                )
+                              : null,
+                        ),
+                        child: Text(
+                          _subscriptionExpiry != null
+                              ? "${_subscriptionExpiry!.year}-${_subscriptionExpiry!.month.toString().padLeft(2, '0')}-${_subscriptionExpiry!.day.toString().padLeft(2, '0')}"
+                              : 'بدون تاريخ انتهاء (مستمر)',
+                          style: GoogleFonts.cairo(
+                            color: _subscriptionExpiry != null
+                                ? (isDark
+                                    ? AppColors.textPrimaryDark
+                                    : AppColors.textPrimaryLight)
+                                : (isDark
+                                    ? AppColors.textTertiaryDark
+                                    : AppColors.textTertiaryLight),
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 16),
                   ],
 

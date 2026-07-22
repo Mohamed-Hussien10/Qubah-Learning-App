@@ -16,6 +16,10 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   stageName: json['stageName'] as String?,
   gradeId: _parseStringNullable(json['grade_id']),
   gradeName: json['gradeName'] as String?,
+  packageId: _parseStringNullable(json['package_id']),
+  package: json['package'] == null
+      ? null
+      : PackageModel.fromJson(json['package'] as Map<String, dynamic>),
   subscriptionStatus: _parseStringNullable(json['subscription_status']),
   subscriptionExpiry: _parseStringNullable(json['subscription_expiry']),
   isActive: json['is_active'] == null ? true : _parseBool(json['is_active']),
@@ -32,6 +36,8 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'stageName': instance.stageName,
   'grade_id': instance.gradeId,
   'gradeName': instance.gradeName,
+  'package_id': instance.packageId,
+  'package': instance.package?.toJson(),
   'subscription_status': instance.subscriptionStatus,
   'subscription_expiry': instance.subscriptionExpiry,
   'is_active': instance.isActive,

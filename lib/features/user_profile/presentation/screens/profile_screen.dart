@@ -14,6 +14,10 @@ import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/qubah_button.dart';
 import '../../../authentication/presentation/manager/cubit/auth_cubit.dart';
 import '../../../authentication/presentation/manager/state/auth_state.dart';
+import 'package:flutter/foundation.dart';
+import '../../../../core/network/dio_client.dart';
+import '../../../subscriptions/data/models/package_model.dart';
+import '../../../subscriptions/domain/entities/package_entity.dart';
 import '../../../authentication/domain/entities/user_entity.dart';
 import '../../../authentication/domain/repositories/auth_repository.dart';
 
@@ -46,7 +50,7 @@ class ProfileScreen extends StatelessWidget {
                   // Avatar
                   const _ProfileAvatarWidget(),
                   const SizedBox(height: 24),
-                  // Name
+                  // User Details & Package Information
                   FutureBuilder<UserEntity?>(
                     future: sl<AuthRepository>().getCachedUser(),
                     builder: (context, snapshot) {
@@ -54,24 +58,16 @@ class ProfileScreen extends StatelessWidget {
                       String email = 'طالب@مثال.com';
                       String stage = 'غير محدد';
                       String grade = 'غير محدد';
-                      String subscription = 'غير فعال';
 
+                      UserEntity? user;
                       if (snapshot.hasData && snapshot.data != null) {
-                        final user = snapshot.data!;
+                        user = snapshot.data!;
                         name = user.name.isNotEmpty ? user.name : name;
                         email = user.email.isNotEmpty ? user.email : email;
                         stage = user.stageName ?? stage;
                         grade = user.gradeName ?? grade;
-
-                        final exp = user.subscriptionExpiry;
-                        if (exp != null && exp.isAfter(DateTime.now())) {
-                          subscription = 'فعال';
-                          subscription +=
-                              ' حتى ${exp.toString().split(" ").first.split("T").first}';
-                        } else {
-                          subscription = 'غير فعال أو منتهي';
-                        }
                       }
+
                       return Column(
                         children: [
                           Text(
@@ -87,11 +83,12 @@ class ProfileScreen extends StatelessWidget {
                             style: TextStyle(
                               color: Theme.of(
                                 context,
-                              ).textTheme.bodySmall?.color?.withOpacity(0.6),
+                              ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                             ),
                           ).animate().fadeIn(delay: 300.ms),
-                          const SizedBox(height: 40),
-                          // Info Cards
+                          const SizedBox(height: 32),
+
+                          // Stage & Grade Info Card
                           _ProfileMenuItem(
                                 icon: Icons.school_rounded,
                                 title: 'المرحلة والصف',
@@ -101,59 +98,18 @@ class ProfileScreen extends StatelessWidget {
                               .animate()
                               .fadeIn(delay: 400.ms)
                               .slideY(begin: 0.1, end: 0),
-                          const SizedBox(height: 12),
-                          subscription != 'غير فعال أو منتهي'
-                              ? _ProfileMenuItem(
-                                      icon: Icons.subscriptions_rounded,
-                                      title: 'الاشتراك',
-                                      subtitle: subscription,
-                                      onTap: () => {},
-                                    )
-                                    .animate()
-                                    .fadeIn(delay: 500.ms)
-                                    .slideY(begin: 0.1, end: 0)
-                              : _ProfileMenuItem(
-                                      icon: Icons.support_agent_rounded,
-                                      title: 'تجديد الاشتراك',
-                                      subtitle: 'تواصل مع الإدارة للتجديد',
-                                      onTap: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (ctx) => AlertDialog(
-                                            title: Text(
-                                              'تواصل مع الإدارة',
-                                              style: GoogleFonts.cairo(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            content: Text(
-                                              'عزيزي الطالب، يرجى التواصل مع إدارة التطبيق لتجديد اشتراكك.',
-                                              style: GoogleFonts.cairo(),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.pop(ctx),
-                                                child: Text(
-                                                  'حسناً',
-                                                  style: GoogleFonts.cairo(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    )
-                                    .animate()
-                                    .fadeIn(delay: 500.ms)
-                                    .slideY(begin: 0.1, end: 0),
+                          const SizedBox(height: 16),
+
+                          // Student Package Card
+                          _StudentPackageCard(user: user)
+                              .animate()
+                              .fadeIn(delay: 500.ms)
+                              .slideY(begin: 0.1, end: 0),
                         ],
                       );
                     },
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 36),
                   // Logout Button
                   QubahButton(
                     text: 'تسجيل الخروج',
@@ -168,6 +124,347 @@ class ProfileScreen extends StatelessWidget {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _StudentPackageCard extends StatefulWidget {
+  final UserEntity? user;
+  const _StudentPackageCard({this.user});
+
+  @override
+  State<_StudentPackageCard> createState() => _StudentPackageCardState();
+}
+
+class _StudentPackageCardState extends State<_StudentPackageCard> {
+  PackageEntity? _fetchedPackage;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPackageIfNeeded();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StudentPackageCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.user?.packageId != oldWidget.user?.packageId ||
+        widget.user?.package != oldWidget.user?.package) {
+      _fetchPackageIfNeeded();
+    }
+  }
+
+  Future<void> _fetchPackageIfNeeded() async {
+    final user = widget.user;
+    if (user == null) return;
+
+    if (user.package != null) {
+      if (mounted) {
+        setState(() {
+          _fetchedPackage = user.package;
+        });
+      }
+      return;
+    }
+
+    final pkgId = user.packageId;
+    if (pkgId == null || pkgId.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _fetchedPackage = null;
+        });
+      }
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
+    try {
+      final dioClient = sl<DioClient>();
+      final response = await dioClient.get('packages/$pkgId');
+      final data = response.data;
+      if (data != null && data['data'] != null) {
+        final pkgJson = data['data'] as Map<String, dynamic>;
+        final pkgEntity = PackageModel.fromJson(pkgJson).toEntity();
+        if (mounted) {
+          setState(() {
+            _fetchedPackage = pkgEntity;
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching package details: $e');
+      }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isActive = widget.user?.isSubscriptionValid ?? false;
+    final package = _fetchedPackage ?? widget.user?.package;
+    final String packageName = package?.name ?? 'الباقة الفعالة';
+    final String scopeText = package?.scopeText ?? '${widget.user?.stageName ?? "المرحلة"} - ${widget.user?.gradeName ?? "الصف"}';
+    final String scopeLevelLabel = package?.scopeLevelLabel ?? 'باقة شاملة';
+
+    final exp = widget.user?.subscriptionExpiry;
+    final String expiryText = (exp != null)
+        ? exp.toString().split(" ").first.split("T").first
+        : 'غير محدد';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isActive
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : AppColors.error.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: (isActive ? AppColors.primary : AppColors.error)
+                .withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row: Icon + Title + Status Chip
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: (isActive ? AppColors.primary : Colors.grey)
+                      .withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.card_membership_rounded,
+                  color: isActive ? AppColors.primary : Colors.grey,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        isActive ? packageName : 'لا يوجد اشتراك فعال',
+                        style: GoogleFonts.cairo(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    if (_isLoading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: (isActive ? Colors.green : Colors.red)
+                      .withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isActive
+                          ? Icons.check_circle_rounded
+                          : Icons.cancel_rounded,
+                      size: 14,
+                      color: isActive ? Colors.green : Colors.red,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isActive ? 'مفعل' : 'منتهي',
+                      style: GoogleFonts.cairo(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isActive ? Colors.green : Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(height: 1, thickness: 1),
+          const SizedBox(height: 16),
+
+          // Details grid: Scope + Expiry Date
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.layers_outlined,
+                            size: 16, color: Colors.grey.shade600),
+                        const SizedBox(width: 6),
+                        Text(
+                          'نطاق الباقة',
+                          style: GoogleFonts.cairo(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      scopeText,
+                      style: GoogleFonts.cairo(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        scopeLevelLabel,
+                        style: GoogleFonts.cairo(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.event_outlined,
+                            size: 16, color: Colors.grey.shade600),
+                        const SizedBox(width: 6),
+                        Text(
+                          'تاريخ الانتهاء',
+                          style: GoogleFonts.cairo(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      expiryText,
+                      style: GoogleFonts.cairo(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          if (!isActive) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Text(
+                        'تفعيل اشتراك',
+                        style: GoogleFonts.cairo(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      content: Text(
+                        'عزيزي الطالب، يرجى التواصل مع إدارة التطبيق أو استخدام كود التفعيل لتجديد اشتراكك.',
+                        style: GoogleFonts.cairo(),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: Text(
+                            'إغلاق',
+                            style: GoogleFonts.cairo(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: Text(
+                  'تجديد الباقة / كود التفعيل',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -197,7 +494,7 @@ class _ProfileMenuItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.withOpacity(0.1)),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
           ),
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -206,7 +503,7 @@ class _ProfileMenuItem extends StatelessWidget {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: AppColors.primary, size: 24),
@@ -229,7 +526,7 @@ class _ProfileMenuItem extends StatelessWidget {
                       style: TextStyle(
                         color: Theme.of(
                           context,
-                        ).textTheme.bodySmall?.color?.withOpacity(0.6),
+                        ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
                         fontSize: 13,
                       ),
                     ),

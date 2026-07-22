@@ -5,6 +5,7 @@ import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/storage/secure_storage.dart' as import_secure_storage;
 import '../../../../core/widgets/error_display.dart';
 import '../../../../core/utils/error_utils.dart';
+import '../../../../core/utils/package_access_helper.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -35,20 +36,21 @@ class _GradesScreenState extends State<GradesScreen> {
     context.read<GradesCubit>().loadGrades(widget.parentId);
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SafeArea(
         child: Container(
-          decoration: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty
+          decoration: widget.backgroundImageUrl != null &&
+                  widget.backgroundImageUrl!.isNotEmpty
               ? BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(AppHelpers.resolveMediaUrl(widget.backgroundImageUrl!)),
+                    image: NetworkImage(
+                        AppHelpers.resolveMediaUrl(widget.backgroundImageUrl!)),
                     fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(Colors.white.withValues(alpha: 0.15), BlendMode.lighten),
+                    colorFilter: ColorFilter.mode(
+                        Colors.white.withValues(alpha: 0.15),
+                        BlendMode.lighten),
                   ),
                 )
               : null,
@@ -57,114 +59,155 @@ class _GradesScreenState extends State<GradesScreen> {
               if (widget.titlePath.isNotEmpty)
                 BreadcrumbNav(pathNames: widget.titlePath),
               Expanded(
-              child: BlocBuilder<GradesCubit, GradesState>(
-                builder: (context, state) {
-                  if (state is GradesLoading)
-                    return const ShimmerGrid();
-                  if (state is GradesError)
-                    return ErrorDisplay(message: ErrorUtils.getFriendlyMessage(state.message));
-                  if (state is GradesLoaded) {
-                    return FutureBuilder<String?>(
-                      future: sl<import_secure_storage.SecureStorage>().getUserData(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const ShimmerGrid();
-                        }
-
-                        String? userGradeId;
-                        if (snapshot.hasData && snapshot.data != null) {
-                          try {
-                            final data = jsonDecode(snapshot.data!);
-                            userGradeId = data['grade_id']?.toString();
-                          } catch (_) {}
-                        }
-
-                        final grades = state.grades.where((g) => userGradeId == null || g.id == userGradeId).toList();
-
-                      if (grades.isEmpty) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.class_rounded,
-                                size: 80,
-                                color: Colors.grey.shade300,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'لا توجد بيانات',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      final itemCount = grades.length;
-                  final crossAxisCount = itemCount == 1 ? 1 : 2;
-                  final childAspectRatio = itemCount == 1 ? 1.5 : 0.85;
-
-                  return GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          childAspectRatio: childAspectRatio,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
-                    itemCount: itemCount,
-                    itemBuilder: (context, index) {
-                      final item = grades[index];
-                      return ChildFriendlyCard(
-                        title: item.name,
-                        subtitle: item.description,
-                        imageUrl: item.imageUrl,
-                        color: Colors.blue,
-                        defaultIcon: Icons.class_rounded,
-                        onTap: () async {
-                          final isGuest = await sl<import_secure_storage.SecureStorage>().isGuest();
-                          if (context.mounted) {
-                            if (isGuest) {
-                              context.push(
-                                '/free-trial-subjects/${item.id}',
-                                extra: {
-                                  'titlePath': [...widget.titlePath, item.name],
-                                  'backgroundImageUrl': widget.backgroundImageUrl,
-                                },
-                              );
-                            } else {
-                              context.push(
-                                '/sections/${item.id}',
-                                extra: {
-                                  'titlePath': [...widget.titlePath, item.name],
-                                  'backgroundImageUrl': widget.backgroundImageUrl,
-                                },
-                              );
-                            }
+                child: BlocBuilder<GradesCubit, GradesState>(
+                  builder: (context, state) {
+                    if (state is GradesLoading) {
+                      return const ShimmerGrid();
+                    }
+                    if (state is GradesError) {
+                      return ErrorDisplay(
+                          message: ErrorUtils.getFriendlyMessage(state.message));
+                    }
+                    if (state is GradesLoaded) {
+                      return FutureBuilder<String?>(
+                        future: sl<import_secure_storage.SecureStorage>()
+                            .getUserData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const ShimmerGrid();
                           }
+
+                          Map<String, dynamic>? userData;
+                          if (snapshot.hasData && snapshot.data != null) {
+                            try {
+                              userData = jsonDecode(snapshot.data!);
+                            } catch (_) {}
+                          }
+
+                          final grades = state.grades.where((g) {
+                            return PackageAccessHelper.canAccessGrade(
+                              userData: userData,
+                              stageId: widget.parentId,
+                              gradeId: g.id,
+                            );
+                          }).toList();
+
+                          final displayGrades =
+                              grades.isNotEmpty ? grades : state.grades;
+
+                          if (displayGrades.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.class_rounded,
+                                    size: 80,
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'لا توجد صفوف متاحة',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          final itemCount = displayGrades.length;
+                          final crossAxisCount = itemCount == 1 ? 1 : 2;
+                          final childAspectRatio = itemCount == 1 ? 1.5 : 0.85;
+
+                          return GridView.builder(
+                            padding: const EdgeInsets.all(16),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              childAspectRatio: childAspectRatio,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                            ),
+                            itemCount: itemCount,
+                            itemBuilder: (context, index) {
+                              final item = displayGrades[index];
+                              final bool isAccessible =
+                                  PackageAccessHelper.canAccessGrade(
+                                userData: userData,
+                                stageId: widget.parentId,
+                                gradeId: item.id,
+                              );
+
+                              return ChildFriendlyCard(
+                                title: item.name,
+                                subtitle: isAccessible
+                                    ? item.description
+                                    : 'غير مشمول في الباقة الحالية',
+                                imageUrl: item.imageUrl,
+                                color: isAccessible ? Colors.blue : Colors.grey,
+                                defaultIcon: isAccessible
+                                    ? Icons.class_rounded
+                                    : Icons.lock_rounded,
+                                onTap: () async {
+                                  if (!isAccessible) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'هذا الصف غير مشمول في باقتك الحالية.'),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  final isGuest =
+                                      await sl<import_secure_storage.SecureStorage>()
+                                          .isGuest();
+                                  if (context.mounted) {
+                                    if (isGuest) {
+                                      context.push(
+                                        '/free-trial-subjects/${item.id}',
+                                        extra: {
+                                          'titlePath': [
+                                            ...widget.titlePath,
+                                            item.name
+                                          ],
+                                          'backgroundImageUrl':
+                                              widget.backgroundImageUrl,
+                                        },
+                                      );
+                                    } else {
+                                      context.push(
+                                        '/sections/${item.id}',
+                                        extra: {
+                                          'titlePath': [
+                                            ...widget.titlePath,
+                                            item.name
+                                          ],
+                                          'backgroundImageUrl':
+                                              widget.backgroundImageUrl,
+                                        },
+                                      );
+                                    }
+                                  }
+                                },
+                              );
+                            },
+                          );
                         },
                       );
-                    },
-                  );
-                 },
-                );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      ),
+        ),
       ),
     );
   }
 }
-
-
-
-

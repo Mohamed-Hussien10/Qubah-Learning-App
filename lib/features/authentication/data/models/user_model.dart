@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import '../../domain/entities/user_entity.dart';
+import '../../../subscriptions/data/models/package_model.dart';
 
 part 'user_model.g.dart';
 
@@ -39,6 +40,9 @@ class UserModel {
   @JsonKey(name: 'grade_id', fromJson: _parseStringNullable)
   final String? gradeId;
   final String? gradeName;
+  @JsonKey(name: 'package_id', fromJson: _parseStringNullable)
+  final String? packageId;
+  final PackageModel? package;
   @JsonKey(name: 'subscription_status', fromJson: _parseStringNullable)
   final String? subscriptionStatus;
   @JsonKey(name: 'subscription_expiry', fromJson: _parseStringNullable)
@@ -58,6 +62,8 @@ class UserModel {
     this.stageName,
     this.gradeId,
     this.gradeName,
+    this.packageId,
+    this.package,
     this.subscriptionStatus,
     this.subscriptionExpiry,
     this.isActive = true,
@@ -65,17 +71,23 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    // Custom handling to extract nested stage and grade titles
     final model = _$UserModelFromJson(json);
-    
+
     String? sName = model.stageName;
     if (json['stage'] != null && json['stage']['title'] != null) {
       sName = json['stage']['title'].toString();
     }
-    
+
     String? gName = model.gradeName;
     if (json['grade'] != null && json['grade']['title'] != null) {
       gName = json['grade']['title'].toString();
+    }
+
+    PackageModel? pkg;
+    if (json['package'] != null && json['package'] is Map<String, dynamic>) {
+      pkg = PackageModel.fromJson(json['package'] as Map<String, dynamic>);
+    } else if (model.package != null) {
+      pkg = model.package;
     }
 
     return UserModel(
@@ -88,6 +100,8 @@ class UserModel {
       stageName: sName,
       gradeId: model.gradeId,
       gradeName: gName,
+      packageId: model.packageId ?? json['package_id']?.toString(),
+      package: pkg,
       subscriptionStatus: model.subscriptionStatus,
       subscriptionExpiry: model.subscriptionExpiry,
       isActive: model.isActive,
@@ -109,6 +123,8 @@ class UserModel {
       stageName: stageName,
       gradeId: gradeId,
       gradeName: gradeName,
+      packageId: packageId,
+      package: package?.toEntity(),
       subscriptionStatus: subscriptionStatus,
       subscriptionExpiry: subscriptionExpiry != null
           ? DateTime.tryParse(subscriptionExpiry!)
@@ -130,6 +146,10 @@ class UserModel {
       stageName: entity.stageName,
       gradeId: entity.gradeId,
       gradeName: entity.gradeName,
+      packageId: entity.packageId,
+      package: entity.package != null
+          ? PackageModel.fromEntity(entity.package!)
+          : null,
       subscriptionStatus: entity.subscriptionStatus,
       subscriptionExpiry: entity.subscriptionExpiry?.toIso8601String(),
       isActive: entity.isActive,

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../subscriptions/domain/entities/package_entity.dart';
 
 /// Pure Dart entity representing a user in the domain layer.
 class UserEntity extends Equatable {
@@ -11,6 +12,8 @@ class UserEntity extends Equatable {
   final String? stageName;
   final String? gradeId;
   final String? gradeName;
+  final String? packageId;
+  final PackageEntity? package;
   final String? subscriptionStatus;
   final DateTime? subscriptionExpiry;
   final bool isActive;
@@ -26,6 +29,8 @@ class UserEntity extends Equatable {
     this.stageName,
     this.gradeId,
     this.gradeName,
+    this.packageId,
+    this.package,
     this.subscriptionStatus,
     this.subscriptionExpiry,
     this.isActive = true,
@@ -33,23 +38,26 @@ class UserEntity extends Equatable {
   });
 
   bool get isSubscriptionValid =>
-      subscriptionExpiry != null && 
-      subscriptionExpiry!.isAfter(DateTime.now());
+      (subscriptionStatus == 'active' || subscriptionStatus == 'valid') ||
+      (subscriptionExpiry != null && subscriptionExpiry!.isAfter(DateTime.now()));
 
   @override
   List<Object?> get props => [
-    id,
-    name,
-    email,
-    avatarUrl,
-    phone,
-    stageId,
-    stageName,
-    gradeId,
-    gradeName,
-    subscriptionStatus,
-    subscriptionExpiry,
-    isActive,
-    createdAt,
-  ];
+        id,
+        name,
+        email,
+        avatarUrl,
+        phone,
+        stageId,
+        stageName,
+        gradeId,
+        gradeName,
+        packageId,
+        package,
+        subscriptionStatus,
+        subscriptionExpiry,
+        isActive,
+        createdAt,
+      ];
 }
+
