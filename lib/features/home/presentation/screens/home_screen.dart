@@ -12,6 +12,7 @@ import '../../../../core/widgets/child_friendly_card.dart';
 import '../../../../core/storage/secure_storage.dart';
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/utils/helpers.dart';
+import '../../../../core/utils/package_access_helper.dart';
 import '../../../authentication/domain/repositories/auth_repository.dart';
 
 /// Main home screen with navigation to educational stages, profile, settings.
@@ -83,12 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (userDataJson != null && userDataJson.isNotEmpty) {
       try {
         final userData = jsonDecode(userDataJson);
-        final expiryStr = userData['subscription_expiry'];
-        if (expiryStr != null) {
-          final expiry = DateTime.parse(expiryStr);
-          if (expiry.isBefore(DateTime.now())) {
-            isExpired = true;
-          }
+        if (!PackageAccessHelper.isSubscriptionActiveFromJson(userData)) {
+          isExpired = true;
         }
       } catch (_) {}
     }

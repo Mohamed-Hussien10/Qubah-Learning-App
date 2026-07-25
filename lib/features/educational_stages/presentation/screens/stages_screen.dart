@@ -55,36 +55,53 @@ class _StagesScreenState extends State<StagesScreen> {
                     } catch (_) {}
                   }
 
-                  final stages = state.stages.where((s) {
+                  final displayStages = state.stages.where((s) {
                     return PackageAccessHelper.canAccessStage(
                       userData: userData,
                       stageId: s.id,
                     );
                   }).toList();
 
-                  // Fallback: if filter results in zero stages, show all available stages
-                  final displayStages =
-                      stages.isNotEmpty ? stages : state.stages;
-
                   if (displayStages.isEmpty) {
+                    final bool isSubActive =
+                        PackageAccessHelper.isSubscriptionActiveFromJson(userData);
                     return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.school_rounded,
-                            size: 80,
-                            color: Colors.grey.shade300,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'لا توجد مراحل تعليمية متاحة',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.grey.shade500,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isSubActive
+                                  ? Icons.school_rounded
+                                  : Icons.lock_outline_rounded,
+                              size: 80,
+                              color: Colors.grey.shade400,
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+                            Text(
+                              isSubActive
+                                  ? 'لا توجد مراحل تعليمية مشمولة في باقتك الحالية'
+                                  : 'اشتراكك غير فعال أو انتهت صلاحيته',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            if (!isSubActive) ...[
+                              const SizedBox(height: 16),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  context.push('/subscription-expired');
+                                },
+                                icon: const Icon(Icons.refresh_rounded),
+                                label: const Text('تجديد الاشتراك'),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     );
                   }

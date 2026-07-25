@@ -45,16 +45,32 @@ class PackageModel {
       return null;
     }
 
+    final stageId = json['educational_stage_id']?.toString() ??
+        json['stage_id']?.toString() ??
+        json['educational_stage']?['id']?.toString() ??
+        json['stage']?['id']?.toString() ??
+        '';
+
+    final gradeId = json['grade_id']?.toString() ??
+        json['grade']?['id']?.toString() ??
+        json['section']?['grade_id']?.toString() ??
+        json['subject']?['section']?['grade_id']?.toString();
+
+    final sectionId = json['section_id']?.toString() ??
+        json['section']?['id']?.toString() ??
+        json['subject']?['section_id']?.toString();
+
+    final subjectId = json['subject_id']?.toString() ??
+        json['subject']?['id']?.toString();
+
     return PackageModel(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
       price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
-      educationalStageId: json['educational_stage_id']?.toString() ??
-          json['stage_id']?.toString() ??
-          '',
-      gradeId: json['grade_id']?.toString(),
-      sectionId: json['section_id']?.toString(),
-      subjectId: json['subject_id']?.toString(),
+      educationalStageId: stageId,
+      gradeId: gradeId,
+      sectionId: sectionId,
+      subjectId: subjectId,
       description: json['description']?.toString(),
       expiryDate: json['expiry_date'] != null
           ? DateTime.tryParse(json['expiry_date'].toString())
@@ -87,6 +103,10 @@ class PackageModel {
       'grade_title': gradeTitle,
       'section_title': sectionTitle,
       'subject_title': subjectTitle,
+      if (sectionId != null) 'section': {'id': sectionId, 'title': sectionTitle},
+      if (subjectId != null) 'subject': {'id': subjectId, 'title': subjectTitle},
+      if (gradeId != null) 'grade': {'id': gradeId, 'title': gradeTitle},
+      if (educationalStageId.isNotEmpty) 'educational_stage': {'id': educationalStageId, 'title': educationalStageTitle},
     };
   }
 

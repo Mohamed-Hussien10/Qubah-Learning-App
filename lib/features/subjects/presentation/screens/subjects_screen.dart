@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/breadcrumb_nav.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
+import '../../../../core/services/logger_service.dart';
 import '../manager/cubit/subjects_cubit.dart';
 import '../manager/state/subjects_state.dart';
 
@@ -85,35 +86,69 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                             } catch (_) {}
                           }
 
-                          final subjects = state.subjects.where((subj) {
-                            return PackageAccessHelper.canAccessSubject(
+                          LoggerService.instance.debug(
+                            '📚 [SubjectsScreen Debug]\n'
+                            'Snapshot Has Data: ${snapshot.hasData}\n'
+                            'UserData JSON: ${snapshot.data}\n'
+                            'Package Map: ${userData?['package']}\n'
+                            'Package Name: ${PackageAccessHelper.getPackageDisplayName(userData)}\n'
+                            'Available Subjects: ${state.subjects.map((s) => "ID:${s.id}-Name:${s.name}").toList()}',
+                          );
+
+                          final displaySubjects = state.subjects.where((subj) {
+                            final canAccess = PackageAccessHelper.canAccessSubject(
                               userData: userData,
                               subjectId: subj.id,
+                              subjectName: subj.name,
+                              sectionId: widget.parentId,
                             );
+                            LoggerService.instance.debug(
+                              '  📘 Subject Check -> ID:${subj.id}, Name:${subj.name} => Access: $canAccess',
+                            );
+                            return canAccess;
                           }).toList();
 
-                          final displaySubjects =
-                              subjects.isNotEmpty ? subjects : state.subjects;
-
                           if (displaySubjects.isEmpty) {
+                            final bool isSubActive =
+                                PackageAccessHelper.isSubscriptionActiveFromJson(
+                                    userData);
                             return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.menu_book_rounded,
-                                    size: 80,
-                                    color: Colors.grey.shade300,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'لا توجد مواد متاحة',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.grey.shade500,
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isSubActive
+                                          ? Icons.menu_book_rounded
+                                          : Icons.lock_outline_rounded,
+                                      size: 80,
+                                      color: Colors.grey.shade400,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      isSubActive
+                                          ? 'لا توجد مواد مشمولة في باقتك لهذا القسم'
+                                          : 'اشتراكك غير فعال أو انتهت صلاحيته',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey.shade700,
+                                      ),
+                                    ),
+                                    if (!isSubActive) ...[
+                                      const SizedBox(height: 16),
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          context.push('/subscription-expired');
+                                        },
+                                        icon: const Icon(Icons.refresh_rounded),
+                                        label: const Text('تجديد الاشتراك'),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                             );
                           }
@@ -138,6 +173,8 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                                   PackageAccessHelper.canAccessSubject(
                                 userData: userData,
                                 subjectId: item.id,
+                                subjectName: item.name,
+                                sectionId: widget.parentId,
                               );
 
                               return ChildFriendlyCard(

@@ -28,10 +28,26 @@ class AuthApiService {
         LoggerService.instance.debug('Login response received successfully');
       }
       final data = response.data as Map<String, dynamic>;
+      final rawUser = Map<String, dynamic>.from(data['data']['user'] as Map<String, dynamic>);
+      final packageId = rawUser['package_id']?.toString();
+
+      if (rawUser['package'] == null && packageId != null && packageId.isNotEmpty) {
+        try {
+          final pkgRes = await _dioClient.get('/packages/$packageId');
+          final pkgData = pkgRes.data as Map<String, dynamic>;
+          final pkgMap = pkgData['data'] ?? pkgData;
+          if (pkgMap is Map<String, dynamic>) {
+            rawUser['package'] = pkgMap;
+          }
+        } catch (e) {
+          LoggerService.instance.error('Fetch package failed for ID: $packageId', error: e);
+        }
+      }
+
+      UserModel userModel = UserModel.fromJson(rawUser);
+
       return {
-        'user': UserModel.fromJson(
-          data['data']['user'] as Map<String, dynamic>,
-        ),
+        'user': userModel,
         'access_token': data['data']['access_token'] as String,
         'refresh_token': data['data']['refresh_token'] as String,
       };
@@ -53,7 +69,23 @@ class AuthApiService {
       // The endpoint is typically /api/v1/auth/me or /api/v1/user
       final response = await _dioClient.get('/auth/me');
       final data = response.data as Map<String, dynamic>;
-      return UserModel.fromJson(data['data']['user'] as Map<String, dynamic>);
+      final rawUser = Map<String, dynamic>.from(data['data']['user'] as Map<String, dynamic>);
+      final packageId = rawUser['package_id']?.toString();
+
+      if (rawUser['package'] == null && packageId != null && packageId.isNotEmpty) {
+        try {
+          final pkgRes = await _dioClient.get('/packages/$packageId');
+          final pkgData = pkgRes.data as Map<String, dynamic>;
+          final pkgMap = pkgData['data'] ?? pkgData;
+          if (pkgMap is Map<String, dynamic>) {
+            rawUser['package'] = pkgMap;
+          }
+        } catch (e) {
+          LoggerService.instance.error('Fetch package failed for ID: $packageId', error: e);
+        }
+      }
+
+      return UserModel.fromJson(rawUser);
     } catch (e) {
       if (e is ServerException ||
           e is NetworkException ||

@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/breadcrumb_nav.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
+import '../../../../core/services/logger_service.dart';
 import '../manager/cubit/sections_cubit.dart';
 import '../manager/state/sections_state.dart';
 
@@ -85,35 +86,70 @@ class _SectionsScreenState extends State<SectionsScreen> {
                             } catch (_) {}
                           }
 
-                          final sections = state.sections.where((sec) {
-                            return PackageAccessHelper.canAccessSection(
+                          LoggerService.instance.debug(
+                            '🔍 [SectionsScreen Debug]\n'
+                            'Snapshot Has Data: ${snapshot.hasData}\n'
+                            'UserData JSON: ${snapshot.data}\n'
+                            'Package Map: ${userData?['package']}\n'
+                            'Package Name: ${PackageAccessHelper.getPackageDisplayName(userData)}\n'
+                            'Available Sections: ${state.sections.map((s) => "ID:${s.id}-Name:${s.name}").toList()}',
+                          );
+
+                          final displaySections = state.sections.where((sec) {
+                            final canAccess = PackageAccessHelper.canAccessSection(
                               userData: userData,
                               sectionId: sec.id,
+                              sectionName: sec.name,
+                              gradeId: widget.parentId,
                             );
+                            LoggerService.instance.debug(
+                              '  🚪 Section Check -> ID:${sec.id}, Name:${sec.name} => Access: $canAccess',
+                            );
+                            return canAccess;
                           }).toList();
 
-                          final displaySections =
-                              sections.isNotEmpty ? sections : state.sections;
-
                           if (displaySections.isEmpty) {
+                            final bool isSubActive =
+                                PackageAccessHelper.isSubscriptionActiveFromJson(
+                                    userData);
                             return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.meeting_room_rounded,
-                                    size: 80,
-                                    color: Colors.grey.shade300,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'لا توجد أقسام متاحة',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.grey.shade500,
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isSubActive
+                                          ? Icons.meeting_room_rounded
+                                          : Icons.lock_outline_rounded,
+                                      size: 80,
+                                      color: Colors.grey.shade400,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      isSubActive
+                                          ? 'لا توجد أقسام مشمولة في باقتك لهذا الصف'
+                                          : 'اشتراكك غير فعال أو انتهت صلاحيته',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey.shade700,
+                                      ),
+                                    ),
+                                    if (!isSubActive) ...[
+                                      const SizedBox(height: 16),
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          context.push('/subscription-expired');
+                                        },
+                                        icon:
+                                            const Icon(Icons.refresh_rounded),
+                                        label: const Text('تجديد الاشتراك'),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                             );
                           }
@@ -138,6 +174,8 @@ class _SectionsScreenState extends State<SectionsScreen> {
                                   PackageAccessHelper.canAccessSection(
                                 userData: userData,
                                 sectionId: item.id,
+                                sectionName: item.name,
+                                gradeId: widget.parentId,
                               );
 
                               return ChildFriendlyCard(

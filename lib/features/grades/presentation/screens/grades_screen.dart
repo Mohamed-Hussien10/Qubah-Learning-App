@@ -85,7 +85,7 @@ class _GradesScreenState extends State<GradesScreen> {
                             } catch (_) {}
                           }
 
-                          final grades = state.grades.where((g) {
+                          final displayGrades = state.grades.where((g) {
                             return PackageAccessHelper.canAccessGrade(
                               userData: userData,
                               stageId: widget.parentId,
@@ -93,28 +93,46 @@ class _GradesScreenState extends State<GradesScreen> {
                             );
                           }).toList();
 
-                          final displayGrades =
-                              grades.isNotEmpty ? grades : state.grades;
-
                           if (displayGrades.isEmpty) {
+                            final bool isSubActive =
+                                PackageAccessHelper.isSubscriptionActiveFromJson(userData);
                             return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.class_rounded,
-                                    size: 80,
-                                    color: Colors.grey.shade300,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'لا توجد صفوف متاحة',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.grey.shade500,
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      isSubActive
+                                          ? Icons.class_rounded
+                                          : Icons.lock_outline_rounded,
+                                      size: 80,
+                                      color: Colors.grey.shade400,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      isSubActive
+                                          ? 'لا توجد صفوف مشمولة في باقتك لهذه المرحلة'
+                                          : 'اشتراكك غير فعال أو انتهت صلاحيته',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey.shade700,
+                                      ),
+                                    ),
+                                    if (!isSubActive) ...[
+                                      const SizedBox(height: 16),
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          context.push('/subscription-expired');
+                                        },
+                                        icon: const Icon(Icons.refresh_rounded),
+                                        label: const Text('تجديد الاشتراك'),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                             );
                           }
