@@ -44,10 +44,19 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
   List<SectionModel> _sections = [];
   List<SubjectModel> _subjects = [];
 
-  String? _selectedStageId;
-  String? _selectedGradeId;
-  String? _selectedSectionId;
-  String? _selectedSubjectId;
+  // Multi-Subset selection state
+  bool _isAllStages = false;
+  final Set<String> _selectedStageIds = {};
+
+  bool _isAllGrades = false;
+  final Set<String> _selectedGradeIds = {};
+
+  bool _isAllSections = false;
+  final Set<String> _selectedSectionIds = {};
+
+  bool _isAllSubjects = false;
+  final Set<String> _selectedSubjectIds = {};
+
   DateTime? _expiryDate;
 
   @override
@@ -63,10 +72,32 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
     _isActive = widget.package?.isActive ?? true;
     _expiryDate = widget.package?.expiryDate;
 
-    _selectedStageId = widget.package?.educationalStageId;
-    _selectedGradeId = widget.package?.gradeId;
-    _selectedSectionId = widget.package?.sectionId;
-    _selectedSubjectId = widget.package?.subjectId;
+    if (widget.package != null) {
+      final pkg = widget.package!;
+      _isAllStages = pkg.isAllStages;
+      _selectedStageIds.addAll(pkg.stageIds);
+      if (_selectedStageIds.isEmpty && pkg.educationalStageId.isNotEmpty) {
+        _selectedStageIds.add(pkg.educationalStageId);
+      }
+
+      _isAllGrades = pkg.isAllGrades;
+      _selectedGradeIds.addAll(pkg.gradeIds);
+      if (_selectedGradeIds.isEmpty && pkg.gradeId != null && pkg.gradeId!.isNotEmpty) {
+        _selectedGradeIds.add(pkg.gradeId!);
+      }
+
+      _isAllSections = pkg.isAllSections;
+      _selectedSectionIds.addAll(pkg.sectionIds);
+      if (_selectedSectionIds.isEmpty && pkg.sectionId != null && pkg.sectionId!.isNotEmpty) {
+        _selectedSectionIds.add(pkg.sectionId!);
+      }
+
+      _isAllSubjects = pkg.isAllSubjects;
+      _selectedSubjectIds.addAll(pkg.subjectIds);
+      if (_selectedSubjectIds.isEmpty && pkg.subjectId != null && pkg.subjectId!.isNotEmpty) {
+        _selectedSubjectIds.add(pkg.subjectId!);
+      }
+    }
 
     _loadInitialData();
   }
@@ -77,15 +108,14 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
       final stagesRepo = sl<StagesRepository>();
       _stages = await stagesRepo.getAll();
 
-      if (_selectedStageId != null && _selectedStageId!.isNotEmpty) {
-        await _fetchGradesForStage(_selectedStageId!);
-        if (_selectedGradeId != null && _selectedGradeId!.isNotEmpty) {
-          await _fetchSectionsForGrade(_selectedGradeId!);
-          if (_selectedSectionId != null && _selectedSectionId!.isNotEmpty) {
-            await _fetchSubjectsForSection(_selectedSectionId!);
-          }
-        }
+      // If initial stage is empty and not edit, select first stage by default
+      if (_selectedStageIds.isEmpty && !_isAllStages && _stages.isNotEmpty) {
+        _selectedStageIds.add(_stages.first.id);
       }
+
+      await _updateGradesForSelectedStages();
+      await _updateSectionsForSelectedGrades();
+      await _updateSubjectsForSelectedSections();
     } catch (e) {
       debugPrint('Error loading initial dialog data: $e');
     } finally {
@@ -95,14 +125,34 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
     }
   }
 
-  Future<void> _fetchGradesForStage(String stageId) async {
+  Future<void> _updateGradesForSelectedStages() async {
     setState(() => _isLoadingGrades = true);
     try {
       final gradesRepo = sl<GradesRepository>();
-      _grades = await gradesRepo.getByStageId(stageId);
+      final List<GradeModel> allFetched = [];
+
+      final targetStageIds = _isAllStages
+          ? _stages.map((e) => e.id).toList()
+          : _selectedStageIds.toList();
+
+      for (final sId in targetStageIds) {
+        final gList = await gradesRepo.getByStageId(sId);
+        allFetched.addAll(gList);
+      }
+
+      // Remove duplicates by ID
+      final Map<String, GradeModel> uniqueMap = {};
+      for (final g in allFetched) {
+        uniqueMap[g.id] = g;
+      }
+      _grades = uniqueMap.values.toList();
+
+      // Clean invalid selected grade IDs
+      final validIds = _grades.map((e) => e.id).toSet();
+      _selectedGradeIds.removeWhere((id) => !validIds.contains(id));
     } catch (e) {
       _grades = [];
-      debugPrint('Error loading grades: $e');
+      debugPrint('Error fetching grades: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoadingGrades = false);
@@ -110,14 +160,32 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
     }
   }
 
-  Future<void> _fetchSectionsForGrade(String gradeId) async {
+  Future<void> _updateSectionsForSelectedGrades() async {
     setState(() => _isLoadingSections = true);
     try {
       final sectionsRepo = sl<SectionsRepository>();
-      _sections = await sectionsRepo.getByGradeId(gradeId);
+      final List<SectionModel> allFetched = [];
+
+      final targetGradeIds = _isAllGrades
+          ? _grades.map((e) => e.id).toList()
+          : _selectedGradeIds.toList();
+
+      for (final gId in targetGradeIds) {
+        final secList = await sectionsRepo.getByGradeId(gId);
+        allFetched.addAll(secList);
+      }
+
+      final Map<String, SectionModel> uniqueMap = {};
+      for (final s in allFetched) {
+        uniqueMap[s.id] = s;
+      }
+      _sections = uniqueMap.values.toList();
+
+      final validIds = _sections.map((e) => e.id).toSet();
+      _selectedSectionIds.removeWhere((id) => !validIds.contains(id));
     } catch (e) {
       _sections = [];
-      debugPrint('Error loading sections: $e');
+      debugPrint('Error fetching sections: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoadingSections = false);
@@ -125,14 +193,32 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
     }
   }
 
-  Future<void> _fetchSubjectsForSection(String sectionId) async {
+  Future<void> _updateSubjectsForSelectedSections() async {
     setState(() => _isLoadingSubjects = true);
     try {
       final subjectsRepo = sl<SubjectsRepository>();
-      _subjects = await subjectsRepo.getBySectionId(sectionId);
+      final List<SubjectModel> allFetched = [];
+
+      final targetSectionIds = _isAllSections
+          ? _sections.map((e) => e.id).toList()
+          : _selectedSectionIds.toList();
+
+      for (final secId in targetSectionIds) {
+        final subList = await subjectsRepo.getBySectionId(secId);
+        allFetched.addAll(subList);
+      }
+
+      final Map<String, SubjectModel> uniqueMap = {};
+      for (final sub in allFetched) {
+        uniqueMap[sub.id] = sub;
+      }
+      _subjects = uniqueMap.values.toList();
+
+      final validIds = _subjects.map((e) => e.id).toSet();
+      _selectedSubjectIds.removeWhere((id) => !validIds.contains(id));
     } catch (e) {
       _subjects = [];
-      debugPrint('Error loading subjects: $e');
+      debugPrint('Error fetching subjects: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoadingSubjects = false);
@@ -150,28 +236,75 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
 
   void _submitForm() {
     if (!_formKey.currentState!.validate()) return;
-    if (_selectedStageId == null || _selectedStageId!.isEmpty) {
+
+    if (!_isAllStages && _selectedStageIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء اختيار المرحلة التعليمية')),
+        const SnackBar(content: Text('الرجاء اختيار مرحلة تعليمية واحدة على الأقل أو تفعيل "كل المراحل"')),
       );
       return;
     }
 
     final price = double.tryParse(_priceController.text.trim()) ?? 0.0;
 
+    final effectiveStageIds = _isAllStages
+        ? _stages.map((e) => e.id).toList()
+        : _selectedStageIds.toList();
+
+    final effectiveGradeIds = _isAllGrades
+        ? _grades.map((e) => e.id).toList()
+        : _selectedGradeIds.toList();
+
+    final effectiveSectionIds = _isAllSections
+        ? _sections.map((e) => e.id).toList()
+        : _selectedSectionIds.toList();
+
+    final effectiveSubjectIds = _isAllSubjects
+        ? _subjects.map((e) => e.id).toList()
+        : _selectedSubjectIds.toList();
+
+    final stageTitles = _isAllStages
+        ? ['كل المراحل']
+        : _stages.where((e) => _selectedStageIds.contains(e.id)).map((e) => e.title).toList();
+
+    final gradeTitles = _isAllGrades
+        ? ['كل الصفوف']
+        : _grades.where((e) => _selectedGradeIds.contains(e.id)).map((e) => e.title).toList();
+
+    final sectionTitles = _isAllSections
+        ? ['كل الفصول']
+        : _sections.where((e) => _selectedSectionIds.contains(e.id)).map((e) => e.title).toList();
+
+    final subjectTitles = _isAllSubjects
+        ? ['كل المواد']
+        : _subjects.where((e) => _selectedSubjectIds.contains(e.id)).map((e) => e.title).toList();
+
     final updatedPackage = PackageModel(
       id: widget.package?.id ?? '',
       name: _nameController.text.trim(),
       price: price,
-      educationalStageId: _selectedStageId!,
-      gradeId: _selectedGradeId,
-      sectionId: _selectedSectionId,
-      subjectId: _selectedSubjectId,
+      educationalStageId: effectiveStageIds.isNotEmpty
+          ? effectiveStageIds.first
+          : (_stages.isNotEmpty ? _stages.first.id : ''),
+      gradeId: !_isAllGrades && effectiveGradeIds.length == 1 ? effectiveGradeIds.first : null,
+      sectionId: !_isAllSections && effectiveSectionIds.length == 1 ? effectiveSectionIds.first : null,
+      subjectId: !_isAllSubjects && effectiveSubjectIds.length == 1 ? effectiveSubjectIds.first : null,
       description: _descriptionController.text.trim().isEmpty
           ? null
           : _descriptionController.text.trim(),
       expiryDate: _expiryDate,
       isActive: _isActive,
+      isAllStages: _isAllStages,
+      stageIds: effectiveStageIds,
+      isAllGrades: _isAllGrades,
+      gradeIds: effectiveGradeIds,
+      isAllSections: _isAllSections,
+      sectionIds: effectiveSectionIds,
+      isAllSubjects: _isAllSubjects,
+      subjectIds: effectiveSubjectIds,
+      stageTitles: stageTitles,
+      gradeTitles: gradeTitles,
+      sectionTitles: sectionTitles,
+      subjectTitles: subjectTitles,
     );
 
     widget.onSubmit(updatedPackage);
@@ -186,9 +319,9 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        width: 620,
+        width: 720,
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxHeight: MediaQuery.of(context).size.height * 0.90,
         ),
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -305,7 +438,7 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
                                   SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      'حدد نطاق الباقة بشكل متدرج. يمكنك التوقف عند المرحلة أو الصف أو الفصل أو المادة.',
+                                      'يمكنك تخصيص الباقة لتشمل مرحلة واحدة أو عدة مراحل، صفوف متعددة، فصول متعددة، أو مواد محددة.',
                                       style: TextStyle(
                                           fontSize: 12, color: AppColors.info),
                                     ),
@@ -313,221 +446,142 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
-                            // 1. Stage Dropdown (Required)
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedStageId,
-                              decoration: const InputDecoration(
-                                labelText: AppStrings.selectStageRequired,
-                                prefixIcon:
-                                    Icon(Icons.account_balance_outlined),
-                                border: OutlineInputBorder(),
-                              ),
-                              items: _stages.map((stage) {
-                                return DropdownMenuItem<String>(
-                                  value: stage.id,
-                                  child: Text(stage.title),
-                                );
-                              }).toList(),
-                              onChanged: (stageId) async {
-                                if (stageId == _selectedStageId) return;
+                            // 1. Stages Selection (Multi-Select)
+                            _buildMultiSelectSection<StageModel>(
+                              title: '1. المراحل التعليمية *',
+                              icon: Icons.account_balance_outlined,
+                              isAllSelected: _isAllStages,
+                              allLabel: 'كل المراحل التعليمية',
+                              items: _stages,
+                              selectedIds: _selectedStageIds,
+                              getItemTitle: (s) => s.title,
+                              getItemId: (s) => s.id,
+                              onToggleAll: (val) async {
                                 setState(() {
-                                  _selectedStageId = stageId;
-                                  _selectedGradeId = null;
-                                  _selectedSectionId = null;
-                                  _selectedSubjectId = null;
-                                  _grades = [];
-                                  _sections = [];
-                                  _subjects = [];
+                                  _isAllStages = val;
+                                  if (val) {
+                                    _selectedStageIds.clear();
+                                  }
                                 });
-                                if (stageId != null) {
-                                  await _fetchGradesForStage(stageId);
-                                }
+                                await _updateGradesForSelectedStages();
+                                await _updateSectionsForSelectedGrades();
+                                await _updateSubjectsForSelectedSections();
                               },
-                              validator: (val) {
-                                if (val == null || val.isEmpty) {
-                                  return 'المرحلة التعليمية مطلوبة';
-                                }
-                                return null;
+                              onItemToggled: (id, selected) async {
+                                setState(() {
+                                  if (selected) {
+                                    _selectedStageIds.add(id);
+                                  } else {
+                                    _selectedStageIds.remove(id);
+                                  }
+                                });
+                                await _updateGradesForSelectedStages();
+                                await _updateSectionsForSelectedGrades();
+                                await _updateSubjectsForSelectedSections();
                               },
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
-                            // 2. Grade Dropdown (Optional)
-                            Stack(
-                              alignment: Alignment.centerLeft,
-                              children: [
-                                DropdownButtonFormField<String?>(
-                                  initialValue: _selectedGradeId,
-                                  decoration: InputDecoration(
-                                    labelText: AppStrings.selectGradeOptional,
-                                    prefixIcon: const Icon(Icons.layers_outlined),
-                                    border: const OutlineInputBorder(),
-                                    enabled: _selectedStageId != null &&
-                                        !_isLoadingGrades,
-                                  ),
-                                  items: [
-                                    const DropdownMenuItem<String?>(
-                                      value: null,
-                                      child: Text(
-                                        '-- ${AppStrings.allGradesInStage} (توقف عند المرحلة) --',
-                                        style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    ..._grades.map((grade) {
-                                      return DropdownMenuItem<String?>(
-                                        value: grade.id,
-                                        child: Text(grade.title),
-                                      );
-                                    }),
-                                  ],
-                                  onChanged: _selectedStageId == null
-                                      ? null
-                                      : (gradeId) async {
-                                          if (gradeId == _selectedGradeId) return;
-                                          setState(() {
-                                            _selectedGradeId = gradeId;
-                                            _selectedSectionId = null;
-                                            _selectedSubjectId = null;
-                                            _sections = [];
-                                            _subjects = [];
-                                          });
-                                          if (gradeId != null) {
-                                            await _fetchSectionsForGrade(gradeId);
-                                          }
-                                        },
-                                ),
-                                if (_isLoadingGrades)
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 12),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    ),
-                                  ),
-                              ],
+                            // 2. Grades Selection (Multi-Select)
+                            _buildMultiSelectSection<GradeModel>(
+                              title: '2. الصفوف الدراسية (اختياري)',
+                              icon: Icons.layers_outlined,
+                              isLoading: _isLoadingGrades,
+                              isAllSelected: _isAllGrades,
+                              allLabel: 'كل الصفوف (ضمن المراحل المختارة)',
+                              items: _grades,
+                              selectedIds: _selectedGradeIds,
+                              getItemTitle: (g) => g.title,
+                              getItemId: (g) => g.id,
+                              onToggleAll: (val) async {
+                                setState(() {
+                                  _isAllGrades = val;
+                                  if (val) {
+                                    _selectedGradeIds.clear();
+                                  }
+                                });
+                                await _updateSectionsForSelectedGrades();
+                                await _updateSubjectsForSelectedSections();
+                              },
+                              onItemToggled: (id, selected) async {
+                                setState(() {
+                                  if (selected) {
+                                    _selectedGradeIds.add(id);
+                                  } else {
+                                    _selectedGradeIds.remove(id);
+                                  }
+                                });
+                                await _updateSectionsForSelectedGrades();
+                                await _updateSubjectsForSelectedSections();
+                              },
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
-                            // 3. Section Dropdown (Optional)
-                            Stack(
-                              alignment: Alignment.centerLeft,
-                              children: [
-                                DropdownButtonFormField<String?>(
-                                  initialValue: _selectedSectionId,
-                                  decoration: InputDecoration(
-                                    labelText: AppStrings.selectSectionOptional,
-                                    prefixIcon:
-                                        const Icon(Icons.grid_view_outlined),
-                                    border: const OutlineInputBorder(),
-                                    enabled: _selectedGradeId != null &&
-                                        !_isLoadingSections,
-                                  ),
-                                  items: [
-                                    const DropdownMenuItem<String?>(
-                                      value: null,
-                                      child: Text(
-                                        '-- ${AppStrings.allSectionsInGrade} (توقف عند الصف) --',
-                                        style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    ..._sections.map((sec) {
-                                      return DropdownMenuItem<String?>(
-                                        value: sec.id,
-                                        child: Text(sec.title),
-                                      );
-                                    }),
-                                  ],
-                                  onChanged: _selectedGradeId == null
-                                      ? null
-                                      : (sectionId) async {
-                                          if (sectionId == _selectedSectionId) {
-                                            return;
-                                          }
-                                          setState(() {
-                                            _selectedSectionId = sectionId;
-                                            _selectedSubjectId = null;
-                                            _subjects = [];
-                                          });
-                                          if (sectionId != null) {
-                                            await _fetchSubjectsForSection(
-                                                sectionId);
-                                          }
-                                        },
-                                ),
-                                if (_isLoadingSections)
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 12),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    ),
-                                  ),
-                              ],
+                            // 3. Sections Selection (Multi-Select)
+                            _buildMultiSelectSection<SectionModel>(
+                              title: '3. الفصول والقطاعات (اختياري)',
+                              icon: Icons.grid_view_outlined,
+                              isLoading: _isLoadingSections,
+                              isAllSelected: _isAllSections,
+                              allLabel: 'كل الفصول (ضمن الصفوف المختارة)',
+                              items: _sections,
+                              selectedIds: _selectedSectionIds,
+                              getItemTitle: (sec) => sec.title,
+                              getItemId: (sec) => sec.id,
+                              onToggleAll: (val) async {
+                                setState(() {
+                                  _isAllSections = val;
+                                  if (val) {
+                                    _selectedSectionIds.clear();
+                                  }
+                                });
+                                await _updateSubjectsForSelectedSections();
+                              },
+                              onItemToggled: (id, selected) async {
+                                setState(() {
+                                  if (selected) {
+                                    _selectedSectionIds.add(id);
+                                  } else {
+                                    _selectedSectionIds.remove(id);
+                                  }
+                                });
+                                await _updateSubjectsForSelectedSections();
+                              },
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
-                            // 4. Subject Dropdown (Optional)
-                            Stack(
-                              alignment: Alignment.centerLeft,
-                              children: [
-                                DropdownButtonFormField<String?>(
-                                  initialValue: _selectedSubjectId,
-                                  decoration: InputDecoration(
-                                    labelText: AppStrings.selectSubjectOptional,
-                                    prefixIcon:
-                                        const Icon(Icons.library_books_outlined),
-                                    border: const OutlineInputBorder(),
-                                    enabled: _selectedSectionId != null &&
-                                        !_isLoadingSubjects,
-                                  ),
-                                  items: [
-                                    const DropdownMenuItem<String?>(
-                                      value: null,
-                                      child: Text(
-                                        '-- ${AppStrings.allSubjectsInSection} (توقف عند الفصل) --',
-                                        style: TextStyle(
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    ..._subjects.map((sub) {
-                                      return DropdownMenuItem<String?>(
-                                        value: sub.id,
-                                        child: Text(sub.title),
-                                      );
-                                    }),
-                                  ],
-                                  onChanged: _selectedSectionId == null
-                                      ? null
-                                      : (subjectId) {
-                                          setState(() {
-                                            _selectedSubjectId = subjectId;
-                                          });
-                                        },
-                                ),
-                                if (_isLoadingSubjects)
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 12),
-                                    child: SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    ),
-                                  ),
-                              ],
+                            // 4. Subjects Selection (Multi-Select)
+                            _buildMultiSelectSection<SubjectModel>(
+                              title: '4. المواد الدراسية (اختياري)',
+                              icon: Icons.library_books_outlined,
+                              isLoading: _isLoadingSubjects,
+                              isAllSelected: _isAllSubjects,
+                              allLabel: 'كل المواد (ضمن الفصول المختارة)',
+                              items: _subjects,
+                              selectedIds: _selectedSubjectIds,
+                              getItemTitle: (sub) => sub.title,
+                              getItemId: (sub) => sub.id,
+                              onToggleAll: (val) {
+                                setState(() {
+                                  _isAllSubjects = val;
+                                  if (val) {
+                                    _selectedSubjectIds.clear();
+                                  }
+                                });
+                              },
+                              onItemToggled: (id, selected) {
+                                setState(() {
+                                  if (selected) {
+                                    _selectedSubjectIds.add(id);
+                                  } else {
+                                    _selectedSubjectIds.remove(id);
+                                  }
+                                });
+                              },
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
 
                             // Description Text Field
                             TextFormField(
@@ -589,8 +643,6 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
                             const SizedBox(height: 16),
 
                             // Active Switch
-
-                            // Active Switch
                             SwitchListTile(
                               title: const Text('حالة تفعيل الباقة'),
                               subtitle: Text(
@@ -635,6 +687,137 @@ class _PackageFormDialogState extends State<PackageFormDialog> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMultiSelectSection<T>({
+    required String title,
+    required IconData icon,
+    bool isLoading = false,
+    required bool isAllSelected,
+    required String allLabel,
+    required List<T> items,
+    required Set<String> selectedIds,
+    required String Function(T item) getItemTitle,
+    required String Function(T item) getItemId,
+    required Function(bool val) onToggleAll,
+    required Function(String id, bool selected) onItemToggled,
+  }) {
+    final theme = Theme.of(context);
+
+    String selectionSummaryText = '';
+    if (isAllSelected) {
+      selectionSummaryText = 'محدد: الكل (${items.length})';
+    } else if (selectedIds.isEmpty) {
+      selectionSummaryText = 'غير محدد (الكل مجاني/تلقائي)';
+    } else {
+      selectionSummaryText = 'محدد: ${selectedIds.length} من ${items.length}';
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.5)),
+      ),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ),
+              if (isLoading)
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isAllSelected || selectedIds.isNotEmpty
+                        ? AppColors.primary.withValues(alpha: 0.1)
+                        : Colors.grey.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    selectionSummaryText,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: isAllSelected || selectedIds.isNotEmpty
+                          ? AppColors.primary
+                          : Colors.grey[700],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+          // Toggle "All" option
+          CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            title: Text(
+              allLabel,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+            value: isAllSelected,
+            activeColor: AppColors.primary,
+            onChanged: (val) {
+              if (val != null) onToggleAll(val);
+            },
+          ),
+
+          // Items Chips Wrap
+          if (!isAllSelected) ...[
+            const SizedBox(height: 6),
+            if (items.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'لا توجد عناصر متاحة للاختيار (يرجى اختيار المستوى الأعلى أولاً)',
+                  style: TextStyle(fontSize: 12, color: theme.hintColor),
+                ),
+              )
+            else
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: items.map((item) {
+                  final id = getItemId(item);
+                  final itemTitle = getItemTitle(item);
+                  final isSelected = selectedIds.contains(id);
+
+                  return FilterChip(
+                    label: Text(itemTitle),
+                    selected: isSelected,
+                    selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                    checkmarkColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? AppColors.primary : theme.textTheme.bodyMedium?.color,
+                    ),
+                    onSelected: (selected) {
+                      onItemToggled(id, selected);
+                    },
+                  );
+                }).toList(),
+              ),
+          ],
+        ],
       ),
     );
   }

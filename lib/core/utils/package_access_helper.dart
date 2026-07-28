@@ -1,3 +1,4 @@
+import 'dart:convert';
 import '../../features/authentication/domain/entities/user_entity.dart';
 import '../services/logger_service.dart';
 
@@ -25,6 +26,37 @@ class PackageAccessHelper {
       }
     }
     return false;
+  }
+
+  /// Extracts embedded scope metadata tag from package description JSON if available.
+  static Map<String, dynamic>? _getScopeMeta(Map<String, dynamic>? userData) {
+    if (userData == null) return null;
+    final package = userData['package'] as Map<String, dynamic>?;
+
+    // Check if package map already contains deserialized array keys
+    if (package != null) {
+      if (package.containsKey('is_all_stages') || package.containsKey('stage_ids')) {
+        return package;
+      }
+      if (package['scope_meta'] is Map<String, dynamic>) {
+        return package['scope_meta'] as Map<String, dynamic>;
+      }
+    }
+
+    // Check raw or description strings for embedded HTML comment tag
+    final desc = package?['description']?.toString() ??
+        package?['raw_description']?.toString() ??
+        userData['package_description']?.toString();
+    if (desc != null && desc.contains('<!--SCOPE_META:')) {
+      try {
+        final regExp = RegExp(r'<!--SCOPE_META:(.*?)-->', dotAll: true);
+        final match = regExp.firstMatch(desc);
+        if (match != null && match.group(1) != null) {
+          return jsonDecode(match.group(1)!) as Map<String, dynamic>;
+        }
+      } catch (_) {}
+    }
+    return null;
   }
 
   /// Extracts the target Stage ID from userData JSON.
@@ -111,11 +143,34 @@ class PackageAccessHelper {
     required String stageId,
   }) {
     if (userData == null) return true; // Guest/default fallback
-    if (!isSubscriptionActiveFromJson(userData)) return false;
+    if (!isSubscriptionActiveFromJson(userData)) {
+      LoggerService.instance.debug('🔒 [canAccessStage] Access DENIED (Subscription Expired) for Stage ID: $stageId');
+      return false;
+    }
+
+    final meta = _getScopeMeta(userData);
+    if (meta != null) {
+      if (meta['is_all_stages'] == true) {
+        LoggerService.instance.debug('🔓 [canAccessStage] Access ALLOWED (All Stages) for Stage ID: $stageId');
+        return true;
+      }
+      final stageIds = List<String>.from(meta['stage_ids'] ?? []);
+      if (stageIds.isNotEmpty) {
+        final allowed = stageIds.contains(stageId);
+        LoggerService.instance.debug(
+          '🔍 [canAccessStage] Stage ID: $stageId | Target Stage IDs: $stageIds | Access: $allowed',
+        );
+        return allowed;
+      }
+    }
 
     final pkgStageId = getPackageStageId(userData);
     if (pkgStageId == null) return true;
-    return pkgStageId == stageId;
+    final allowed = (pkgStageId == stageId);
+    LoggerService.instance.debug(
+      '🔍 [canAccessStage Legacy] Stage ID: $stageId | Pkg Stage ID: $pkgStageId | Access: $allowed',
+    );
+    return allowed;
   }
 
   /// Checks whether a student can access a specific Grade.
@@ -129,12 +184,35 @@ class PackageAccessHelper {
 
     // Stage level check first (if stageId provided)
     if (stageId != null && !canAccessStage(userData: userData, stageId: stageId)) {
+      LoggerService.instance.debug('🔒 [canAccessGrade] Stage $stageId not allowed -> Grade $gradeId DENIED');
       return false;
+    }
+
+    final meta = _getScopeMeta(userData);
+    if (meta != null) {
+      if (meta['is_all_grades'] == true) {
+        LoggerService.instance.debug('🔓 [canAccessGrade] Access ALLOWED (All Grades) for Grade ID: $gradeId');
+        return true;
+      }
+      final gradeIds = List<String>.from(meta['grade_ids'] ?? []);
+      if (gradeIds.isNotEmpty) {
+        final allowed = gradeIds.contains(gradeId);
+        LoggerService.instance.debug(
+          '🔍 [canAccessGrade] Grade ID: $gradeId | Subset Grade IDs: $gradeIds | Access: $allowed',
+        );
+        return allowed;
+      }
+      LoggerService.instance.debug('🔓 [canAccessGrade] Access ALLOWED (No Grade Restrictions) for Grade ID: $gradeId');
+      return true;
     }
 
     final pkgGradeId = getPackageGradeId(userData);
     if (pkgGradeId == null) return true;
-    return pkgGradeId == gradeId;
+    final allowed = (pkgGradeId == gradeId);
+    LoggerService.instance.debug(
+      '🔍 [canAccessGrade Legacy] Grade ID: $gradeId | Pkg Grade ID: $pkgGradeId | Access: $allowed',
+    );
+    return allowed;
   }
 
   /// Checks whether a student can access a specific Section.
@@ -154,7 +232,26 @@ class PackageAccessHelper {
           stageId: stageId,
           gradeId: gradeId,
         )) {
+      LoggerService.instance.debug('🔒 [canAccessSection] Grade $gradeId not allowed -> Section $sectionId DENIED');
       return false;
+    }
+
+    final meta = _getScopeMeta(userData);
+    if (meta != null) {
+      if (meta['is_all_sections'] == true) {
+        LoggerService.instance.debug('🔓 [canAccessSection] Access ALLOWED (All Sections) for Section ID: $sectionId');
+        return true;
+      }
+      final sectionIds = List<String>.from(meta['section_ids'] ?? []);
+      if (sectionIds.isNotEmpty) {
+        final allowed = sectionIds.contains(sectionId);
+        LoggerService.instance.debug(
+          '🔍 [canAccessSection] Section ID: $sectionId | Subset Section IDs: $sectionIds | Access: $allowed',
+        );
+        return allowed;
+      }
+      LoggerService.instance.debug('🔓 [canAccessSection] Access ALLOWED (No Section Restrictions) for Section ID: $sectionId');
+      return true;
     }
 
     final pkgSectionId = getPackageSectionId(userData);
@@ -164,13 +261,6 @@ class PackageAccessHelper {
     final normSectionName = sectionName != null ? _normalizeArabic(sectionName) : null;
     final normPkgSectionTitle = pkgSectionTitle != null ? _normalizeArabic(pkgSectionTitle) : null;
     final normPkgName = _normalizeArabic(pkgName);
-
-    LoggerService.instance.debug(
-      '   ⚙️ [canAccessSection Analysis]\n'
-      '      targetSectionId: $sectionId, targetSectionName: $sectionName (norm: $normSectionName)\n'
-      '      pkgSectionId: $pkgSectionId, pkgSectionTitle: $pkgSectionTitle (norm: $normPkgSectionTitle)\n'
-      '      pkgName: $pkgName (norm: $normPkgName)',
-    );
 
     if (pkgSectionId != null) {
       if (pkgSectionId == sectionId) return true;
@@ -212,7 +302,26 @@ class PackageAccessHelper {
           gradeId: gradeId,
           stageId: stageId,
         )) {
+      LoggerService.instance.debug('🔒 [canAccessSubject] Section $sectionId not allowed -> Subject $subjectId DENIED');
       return false;
+    }
+
+    final meta = _getScopeMeta(userData);
+    if (meta != null) {
+      if (meta['is_all_subjects'] == true) {
+        LoggerService.instance.debug('🔓 [canAccessSubject] Access ALLOWED (All Subjects) for Subject ID: $subjectId');
+        return true;
+      }
+      final subjectIds = List<String>.from(meta['subject_ids'] ?? []);
+      if (subjectIds.isNotEmpty) {
+        final allowed = subjectIds.contains(subjectId);
+        LoggerService.instance.debug(
+          '🔍 [canAccessSubject] Subject ID: $subjectId | Subset Subject IDs: $subjectIds | Access: $allowed',
+        );
+        return allowed;
+      }
+      LoggerService.instance.debug('🔓 [canAccessSubject] Access ALLOWED (No Subject Restrictions) for Subject ID: $subjectId');
+      return true;
     }
 
     final pkgSubjectId = getPackageSubjectId(userData);
