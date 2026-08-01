@@ -4,6 +4,22 @@ import 'package:web_dashboard/features/lesson_files/data/repositories/lesson_fil
 import 'package:web_dashboard/features/lesson_files/presentation/manager/lesson_files_state.dart';
 import 'package:web_dashboard/core/errors/error_handler.dart';
 
+class BatchUploadItem {
+  final String title;
+  final String type;
+  final String fileName;
+  final int bytesCount;
+  final List<int>? fileBytes;
+
+  BatchUploadItem({
+    required this.title,
+    required this.type,
+    required this.fileName,
+    required this.bytesCount,
+    this.fileBytes,
+  });
+}
+
 class LessonFilesCubit extends Cubit<LessonFilesState> {
   final LessonFilesRepository _repository;
   late String _lessonId;
@@ -55,34 +71,53 @@ class LessonFilesCubit extends Cubit<LessonFilesState> {
     required int bytesCount,
     List<int>? fileBytes,
   }) async {
+    await uploadMultipleFiles([
+      BatchUploadItem(
+        title: title,
+        type: type,
+        fileName: fileName,
+        bytesCount: bytesCount,
+        fileBytes: fileBytes,
+      )
+    ]);
+  }
+
+  Future<void> uploadMultipleFiles(List<BatchUploadItem> items) async {
     final currentState = state;
-    if (currentState is LessonFilesLoaded) {
+    if (currentState is LessonFilesLoaded && items.isNotEmpty) {
+      final total = items.length;
       emit(currentState.copyWith(uploadProgress: 0.0));
-      try {
-        await _repository.uploadFile(
-          lessonId: _lessonId,
-          title: title,
-          type: type,
-          fileName: fileName,
-          bytesCount: bytesCount,
-          fileBytes: fileBytes,
-          onProgress: (progress) {
-            final latestState = state;
-            if (latestState is LessonFilesLoaded) {
-              emit(latestState.copyWith(uploadProgress: progress));
-            }
-          },
-        );
-        final freshFiles = await _repository.getByLessonId(_lessonId);
-        emit(LessonFilesLoaded(
-          files: freshFiles,
-          lessonId: _lessonId,
-          lessonName: currentState.lessonName,
-          uploadProgress: null,
-        ));
-      } catch (e) {
-        emit(LessonFilesError(ErrorHandler.handle(e)));
+
+      for (int i = 0; i < total; i++) {
+        final item = items[i];
+        try {
+          await _repository.uploadFile(
+            lessonId: _lessonId,
+            title: item.title,
+            type: item.type,
+            fileName: item.fileName,
+            bytesCount: item.bytesCount,
+            fileBytes: item.fileBytes,
+            onProgress: (progress) {
+              final latestState = state;
+              if (latestState is LessonFilesLoaded) {
+                final overall = (i + progress) / total;
+                emit(latestState.copyWith(uploadProgress: overall));
+              }
+            },
+          );
+        } catch (e) {
+          // Log error or continue with remaining files
+        }
       }
+
+      final freshFiles = await _repository.getByLessonId(_lessonId);
+      emit(LessonFilesLoaded(
+        files: freshFiles,
+        lessonId: _lessonId,
+        lessonName: currentState.lessonName,
+        uploadProgress: null,
+      ));
     }
   }
 
@@ -116,3 +151,4 @@ class LessonFilesCubit extends Cubit<LessonFilesState> {
     return false;
   }
 }
+

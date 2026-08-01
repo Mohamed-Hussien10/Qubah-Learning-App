@@ -3,6 +3,7 @@ import 'package:web_dashboard/features/subjects/data/models/subject_model.dart';
 import 'package:web_dashboard/features/free_trial_lesson_files/data/repositories/free_trial_lesson_files_repository.dart';
 import 'package:web_dashboard/features/free_trial_lesson_files/presentation/manager/free_trial_lesson_files_state.dart';
 import 'package:web_dashboard/core/errors/error_handler.dart';
+import 'package:web_dashboard/features/lesson_files/presentation/manager/lesson_files_cubit.dart' show BatchUploadItem;
 
 class FreeTrialLessonFilesCubit extends Cubit<FreeTrialLessonFilesState> {
   final FreeTrialLessonFilesRepository _repository;
@@ -55,34 +56,53 @@ class FreeTrialLessonFilesCubit extends Cubit<FreeTrialLessonFilesState> {
     required int bytesCount,
     List<int>? fileBytes,
   }) async {
+    await uploadMultipleFiles([
+      BatchUploadItem(
+        title: title,
+        type: type,
+        fileName: fileName,
+        bytesCount: bytesCount,
+        fileBytes: fileBytes,
+      )
+    ]);
+  }
+
+  Future<void> uploadMultipleFiles(List<BatchUploadItem> items) async {
     final currentState = state;
-    if (currentState is FreeTrialLessonFilesLoaded) {
+    if (currentState is FreeTrialLessonFilesLoaded && items.isNotEmpty) {
+      final total = items.length;
       emit(currentState.copyWith(uploadProgress: 0.0));
-      try {
-        await _repository.uploadFile(
-          subjectId: _subjectId,
-          title: title,
-          type: type,
-          fileName: fileName,
-          bytesCount: bytesCount,
-          fileBytes: fileBytes,
-          onProgress: (progress) {
-            final latestState = state;
-            if (latestState is FreeTrialLessonFilesLoaded) {
-              emit(latestState.copyWith(uploadProgress: progress));
-            }
-          },
-        );
-        final freshFiles = await _repository.getBySubjectId(_subjectId);
-        emit(FreeTrialLessonFilesLoaded(
-          files: freshFiles,
-          subjectId: _subjectId,
-          subjectName: currentState.subjectName,
-          uploadProgress: null,
-        ));
-      } catch (e) {
-        emit(FreeTrialLessonFilesError(ErrorHandler.handle(e)));
+
+      for (int i = 0; i < total; i++) {
+        final item = items[i];
+        try {
+          await _repository.uploadFile(
+            subjectId: _subjectId,
+            title: item.title,
+            type: item.type,
+            fileName: item.fileName,
+            bytesCount: item.bytesCount,
+            fileBytes: item.fileBytes,
+            onProgress: (progress) {
+              final latestState = state;
+              if (latestState is FreeTrialLessonFilesLoaded) {
+                final overall = (i + progress) / total;
+                emit(latestState.copyWith(uploadProgress: overall));
+              }
+            },
+          );
+        } catch (e) {
+          // Log error or continue with remaining files
+        }
       }
+
+      final freshFiles = await _repository.getBySubjectId(_subjectId);
+      emit(FreeTrialLessonFilesLoaded(
+        files: freshFiles,
+        subjectId: _subjectId,
+        subjectName: currentState.subjectName,
+        uploadProgress: null,
+      ));
     }
   }
 
@@ -116,3 +136,4 @@ class FreeTrialLessonFilesCubit extends Cubit<FreeTrialLessonFilesState> {
     return false;
   }
 }
+

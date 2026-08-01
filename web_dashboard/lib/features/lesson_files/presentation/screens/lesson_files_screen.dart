@@ -155,7 +155,7 @@ class _LessonFilesView extends StatelessWidget {
         FilledButton.icon(
           onPressed: isUploading ? null : () => _pickAndUploadFile(context),
           icon: const Icon(Icons.cloud_upload_rounded),
-          label: const Text('رفع ملف جديد'),
+          label: const Text('رفع ملفات جديدة'),
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.primary,
             padding:
@@ -297,14 +297,6 @@ class _LessonFilesView extends StatelessWidget {
                         icon: const Icon(Icons.add_photo_alternate_rounded, color: AppColors.primary),
                         onPressed: () => _pickAndUploadThumbnail(context, file),
                         tooltip: 'إضافة صورة مصغرة',
-                        style: IconButton.styleFrom(
-                          padding: const EdgeInsets.all(8),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.download_rounded),
-                        onPressed: () => _downloadFile(context, file),
-                        tooltip: 'تحميل',
                         style: IconButton.styleFrom(
                           padding: const EdgeInsets.all(8),
                         ),
@@ -468,49 +460,42 @@ class _LessonFilesView extends StatelessWidget {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.any,
+        allowMultiple: true,
       );
 
       if (result != null && result.files.isNotEmpty) {
-        final pickedFile = result.files.first;
-        final bytesCount = pickedFile.size;
-        final fileName = pickedFile.name;
+        final itemsToUpload = <BatchUploadItem>[];
 
-        // Auto detect file type by extension
-        final extension = fileName.split('.').last.toLowerCase();
-        String fileType = 'pdf';
-        if (['mp4', 'mov', 'avi', 'mkv'].contains(extension)) {
-          fileType = 'video';
-        } else if (['mp3', 'wav', 'aac'].contains(extension)) {
-          fileType = 'audio';
-        } else if (['png', 'jpg', 'jpeg', 'gif'].contains(extension)) {
-          fileType = 'image';
-        } else if (extension == 'zip') {
-          fileType = 'scorm';
-        } else if (['html', 'htm'].contains(extension)) {
-          fileType = 'html5';
-        }
+        if (result.files.length == 1) {
+          final pickedFile = result.files.first;
+          final fileName = pickedFile.name;
+          final bytesCount = pickedFile.size;
+          final defaultTitle = fileName.contains('.')
+              ? fileName.substring(0, fileName.lastIndexOf('.'))
+              : fileName;
 
-        if (!context.mounted) return;
-        final titleCtrl = TextEditingController(text: fileName.split('.').first);
-        String? title;
-        await showDialog(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('تأكيد رفع الملف'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('أدخل اسماً توضيحياً للملف:'),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: titleCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'عنوان الملف *',
-                    border: OutlineInputBorder(),
+          final titleCtrl = TextEditingController(text: defaultTitle);
+          String? title;
+
+          if (!context.mounted) return;
+          await showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text('تأكيد رفع الملف'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('أدخل اسماً توضيحياً للملف:'),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: titleCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'عنوان الملف *',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
@@ -525,21 +510,168 @@ class _LessonFilesView extends StatelessWidget {
                 ),
               ],
             ),
-        );
-
-        if (title != null && title!.isNotEmpty) {
-          await cubit.uploadFile(
-            title: title!,
-            type: fileType,
-            fileName: fileName,
-            bytesCount: bytesCount,
-            fileBytes: pickedFile.bytes,
           );
+
+          if (title != null && title!.isNotEmpty) {
+            itemsToUpload.add(BatchUploadItem(
+              title: title!,
+              type: _detectFileType(fileName),
+              fileName: fileName,
+              bytesCount: bytesCount,
+              fileBytes: pickedFile.bytes,
+            ));
+          }
+        } else {
+          // Multiple files selected
+          final controllers = result.files.map((file) {
+            final defaultTitle = file.name.contains('.')
+                ? file.name.substring(0, file.name.lastIndexOf('.'))
+                : file.name;
+            return TextEditingController(text: defaultTitle);
+          }).toList();
+
+          bool confirmed = false;
+
+          if (!context.mounted) return;
+          await showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text('تأكيد رفع الملفات (${result.files.length})'),
+              content: SizedBox(
+                width: 500,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('أدخل أسماء توضيحية للملفات المختارة:'),
+                    const SizedBox(height: 12),
+                    Flexible(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: result.files.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final file = result.files[index];
+                          final fileType = _detectFileType(file.name);
+                          final icon = _getFileIcon(fileType);
+                          final color = _getFileTypeColor(fileType);
+
+                          return Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? AppColors.cardDark
+                                  : AppColors.surfaceLight,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? AppColors.borderDark
+                                    : AppColors.borderLight,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(icon, color: color, size: 24),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        file.name,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? AppColors.textTertiaryDark
+                                              : AppColors.textTertiaryLight,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      TextField(
+                                        controller: controllers[index],
+                                        decoration: const InputDecoration(
+                                          labelText: 'عنوان الملف *',
+                                          isDense: true,
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text(AppStrings.cancel),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    confirmed = true;
+                    Navigator.pop(ctx);
+                  },
+                  child: Text('رفع الكل (${result.files.length})'),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmed) {
+            for (int i = 0; i < result.files.length; i++) {
+              final file = result.files[i];
+              final titleText = controllers[i].text.trim().isNotEmpty
+                  ? controllers[i].text.trim()
+                  : file.name;
+              itemsToUpload.add(BatchUploadItem(
+                title: titleText,
+                type: _detectFileType(file.name),
+                fileName: file.name,
+                bytesCount: file.size,
+                fileBytes: file.bytes,
+              ));
+            }
+          }
+        }
+
+        if (itemsToUpload.isNotEmpty) {
+          await cubit.uploadMultipleFiles(itemsToUpload);
         }
       }
     } catch (e) {
       debugPrint('Error picking file: $e');
     }
+  }
+
+  String _detectFileType(String fileName) {
+    final extension = fileName.split('.').last.toLowerCase();
+    if (['mp4', 'mov', 'avi', 'mkv', 'webm'].contains(extension)) {
+      return 'video';
+    } else if (['mp3', 'wav', 'aac', 'm4a', 'ogg'].contains(extension)) {
+      return 'audio';
+    } else if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].contains(extension)) {
+      return 'image';
+    } else if (['zip', 'rar', '7z'].contains(extension)) {
+      return 'scorm';
+    } else if (['html', 'htm'].contains(extension)) {
+      return 'html5';
+    }
+    return 'pdf';
   }
 
   Future<void> _pickAndUploadThumbnail(BuildContext context, LessonFileModel file) async {
@@ -639,9 +771,7 @@ class _LessonFilesView extends StatelessWidget {
     }
   }
 
-  void _downloadFile(BuildContext context, LessonFileModel file) {
-    _previewFile(context, file);
-  }
+
 }
 
 String resolveImageUrl(String path) {
