@@ -33,7 +33,12 @@ class LessonFileModel extends BaseEntity {
       type: json['type'] ?? 'pdf',
       fileUrl: json['file_url'] ?? json['file_path'] ?? '',
       fileSize: json['file_size'] ?? (json['metadata'] is Map ? json['metadata']['file_size'] : null) ?? '0 KB',
-      thumbnailUrl: json['thumbnail_url'],
+      thumbnailUrl: json['thumbnail_path'] as String? ??
+          json['thumbnail_url'] as String? ??
+          json['thumbnail'] as String? ??
+          json['file_thumbnail'] as String? ??
+          json['image_url'] as String? ??
+          json['image'] as String?,
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       order: json['order'] ?? 0,
       createdAt: json['created_at'] != null

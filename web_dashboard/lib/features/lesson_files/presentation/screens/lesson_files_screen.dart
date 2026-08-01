@@ -10,6 +10,8 @@ import 'package:web_dashboard/core/constants/app_colors.dart';
 import 'package:web_dashboard/core/constants/app_strings.dart';
 import 'package:web_dashboard/features/lesson_files/data/models/lesson_file_model.dart';
 import 'package:web_dashboard/features/lesson_files/presentation/manager/lesson_files_cubit.dart';
+import 'package:web_dashboard/core/widgets/smart_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_dashboard/core/services/dependency_injection.dart';
 import 'package:web_dashboard/features/lesson_files/presentation/manager/lesson_files_state.dart';
 
@@ -234,134 +236,111 @@ class _LessonFilesView extends StatelessWidget {
   Widget _buildFileCard(BuildContext context, LessonFileModel file, bool isDark) {
     final iconData = _getFileIcon(file.type);
     final themeColor = _getFileTypeColor(file.type);
+    final effectiveThumbnail = _getEffectiveThumbnail(file);
 
     return Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
         onTap: () => _previewFile(context, file),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top row: Type Icon + Actions
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Cover Thumbnail Banner
+            Expanded(
+              flex: 5,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-
-                  if (file.thumbnailUrl != null)
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: themeColor.withValues(alpha: 0.2), width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: themeColor.withValues(alpha: 0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          resolveImageUrl(file.thumbnailUrl!),
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, stack) {
-                            return Container(
-                              padding: const EdgeInsets.all(12),
-                              color: themeColor.withValues(alpha: 0.1),
-                              child: Icon(iconData, color: themeColor, size: 28),
-                            );
-                          },
+                  if (effectiveThumbnail != null)
+                    SmartImage(
+                      imageUrl: resolveImageUrl(effectiveThumbnail),
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, err, stack) => Container(
+                        color: themeColor.withValues(alpha: 0.15),
+                        child: Center(
+                          child: Icon(iconData, color: themeColor, size: 40),
                         ),
                       ),
                     )
                   else
                     Container(
-                      width: 56,
-                      height: 56,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: themeColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: themeColor.withValues(alpha: 0.2), width: 1.5),
+                      color: themeColor.withValues(alpha: 0.15),
+                      child: Center(
+                        child: Icon(iconData, color: themeColor, size: 40),
                       ),
-                      child: Icon(iconData, color: themeColor, size: 28),
                     ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.add_photo_alternate_rounded, color: AppColors.primary),
-                        onPressed: () => _pickAndUploadThumbnail(context, file),
-                        tooltip: 'إضافة صورة مصغرة',
-                        style: IconButton.styleFrom(
-                          padding: const EdgeInsets.all(8),
+                  // Top overlay: type badge & delete action
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    left: 8,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            file.type.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline_rounded,
-                            color: AppColors.error),
-                        onPressed: () => _confirmDelete(context, file),
-                        tooltip: AppStrings.delete,
-                        style: IconButton.styleFrom(
-                          padding: const EdgeInsets.all(8),
+                        Material(
+                          color: Colors.transparent,
+                          child: IconButton(
+                            icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
+                            onPressed: () => _confirmDelete(context, file),
+                            tooltip: AppStrings.delete,
+                            style: IconButton.styleFrom(
+                              backgroundColor: (isDark ? Colors.black : Colors.white).withValues(alpha: 0.85),
+                              padding: const EdgeInsets.all(6),
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
-              const Spacer(),
-              // Title
-              Text(
-                file.title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 6),
-              // Size & Type Badge
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    file.fileSize,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark
-                          ? AppColors.textTertiaryDark
-                          : AppColors.textTertiaryLight,
+            ),
+            // Bottom Details Area
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      file.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColors.surfaceDark
-                          : AppColors.backgroundLight,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
+                    const SizedBox(height: 4),
+                    Text(
+                      file.fileSize,
+                      style: TextStyle(
+                        fontSize: 12,
                         color: isDark
-                            ? AppColors.borderDark
-                            : AppColors.borderLight,
+                            ? AppColors.textTertiaryDark
+                            : AppColors.textTertiaryLight,
                       ),
                     ),
-                    child: Text(
-                      file.type.toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -674,54 +653,23 @@ class _LessonFilesView extends StatelessWidget {
     return 'pdf';
   }
 
-  Future<void> _pickAndUploadThumbnail(BuildContext context, LessonFileModel file) async {
-    final cubit = context.read<LessonFilesCubit>();
-    BuildContext? dialogContext;
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-      );
-
-      if (result != null && result.files.isNotEmpty) {
-        final pickedFile = result.files.first;
-        if (pickedFile.bytes != null) {
-          if (!context.mounted) return;
-          
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (ctx) {
-              dialogContext = ctx;
-              return const Center(child: CircularProgressIndicator());
-            },
-          );
-
-          try {
-            final success = await cubit.uploadThumbnail(
-              fileId: file.id,
-              thumbnailBytes: pickedFile.bytes!,
-              thumbnailFileName: pickedFile.name,
-            );
-
-            if (success && context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم رفع الصورة المصغرة بنجاح'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-            }
-          } finally {
-            if (dialogContext != null && dialogContext!.mounted) {
-              Navigator.pop(dialogContext!);
-            }
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Error picking thumbnail: $e');
+  String? _getEffectiveThumbnail(LessonFileModel file) {
+    if (file.thumbnailUrl != null && file.thumbnailUrl!.isNotEmpty) {
+      return file.thumbnailUrl;
     }
+    if (sl.isRegistered<SharedPreferences>()) {
+      final prefs = sl<SharedPreferences>();
+      final type = file.type.toLowerCase();
+      final defaultKey = 'stage_file_thumb_$type';
+      final defaultUrl = prefs.getString(defaultKey);
+      if (defaultUrl != null && defaultUrl.isNotEmpty) {
+        return defaultUrl;
+      }
+    }
+    return null;
   }
+
+
 
   void _confirmDelete(BuildContext context, LessonFileModel file) {
     showDialog(
@@ -776,6 +724,7 @@ class _LessonFilesView extends StatelessWidget {
 
 String resolveImageUrl(String path) {
   if (path.isEmpty) return '';
+  if (path.startsWith('data:')) return path;
   if (path.contains('thumbnails/')) {
     final fileName = path.split('thumbnails/').last;
     return 'https://qubahom.com/api/v1/thumbnails/$fileName';

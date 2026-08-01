@@ -125,6 +125,12 @@ final List<SidebarSection> sidebarSections = [
         activeIcon: Icons.card_membership_rounded,
         route: '/packages',
       ),
+      SidebarItem(
+        label: AppStrings.stageFileThumbnails,
+        icon: Icons.photo_library_outlined,
+        activeIcon: Icons.photo_library_rounded,
+        route: '/stage-file-thumbnails',
+      ),
     ],
   ),
   // Reports & Settings

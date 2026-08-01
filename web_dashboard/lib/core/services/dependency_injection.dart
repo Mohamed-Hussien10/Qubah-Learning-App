@@ -19,6 +19,7 @@ import 'package:web_dashboard/features/analytics/data/repositories/analytics_rep
 import 'package:web_dashboard/features/settings/data/repositories/settings_repository.dart';
 import 'package:web_dashboard/features/dashboard/data/repositories/dashboard_repository.dart';
 import 'package:web_dashboard/features/packages/data/repositories/packages_repository.dart';
+import 'package:web_dashboard/features/stage_file_thumbnails/data/repositories/stage_file_thumbnails_repository.dart';
 
 // Cubits
 import 'package:web_dashboard/features/authentication/presentation/manager/auth_cubit.dart';
@@ -34,6 +35,7 @@ import 'package:web_dashboard/features/analytics/presentation/manager/analytics_
 import 'package:web_dashboard/features/settings/presentation/manager/settings_cubit.dart';
 import 'package:web_dashboard/features/dashboard/presentation/manager/dashboard_cubit.dart';
 import 'package:web_dashboard/features/packages/presentation/manager/packages_cubit.dart';
+import 'package:web_dashboard/features/stage_file_thumbnails/presentation/manager/stage_file_thumbnails_cubit.dart';
 
 // Free Trial
 import 'package:web_dashboard/features/free_trial_stages/data/repositories/free_trial_stages_repository.dart';
@@ -82,6 +84,9 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<SettingsRepository>(() => SettingsRepository(sl<ApiClient>()));
   sl.registerLazySingleton<DashboardRepository>(() => DashboardRepository(sl<ApiClient>()));
   sl.registerLazySingleton<PackagesRepository>(() => PackagesRepository(sl<ApiClient>()));
+  sl.registerLazySingleton<StageFileThumbnailsRepository>(
+    () => StageFileThumbnailsRepository(sl<ApiClient>(), sl<SharedPreferences>()),
+  );
 
   sl.registerLazySingleton<FreeTrialStagesRepository>(() => FreeTrialStagesRepository(sl<ApiClient>()));
   sl.registerLazySingleton<FreeTrialGradesRepository>(() => FreeTrialGradesRepository(sl<ApiClient>()));
@@ -127,6 +132,12 @@ Future<void> initDependencies() async {
   );
   sl.registerFactory<PackagesCubit>(
     () => PackagesCubit(repository: sl<PackagesRepository>()),
+  );
+  sl.registerFactory<StageFileThumbnailsCubit>(
+    () => StageFileThumbnailsCubit(
+      stagesRepository: sl<StagesRepository>(),
+      thumbnailsRepository: sl<StageFileThumbnailsRepository>(),
+    ),
   );
 
   sl.registerFactory<FreeTrialStagesCubit>(

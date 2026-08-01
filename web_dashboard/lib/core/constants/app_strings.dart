@@ -23,6 +23,7 @@ class AppStrings {
 
   // ── Free Trial ───────────────────────────────────────────────────────
   static const String packages = 'باقات الاشتراك';
+  static const String stageFileThumbnails = 'صور مصغرة للملفات';
   static const String package = 'باقة';
   static const String addPackage = 'إضافة باقة جديدة';
   static const String editPackage = 'تعديل الباقة';

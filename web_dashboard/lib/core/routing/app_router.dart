@@ -20,6 +20,7 @@ import 'package:web_dashboard/features/free_trial_grades/presentation/screens/fr
 import 'package:web_dashboard/features/free_trial_subjects/presentation/screens/free_trial_subjects_screen.dart';
 import 'package:web_dashboard/features/free_trial_lesson_files/presentation/screens/free_trial_lesson_files_screen.dart';
 import 'package:web_dashboard/features/packages/presentation/screens/packages_screen.dart';
+import 'package:web_dashboard/features/stage_file_thumbnails/presentation/screens/stage_file_thumbnails_screen.dart';
 import 'package:web_dashboard/core/widgets/dashboard_shell.dart';
 
 class NavigationState {
@@ -136,6 +137,10 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/packages',
           builder: (context, state) => const PackagesScreen(),
+        ),
+        GoRoute(
+          path: '/stage-file-thumbnails',
+          builder: (context, state) => const StageFileThumbnailsScreen(),
         ),
         GoRoute(
           path: '/free-trial-stages',
