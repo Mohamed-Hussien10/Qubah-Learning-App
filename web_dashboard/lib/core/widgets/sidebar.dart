@@ -131,6 +131,12 @@ final List<SidebarSection> sidebarSections = [
         activeIcon: Icons.photo_library_rounded,
         route: '/stage-file-thumbnails',
       ),
+      SidebarItem(
+        label: 'صور مصغرة للملفات التجريبية',
+        icon: Icons.photo_album_outlined,
+        activeIcon: Icons.photo_album_rounded,
+        route: '/free-trial-file-thumbnails',
+      ),
     ],
   ),
   // Reports & Settings

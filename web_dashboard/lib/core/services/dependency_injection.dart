@@ -136,6 +136,7 @@ Future<void> initDependencies() async {
   sl.registerFactory<StageFileThumbnailsCubit>(
     () => StageFileThumbnailsCubit(
       stagesRepository: sl<StagesRepository>(),
+      freeTrialStagesRepository: sl<FreeTrialStagesRepository>(),
       thumbnailsRepository: sl<StageFileThumbnailsRepository>(),
     ),
   );

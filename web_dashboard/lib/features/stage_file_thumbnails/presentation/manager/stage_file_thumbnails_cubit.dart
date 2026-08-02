@@ -1,24 +1,43 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/educational_stages/data/models/stage_model.dart';
 import 'package:web_dashboard/features/educational_stages/data/repositories/stages_repository.dart';
+import 'package:web_dashboard/features/free_trial_stages/data/repositories/free_trial_stages_repository.dart';
 import 'package:web_dashboard/features/stage_file_thumbnails/data/repositories/stage_file_thumbnails_repository.dart';
 import 'package:web_dashboard/features/stage_file_thumbnails/presentation/manager/stage_file_thumbnails_state.dart';
 
 class StageFileThumbnailsCubit extends Cubit<StageFileThumbnailsState> {
   final StagesRepository _stagesRepository;
+  final FreeTrialStagesRepository _freeTrialStagesRepository;
   final StageFileThumbnailsRepository _thumbnailsRepository;
 
   StageFileThumbnailsCubit({
     required StagesRepository stagesRepository,
+    required FreeTrialStagesRepository freeTrialStagesRepository,
     required StageFileThumbnailsRepository thumbnailsRepository,
   })  : _stagesRepository = stagesRepository,
+        _freeTrialStagesRepository = freeTrialStagesRepository,
         _thumbnailsRepository = thumbnailsRepository,
         super(const StageFileThumbnailsInitial());
 
-  Future<void> loadData() async {
+  Future<void> loadData({bool isFreeTrial = false}) async {
     emit(const StageFileThumbnailsLoading());
     try {
-      var stages = await _stagesRepository.getAll();
+      List<StageModel> stages = [];
+      if (isFreeTrial) {
+        final ftStages = await _freeTrialStagesRepository.getAll();
+        stages = ftStages.map((ft) => StageModel(
+          id: ft.id,
+          title: ft.title,
+          description: ft.description,
+          thumbnailUrl: ft.thumbnailUrl,
+          isActive: ft.isActive,
+          order: ft.order,
+          createdAt: ft.createdAt,
+        )).toList();
+      } else {
+        stages = await _stagesRepository.getAll();
+      }
+
       if (stages.isEmpty) {
         stages = StageModel.dummyList;
       }

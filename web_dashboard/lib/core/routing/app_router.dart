@@ -140,7 +140,11 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: '/stage-file-thumbnails',
-          builder: (context, state) => const StageFileThumbnailsScreen(),
+          builder: (context, state) => const StageFileThumbnailsScreen(isFreeTrial: false),
+        ),
+        GoRoute(
+          path: '/free-trial-file-thumbnails',
+          builder: (context, state) => const StageFileThumbnailsScreen(isFreeTrial: true),
         ),
         GoRoute(
           path: '/free-trial-stages',

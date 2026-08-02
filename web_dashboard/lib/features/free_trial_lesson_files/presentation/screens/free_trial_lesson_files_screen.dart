@@ -294,17 +294,23 @@ class _FreeTrialLessonFilesView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Material(
-                          color: Colors.transparent,
-                          child: IconButton(
-                            icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
-                            onPressed: () => _confirmDelete(context, file),
-                            tooltip: AppStrings.delete,
-                            style: IconButton.styleFrom(
-                              backgroundColor: (isDark ? Colors.black : Colors.white).withValues(alpha: 0.85),
-                              padding: const EdgeInsets.all(6),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+
+                            Material(
+                              color: Colors.transparent,
+                              child: IconButton(
+                                icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
+                                onPressed: () => _confirmDelete(context, file),
+                                tooltip: AppStrings.delete,
+                                style: IconButton.styleFrom(
+                                  backgroundColor: (isDark ? Colors.black : Colors.white).withValues(alpha: 0.85),
+                                  padding: const EdgeInsets.all(6),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -439,7 +445,8 @@ class _FreeTrialLessonFilesView extends StatelessWidget {
     final cubit = context.read<FreeTrialLessonFilesCubit>();
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.any,
+        type: FileType.custom,
+        allowedExtensions: ['mp4', 'mov', 'avi', 'mkv', 'webm', 'mp3', 'wav', 'aac', 'm4a', 'ogg', 'zip', 'rar', '7z', 'pdf'],
         allowMultiple: true,
       );
 
@@ -638,18 +645,15 @@ class _FreeTrialLessonFilesView extends StatelessWidget {
     }
   }
 
+
   String _detectFileType(String fileName) {
     final extension = fileName.split('.').last.toLowerCase();
     if (['mp4', 'mov', 'avi', 'mkv', 'webm'].contains(extension)) {
       return 'video';
     } else if (['mp3', 'wav', 'aac', 'm4a', 'ogg'].contains(extension)) {
       return 'audio';
-    } else if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].contains(extension)) {
-      return 'image';
     } else if (['zip', 'rar', '7z'].contains(extension)) {
       return 'scorm';
-    } else if (['html', 'htm'].contains(extension)) {
-      return 'html5';
     }
     return 'pdf';
   }
@@ -661,7 +665,7 @@ class _FreeTrialLessonFilesView extends StatelessWidget {
     if (sl.isRegistered<SharedPreferences>()) {
       final prefs = sl<SharedPreferences>();
       final type = file.type.toLowerCase();
-      final defaultKey = 'stage_file_thumb_$type';
+      final defaultKey = 'stage_file_thumb_free_trial_$type';
       final defaultUrl = prefs.getString(defaultKey);
       if (defaultUrl != null && defaultUrl.isNotEmpty) {
         return defaultUrl;

@@ -11,64 +11,87 @@ import 'package:web_dashboard/features/stage_file_thumbnails/presentation/manage
 import 'package:web_dashboard/features/stage_file_thumbnails/presentation/manager/stage_file_thumbnails_state.dart';
 
 class StageFileThumbnailsScreen extends StatelessWidget {
-  const StageFileThumbnailsScreen({super.key});
+  final bool isFreeTrial;
+  const StageFileThumbnailsScreen({super.key, this.isFreeTrial = false});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => sl<StageFileThumbnailsCubit>()..loadData(),
-      child: const _StageFileThumbnailsView(),
+      create: (_) => sl<StageFileThumbnailsCubit>()..loadData(isFreeTrial: isFreeTrial),
+      child: _StageFileThumbnailsView(isFreeTrial: isFreeTrial),
     );
   }
 }
 
 class _StageFileThumbnailsView extends StatelessWidget {
-  const _StageFileThumbnailsView();
+  final bool isFreeTrial;
+  const _StageFileThumbnailsView({required this.isFreeTrial});
 
-  static const List<Map<String, dynamic>> _fileFormats = [
-    {
-      'key': 'pdf',
-      'name': 'ملفات PDF',
-      'icon': Icons.picture_as_pdf_rounded,
-      'color': AppColors.error,
-      'description': 'الصورة المصغرة الافتراضية للمستندات والملفات النصية',
-    },
-    {
-      'key': 'video',
-      'name': 'الفيديوهات',
-      'icon': Icons.video_library_rounded,
-      'color': AppColors.primary,
-      'description': 'الصورة المصغرة الافتراضية لمقاطع الفيديو الدروس',
-    },
-    {
-      'key': 'audio',
-      'name': 'الملفات الصوتية',
-      'icon': Icons.audiotrack_rounded,
-      'color': AppColors.accent,
-      'description': 'الصورة المصغرة الافتراضية للشروحات والقصائد الصوتية',
-    },
-    {
-      'key': 'image',
-      'name': 'الصور والرسومات',
-      'icon': Icons.image_rounded,
-      'color': AppColors.warning,
-      'description': 'الصورة المصغرة الافتراضية للبطاقات التوضيحية والإنفوجرافيك',
-    },
-    {
-      'key': 'scorm',
-      'name': 'حزم SCORM',
-      'icon': Icons.webhook_rounded,
-      'color': AppColors.success,
-      'description': 'الصورة المصغرة الافتراضية للمحتوى التفاعلي المنظم',
-    },
-    {
-      'key': 'html5',
-      'name': 'محتوى HTML5',
-      'icon': Icons.html_rounded,
-      'color': AppColors.info,
-      'description': 'الصورة المصغرة الافتراضية للألعاب والأنشطة التفاعلية',
-    },
-  ];
+  List<Map<String, dynamic>> get _currentFormats {
+    if (isFreeTrial) {
+      return [
+        {
+          'key': 'free_trial_pdf',
+          'name': 'ملفات PDF (تجريبي)',
+          'icon': Icons.picture_as_pdf_rounded,
+          'color': AppColors.error,
+          'description': 'الصورة المصغرة لملفات PDF المجانية',
+        },
+        {
+          'key': 'free_trial_video',
+          'name': 'فيديو (تجريبي)',
+          'icon': Icons.video_library_rounded,
+          'color': AppColors.primary,
+          'description': 'الصورة المصغرة لمقاطع الفيديو المجانية',
+        },
+        {
+          'key': 'free_trial_audio',
+          'name': 'صوتيات (تجريبي)',
+          'icon': Icons.audiotrack_rounded,
+          'color': AppColors.accent,
+          'description': 'الصورة المصغرة للملفات الصوتية المجانية',
+        },
+        {
+          'key': 'free_trial_scorm',
+          'name': 'SCORM (تجريبي)',
+          'icon': Icons.webhook_rounded,
+          'color': AppColors.success,
+          'description': 'الصورة المصغرة للملفات التفاعلية المجانية',
+        },
+      ];
+    } else {
+      return [
+        {
+          'key': 'pdf',
+          'name': 'ملفات PDF',
+          'icon': Icons.picture_as_pdf_rounded,
+          'color': AppColors.error,
+          'description': 'الصورة المصغرة الافتراضية للمستندات والملفات النصية',
+        },
+        {
+          'key': 'video',
+          'name': 'الفيديوهات',
+          'icon': Icons.video_library_rounded,
+          'color': AppColors.primary,
+          'description': 'الصورة المصغرة الافتراضية لمقاطع الفيديو الدروس',
+        },
+        {
+          'key': 'audio',
+          'name': 'الملفات الصوتية',
+          'icon': Icons.audiotrack_rounded,
+          'color': AppColors.accent,
+          'description': 'الصورة المصغرة الافتراضية للشروحات والقصائد الصوتية',
+        },
+        {
+          'key': 'scorm',
+          'name': 'حزم SCORM',
+          'icon': Icons.webhook_rounded,
+          'color': AppColors.success,
+          'description': 'الصورة المصغرة الافتراضية للمحتوى التفاعلي المنظم',
+        },
+      ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +165,7 @@ class _StageFileThumbnailsView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'صور مصغرة للملفات بحسب المرحلة',
+              isFreeTrial ? 'صور مصغرة للملفات التجريبية' : 'صور مصغرة للملفات بحسب المرحلة',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
@@ -236,9 +259,9 @@ class _StageFileThumbnailsView extends StatelessWidget {
         mainAxisSpacing: 20,
         childAspectRatio: 1.1,
       ),
-      itemCount: _fileFormats.length,
+      itemCount: _currentFormats.length,
       itemBuilder: (context, index) {
-        final formatInfo = _fileFormats[index];
+        final formatInfo = _currentFormats[index];
         final formatKey = formatInfo['key'] as String;
         final currentUrl = state.thumbnails[formatKey];
 
