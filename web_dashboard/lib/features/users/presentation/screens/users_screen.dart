@@ -115,6 +115,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
     // Headers
     sheet.appendRow([
       TextCellValue('المعرف'),
+      TextCellValue('الاسم'),
       TextCellValue('البريد / اسم المستخدم'),
       TextCellValue('الدور'),
       TextCellValue('الحالة'),
@@ -126,6 +127,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
     for (final user in users) {
       sheet.appendRow([
         TextCellValue(user.id.toString()),
+        TextCellValue(user.name),
         TextCellValue(user.username),
         TextCellValue(user.roleLabel),
         TextCellValue(user.statusLabel),
@@ -384,6 +386,10 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                         fixedWidth: 56,
                       ),
                       DataColumn2(
+                        label: Text('الاسم', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                        size: ColumnSize.M,
+                      ),
+                      DataColumn2(
                         label: Text('البريد / اسم المستخدم', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
                         size: ColumnSize.L,
                       ),
@@ -435,7 +441,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                                   radius: 18,
                                   backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                                   child: Text(
-                                    user.username.isNotEmpty ? user.username[0].toUpperCase() : '?',
+                                    user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
                                     style: GoogleFonts.cairo(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
@@ -445,12 +451,22 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    user.username,
+                                    user.name,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
                                   ),
                                 ),
                               ],
+                            ),
+                          ),
+                          DataCell(
+                            Text(
+                              user.username,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                              ),
                             ),
                           ),
                           DataCell(_buildRoleChip(user.role)),

@@ -54,14 +54,14 @@ class ProfileScreen extends StatelessWidget {
                   FutureBuilder<UserEntity?>(
                     future: sl<AuthRepository>().getCachedUser(),
                     builder: (context, snapshot) {
-                      String email = 'طالب';
+                      String name = 'طالب';
                       String stage = 'غير محدد';
                       String grade = 'غير محدد';
 
                       UserEntity? user;
                       if (snapshot.hasData && snapshot.data != null) {
                         user = snapshot.data!;
-                        email = user.email.isNotEmpty ? user.email : email;
+                        name = user.name.isNotEmpty ? user.name : name;
                         stage = user.stageName ?? stage;
                         grade = user.gradeName ?? grade;
                       }
@@ -69,7 +69,7 @@ class ProfileScreen extends StatelessWidget {
                       return Column(
                         children: [
                           Text(
-                            email,
+                            name,
                             style: GoogleFonts.cairo(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
