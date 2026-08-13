@@ -356,6 +356,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: DataTable2(
+                    showCheckboxColumn: false,
                     columnSpacing: 12,
                     horizontalMargin: 16,
                     dataRowHeight: 64,
