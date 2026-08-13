@@ -93,7 +93,7 @@ class UserModel {
     return UserModel(
       id: model.id,
       name: model.name,
-      email: model.email,
+      email: model.email.replaceAll('@qubah.app', ''),
       avatarUrl: model.avatarUrl,
       phone: model.phone,
       stageId: model.stageId,

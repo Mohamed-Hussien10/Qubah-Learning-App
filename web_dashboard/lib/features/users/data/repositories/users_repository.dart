@@ -28,7 +28,7 @@ class UsersRepository {
 
   Future<UserModel> create({
     required String name,
-    required String email,
+    required String username,
     required String password,
     required UserRole role,
     bool isActive = true,
@@ -39,7 +39,7 @@ class UsersRepository {
   }) async {
     final payload = {
       'name': name,
-      'email': email,
+      'email': username.contains('@') ? username : '$username@qubah.app',
       'password': password,
       'password_confirmation': password,
       'role': role.name,

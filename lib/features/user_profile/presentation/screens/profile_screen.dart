@@ -54,15 +54,13 @@ class ProfileScreen extends StatelessWidget {
                   FutureBuilder<UserEntity?>(
                     future: sl<AuthRepository>().getCachedUser(),
                     builder: (context, snapshot) {
-                      String name = 'اسم الطالب';
-                      String email = 'طالب@مثال.com';
+                      String email = 'طالب';
                       String stage = 'غير محدد';
                       String grade = 'غير محدد';
 
                       UserEntity? user;
                       if (snapshot.hasData && snapshot.data != null) {
                         user = snapshot.data!;
-                        name = user.name.isNotEmpty ? user.name : name;
                         email = user.email.isNotEmpty ? user.email : email;
                         stage = user.stageName ?? stage;
                         grade = user.gradeName ?? grade;
@@ -71,34 +69,13 @@ class ProfileScreen extends StatelessWidget {
                       return Column(
                         children: [
                           Text(
-                            name,
+                            email,
                             style: GoogleFonts.cairo(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ).animate().fadeIn(delay: 200.ms),
-                          const SizedBox(height: 4),
-                          Text(
-                            email,
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-                            ),
-                          ).animate().fadeIn(delay: 300.ms),
                           const SizedBox(height: 32),
-
-                          // Stage & Grade Info Card
-                          _ProfileMenuItem(
-                                icon: Icons.school_rounded,
-                                title: 'المرحلة والصف',
-                                subtitle: '$stage - $grade',
-                                onTap: () {},
-                              )
-                              .animate()
-                              .fadeIn(delay: 400.ms)
-                              .slideY(begin: 0.1, end: 0),
-                          const SizedBox(height: 16),
 
                           // Student Package Card
                           _StudentPackageCard(user: user)
@@ -222,7 +199,9 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
     final bool isActive = widget.user?.isSubscriptionValid ?? false;
     final package = _fetchedPackage ?? widget.user?.package;
     final String packageName = package?.name ?? 'الباقة الفعالة';
-    final String scopeText = package?.scopeText ?? '${widget.user?.stageName ?? "المرحلة"} - ${widget.user?.gradeName ?? "الصف"}';
+    final String scopeText =
+        package?.scopeText ??
+        '${widget.user?.stageName ?? "المرحلة"} - ${widget.user?.gradeName ?? "الصف"}';
     final String scopeLevelLabel = package?.scopeLevelLabel ?? 'باقة شاملة';
 
     final exp = widget.user?.subscriptionExpiry;
@@ -242,11 +221,12 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
         ),
         boxShadow: [
           BoxShadow(
-            color: (isActive ? AppColors.primary : AppColors.error)
-                .withValues(alpha: 0.08),
+            color: (isActive ? AppColors.primary : AppColors.error).withValues(
+              alpha: 0.08,
+            ),
             blurRadius: 16,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       padding: const EdgeInsets.all(20),
@@ -291,7 +271,9 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                           height: 14,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primary,
+                            ),
                           ),
                         ),
                       ),
@@ -299,11 +281,14 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
-                  color: (isActive ? Colors.green : Colors.red)
-                      .withValues(alpha: 0.12),
+                  color: (isActive ? Colors.green : Colors.red).withValues(
+                    alpha: 0.12,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -343,8 +328,11 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.layers_outlined,
-                            size: 16, color: Colors.grey.shade600),
+                        Icon(
+                          Icons.layers_outlined,
+                          size: 16,
+                          color: Colors.grey.shade600,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'نطاق الباقة',
@@ -366,7 +354,9 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                     const SizedBox(height: 2),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(6),
@@ -390,8 +380,11 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.event_outlined,
-                            size: 16, color: Colors.grey.shade600),
+                        Icon(
+                          Icons.event_outlined,
+                          size: 16,
+                          color: Colors.grey.shade600,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'تاريخ الانتهاء',
@@ -427,9 +420,7 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                     builder: (ctx) => AlertDialog(
                       title: Text(
                         'تفعيل اشتراك',
-                        style: GoogleFonts.cairo(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
                       ),
                       content: Text(
                         'عزيزي الطالب، يرجى التواصل مع إدارة التطبيق أو استخدام كود التفعيل لتجديد اشتراكك.',
@@ -465,82 +456,6 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
             ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _ProfileMenuItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  const _ProfileMenuItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardTheme.color,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: AppColors.primary, size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.cairo(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Theme.of(
-                          context,
-                        ).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 16,
-                color: Colors.grey,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -592,7 +507,11 @@ class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
     if (result != null && result.files.single.path != null) {
       final path = result.files.single.path!;
       final prefs = await SharedPreferences.getInstance();
-      final userId = _userId ?? (await sl<AuthRepository>().getCachedUser())?.id ?? await sl<SecureStorage>().getUserId() ?? 'guest';
+      final userId =
+          _userId ??
+          (await sl<AuthRepository>().getCachedUser())?.id ??
+          await sl<SecureStorage>().getUserId() ??
+          'guest';
       await prefs.setString('user_profile_image_$userId', path);
       if (mounted) {
         setState(() {
@@ -622,9 +541,7 @@ class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
             onTap: _pickImage,
             child: CircleAvatar(
               radius: 60,
-              backgroundColor: AppColors.primary.withValues(
-                alpha: 0.1,
-              ),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
               backgroundImage: avatarImage,
               child: avatarImage == null
                   ? const Icon(

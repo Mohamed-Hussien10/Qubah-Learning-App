@@ -23,7 +23,7 @@ class AdminModel extends Equatable {
     return AdminModel(
       id: json['id'] as int? ?? 0,
       name: json['name'] as String? ?? '',
-      email: json['email'] as String? ?? '',
+      email: (json['email'] as String? ?? '').replaceAll('@qubah.app', ''),
       role: json['role'] as String? ?? 'admin',
       token: json['token'] as String? ?? '',
       createdAt: json['created_at'] != null

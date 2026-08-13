@@ -18,11 +18,11 @@ class AuthCubit extends Cubit<AuthState> {
        super(AuthInitial());
 
   /// Attempts to log in with the given credentials.
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({required String username, required String password}) async {
     emit(AuthLoading());
     try {
       final user = await _loginUseCase(
-        LoginParams(email: email, password: password),
+        LoginParams(username: username, password: password),
       );
       emit(AuthAuthenticated(user));
     } catch (e) {

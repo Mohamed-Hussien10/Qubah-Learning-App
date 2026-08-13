@@ -6,7 +6,7 @@ enum UserRole { admin, student }
 class UserModel extends Equatable {
   final int id;
   final String name;
-  final String email;
+  final String username;
   final UserRole role;
   final bool isActive;
   final int? stageId;
@@ -20,7 +20,7 @@ class UserModel extends Equatable {
   const UserModel({
     required this.id,
     required this.name,
-    required this.email,
+    required this.username,
     required this.role,
     required this.isActive,
     this.stageId,
@@ -53,7 +53,7 @@ class UserModel extends Equatable {
   UserModel copyWith({
     int? id,
     String? name,
-    String? email,
+    String? username,
     UserRole? role,
     bool? isActive,
     int? stageId,
@@ -67,7 +67,7 @@ class UserModel extends Equatable {
     return UserModel(
       id: id ?? this.id,
       name: name ?? this.name,
-      email: email ?? this.email,
+      username: username ?? this.username,
       role: role ?? this.role,
       isActive: isActive ?? this.isActive,
       stageId: stageId ?? this.stageId,
@@ -89,7 +89,7 @@ class UserModel extends Equatable {
     return UserModel(
       id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
       name: json['name'] as String? ?? '',
-      email: json['email'] as String? ?? '',
+      username: (json['email'] as String? ?? '').replaceAll('@qubah.app', ''),
       role: UserRole.values.firstWhere(
         (e) => e.name == json['role'],
         orElse: () => UserRole.student,
@@ -114,7 +114,7 @@ class UserModel extends Equatable {
     return {
       'id': id,
       'name': name,
-      'email': email,
+      'email': username.contains('@') ? username : '$username@qubah.app',
       'role': role.name,
       'is_active': isActive,
       'stage_id': stageId,
@@ -130,7 +130,7 @@ class UserModel extends Equatable {
     UserModel(
       id: 1,
       name: 'أحمد محمد علي',
-      email: 'ahmed@example.com',
+      username: 'ahmed_example',
       role: UserRole.admin,
       isActive: true,
       createdAt: DateTime(2024, 1, 15),
@@ -143,7 +143,7 @@ class UserModel extends Equatable {
   List<Object?> get props => [
         id,
         name,
-        email,
+        username,
         role,
         isActive,
         stageId,

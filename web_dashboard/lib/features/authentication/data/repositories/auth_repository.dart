@@ -22,7 +22,7 @@ class AuthRepository {
       final response = await _apiClient.post(
         '/auth/login',
         data: {
-          'email': email,
+          'email': email.contains('@') ? email : '$email@qubah.app',
           'password': password,
         },
       );

@@ -22,13 +22,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity> login({
-    required String email,
+    required String username,
     required String password,
   }) async {
     if (!await _networkInfo.isConnected) {
       throw const NetworkException();
     }
-    final result = await _apiService.login(email: email, password: password);
+    final result = await _apiService.login(username: username, password: password);
     final user = result['user'] as UserModel;
     final accessToken = result['access_token'] as String;
     final refreshToken = result['refresh_token'] as String;

@@ -13,16 +13,19 @@ class AuthApiService {
 
   /// Authenticates user with email/password. Returns [UserModel] and tokens.
   Future<Map<String, dynamic>> login({
-    required String email,
+    required String username,
     required String password,
   }) async {
     if (kDebugMode) {
-      LoggerService.instance.debug('Login attempt (email masked)');
+      LoggerService.instance.debug('Login attempt (username masked)');
     }
     try {
       final response = await _dioClient.post(
         ApiEndpoints.login,
-        data: {'email': email, 'password': password},
+        data: {
+          'email': username.contains('@') ? username : '$username@qubah.app',
+          'password': password
+        },
       );
       if (kDebugMode) {
         LoggerService.instance.debug('Login response received successfully');

@@ -9,13 +9,13 @@ class LoginUseCase implements UseCase<UserEntity, LoginParams> {
 
   @override
   Future<UserEntity> call(LoginParams params) {
-    return _repository.login(email: params.email, password: params.password);
+    return _repository.login(username: params.username, password: params.password);
   }
 }
 
 /// Parameters for the login use case.
 class LoginParams {
-  final String email;
+  final String username;
   final String password;
-  const LoginParams({required this.email, required this.password});
+  const LoginParams({required this.username, required this.password});
 }

@@ -28,7 +28,7 @@ class UsersCubit extends Cubit<UsersState> {
 
   Future<void> createUser({
     required String name,
-    required String email,
+    required String username,
     required String password,
     required UserRole role,
     bool isActive = true,
@@ -40,7 +40,7 @@ class UsersCubit extends Cubit<UsersState> {
     try {
       await _repository.create(
         name: name,
-        email: email,
+        username: username,
         password: password,
         role: role,
         isActive: isActive,
@@ -167,7 +167,7 @@ class UsersCubit extends Cubit<UsersState> {
       filtered = filtered
           .where((u) =>
               u.name.contains(state.searchQuery) ||
-              u.email.contains(state.searchQuery))
+              u.username.contains(state.searchQuery))
           .toList();
     }
 

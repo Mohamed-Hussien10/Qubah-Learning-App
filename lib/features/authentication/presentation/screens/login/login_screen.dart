@@ -20,13 +20,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -174,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         CrossAxisAlignment.stretch,
                                     children: [
                                       Text(
-                                        'البريد الإلكتروني',
+                                        'اسم المستخدم',
                                         style: GoogleFonts.cairo(
                                           color: AppColors.hessaTextBrown,
                                           fontWeight: FontWeight.bold,
@@ -183,13 +183,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       const SizedBox(height: 8),
                                       QubahTextField(
-                                        controller: _emailController,
-                                        hintText: 'البريد الإلكتروني',
-                                        prefixIcon: Icons.email_outlined,
+                                        controller: _usernameController,
+                                        hintText: 'اسم المستخدم',
+                                        prefixIcon: Icons.person_outline,
                                         keyboardType:
-                                            TextInputType.emailAddress,
+                                            TextInputType.text,
                                         validator: (v) => v == null || v.isEmpty
-                                            ? 'يرجى إدخال البريد الإلكتروني'
+                                            ? 'يرجى إدخال اسم المستخدم'
                                             : null,
                                       ),
 
@@ -246,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               false,
                                             );
                                             context.read<AuthCubit>().login(
-                                              email: _emailController.text
+                                              username: _usernameController.text
                                                   .trim(),
                                               password:
                                                   _passwordController.text,

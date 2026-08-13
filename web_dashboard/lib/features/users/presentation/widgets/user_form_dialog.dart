@@ -24,7 +24,7 @@ class UserFormDialog extends StatefulWidget {
 class _UserFormDialogState extends State<UserFormDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
-  late final TextEditingController _emailController;
+  late final TextEditingController _usernameController;
   late final TextEditingController _passwordController;
   late UserRole _selectedRole;
   late bool _isActive;
@@ -41,7 +41,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.user?.name ?? '');
-    _emailController = TextEditingController(text: widget.user?.email ?? '');
+    _usernameController = TextEditingController(text: widget.user?.username ?? '');
     _passwordController = TextEditingController();
     _selectedRole = widget.user?.role ?? UserRole.student;
     _isActive = widget.user?.isActive ?? true;
@@ -77,7 +77,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -137,9 +137,9 @@ class _UserFormDialogState extends State<UserFormDialog> {
                   ),
                   const SizedBox(height: 24),
 
-                  // ── Name ──────────────────────────────────
+                  // ── Role ──────────────────────────────────
                   Text(
-                    'الاسم الكامل',
+                    'الدور',
                     style: GoogleFonts.cairo(
                       fontWeight: FontWeight.w600,
                       color: isDark
@@ -148,24 +148,59 @@ class _UserFormDialogState extends State<UserFormDialog> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _nameController,
+                  DropdownButtonFormField<UserRole>(
+                    initialValue: _selectedRole,
                     style: GoogleFonts.cairo(
                       color: isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimaryLight,
                     ),
-                    decoration: _inputDecoration('أدخل الاسم الكامل', isDark),
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return 'الاسم مطلوب';
-                      return null;
+                    decoration: _inputDecoration(null, isDark),
+                    dropdownColor:
+                        isDark ? AppColors.cardDark : AppColors.cardLight,
+                    items: const [
+                      DropdownMenuItem(
+                          value: UserRole.student, child: Text('طالب')),
+                      DropdownMenuItem(
+                          value: UserRole.admin, child: Text('مدير')),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) setState(() => _selectedRole = v);
                     },
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Email ─────────────────────────────────
+                  // ── Name (Admins Only) ───────────────────────
+                  if (_selectedRole == UserRole.admin) ...[
+                    Text(
+                      'الاسم الكامل',
+                      style: GoogleFonts.cairo(
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimaryLight,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nameController,
+                      style: GoogleFonts.cairo(
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimaryLight,
+                      ),
+                      decoration: _inputDecoration('أدخل الاسم الكامل', isDark),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) return 'الاسم مطلوب';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // ── Identifier ─────────────────────────────────
                   Text(
-                    AppStrings.email,
+                    _selectedRole == UserRole.admin ? AppStrings.email : 'اسم المستخدم',
                     style: GoogleFonts.cairo(
                       fontWeight: FontWeight.w600,
                       color: isDark
@@ -175,19 +210,21 @@ class _UserFormDialogState extends State<UserFormDialog> {
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
-                    controller: _emailController,
+                    controller: _usernameController,
                     style: GoogleFonts.cairo(
                       color: isDark
                           ? AppColors.textPrimaryDark
                           : AppColors.textPrimaryLight,
                     ),
-                    decoration: _inputDecoration('example@email.com', isDark),
-                    keyboardType: TextInputType.emailAddress,
+                    decoration: _inputDecoration(_selectedRole == UserRole.admin ? 'example@email.com' : 'أدخل اسم المستخدم', isDark),
+                    keyboardType: _selectedRole == UserRole.admin ? TextInputType.emailAddress : TextInputType.text,
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
-                        return 'البريد الإلكتروني مطلوب';
+                        return _selectedRole == UserRole.admin ? 'البريد الإلكتروني مطلوب' : 'اسم المستخدم مطلوب';
                       }
-                      if (!v.contains('@')) return 'بريد إلكتروني غير صالح';
+                      if (_selectedRole == UserRole.admin && !v.contains('@')) {
+                        return 'بريد إلكتروني غير صالح';
+                      }
                       return null;
                     },
                   ),
@@ -225,39 +262,6 @@ class _UserFormDialogState extends State<UserFormDialog> {
                     const SizedBox(height: 16),
                   ],
 
-                  // ── Role ──────────────────────────────────
-                  Text(
-                    'الدور',
-                    style: GoogleFonts.cairo(
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<UserRole>(
-                    initialValue: _selectedRole,
-                    style: GoogleFonts.cairo(
-                      color: isDark
-                          ? AppColors.textPrimaryDark
-                          : AppColors.textPrimaryLight,
-                    ),
-                    decoration: _inputDecoration(null, isDark),
-                    dropdownColor:
-                        isDark ? AppColors.cardDark : AppColors.cardLight,
-                    items: const [
-                      DropdownMenuItem(
-                          value: UserRole.student, child: Text('طالب')),
-                      DropdownMenuItem(
-                          value: UserRole.admin, child: Text('مدير')),
-                    ],
-                    onChanged: (v) {
-                      if (v != null) setState(() => _selectedRole = v);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
                   // ── Student Package Assignment ───────────
                   if (_selectedRole == UserRole.student) ...[
                     Text(
@@ -278,6 +282,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                             ),
                           )
                         : DropdownButtonFormField<String?>(
+                            isExpanded: true,
                             initialValue: _selectedPackageId,
                             style: GoogleFonts.cairo(
                               color: isDark
@@ -575,10 +580,14 @@ class _UserFormDialogState extends State<UserFormDialog> {
         ? int.tryParse(_selectedPackageId!)
         : null;
 
+    final finalName = _selectedRole == UserRole.student
+        ? _usernameController.text.trim()
+        : _nameController.text.trim();
+
     if (isEditing) {
       cubit.updateUser(widget.user!.copyWith(
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
+        name: finalName,
+        username: _usernameController.text.trim(),
         role: _selectedRole,
         isActive: _isActive,
         packageId: pkgId,
@@ -587,8 +596,8 @@ class _UserFormDialogState extends State<UserFormDialog> {
       ));
     } else {
       cubit.createUser(
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
+        name: finalName,
+        username: _usernameController.text.trim(),
         password: _passwordController.text.trim(),
         role: _selectedRole,
         isActive: _isActive,

@@ -115,8 +115,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
     // Headers
     sheet.appendRow([
       TextCellValue('المعرف'),
-      TextCellValue('الاسم'),
-      TextCellValue('البريد الإلكتروني'),
+      TextCellValue('البريد / اسم المستخدم'),
       TextCellValue('الدور'),
       TextCellValue('الحالة'),
       TextCellValue('تاريخ الانضمام'),
@@ -127,8 +126,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
     for (final user in users) {
       sheet.appendRow([
         TextCellValue(user.id.toString()),
-        TextCellValue(user.name),
-        TextCellValue(user.email),
+        TextCellValue(user.username),
         TextCellValue(user.roleLabel),
         TextCellValue(user.statusLabel),
         TextCellValue('${user.createdAt.year}-${user.createdAt.month}-${user.createdAt.day}'),
@@ -385,11 +383,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                         fixedWidth: 56,
                       ),
                       DataColumn2(
-                        label: Text('الاسم', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-                        size: ColumnSize.L,
-                      ),
-                      DataColumn2(
-                        label: Text(AppStrings.email, style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+                        label: Text('البريد / اسم المستخدم', style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
                         size: ColumnSize.L,
                       ),
                       DataColumn2(
@@ -440,7 +434,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                                   radius: 18,
                                   backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                                   child: Text(
-                                    user.name.isNotEmpty ? user.name[0] : '?',
+                                    user.username.isNotEmpty ? user.username[0].toUpperCase() : '?',
                                     style: GoogleFonts.cairo(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
@@ -450,7 +444,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    user.name,
+                                    user.username,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
                                   ),
@@ -458,7 +452,6 @@ class _UsersScreenState extends State<_UsersScreenBody> {
                               ],
                             ),
                           ),
-                          DataCell(Text(user.email, overflow: TextOverflow.ellipsis)),
                           DataCell(_buildRoleChip(user.role)),
                           DataCell(
                             Text(
