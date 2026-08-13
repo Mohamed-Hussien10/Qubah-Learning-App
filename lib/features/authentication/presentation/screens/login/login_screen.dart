@@ -57,6 +57,19 @@ class _LoginScreenState extends State<LoginScreen> {
           body: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthAuthenticated) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Text(
+                        'مرحباً بك ${state.user.name}',
+                        style: GoogleFonts.cairo(color: Colors.white),
+                      ),
+                    ),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+
                 sl<SecureStorage>().hasParentPin().then((hasPin) {
                   if (!context.mounted) return;
                   if (hasPin) {
@@ -263,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           foregroundColor: AppColors.hessaBrown,
                                         ),
                                         child: Text(
-                                          'نسيت البريد الإلكتروني أو كلمة المرور؟ تواصل مع الدعم',
+                                          'نسيت اسم المستخدم أو كلمة المرور؟ تواصل مع الدعم',
                                           style: GoogleFonts.cairo(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,

@@ -88,7 +88,7 @@ class ErrorInterceptor extends Interceptor {
 
     // Map specific backend messages to user-friendly Arabic
     if (message == 'The provided credentials are incorrect.') {
-      message = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+      message = 'اسم المستخدم أو كلمة المرور غير صحيحة.';
     }
 
     switch (statusCode) {
