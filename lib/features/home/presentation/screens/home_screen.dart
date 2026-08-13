@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/routing/app_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
@@ -100,7 +101,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _handleSubscribeNow() async {
-    context.go(AppRoutes.subscription);
+    final url = Uri.parse('https://a-z.om/ProgramCheckout?pid=2&mid=qaLRgzEwq3qrR2wOwRMr');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('لا يمكن فتح الرابط')),
+        );
+      }
+    }
   }
 
   void _showRenewSubscriptionDialog() {

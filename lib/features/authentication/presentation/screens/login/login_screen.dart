@@ -68,7 +68,15 @@ class _LoginScreenState extends State<LoginScreen> {
               } else if (state is AuthError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.message),
+                  content: Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: Text(
+                      RegExp(r'[a-zA-Z]').hasMatch(state.message)
+                          ? 'حدث خطأ. يرجى التحقق من البيانات المدخلة والمحاولة مجدداً.'
+                          : state.message,
+                      style: GoogleFonts.cairo(color: Colors.white),
+                    ),
+                  ),
                   backgroundColor: AppColors.error,
                 ),
               );
@@ -166,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         CrossAxisAlignment.stretch,
                                     children: [
                                       Text(
-                                        'اسم المستخدم',
+                                        'البريد الإلكتروني',
                                         style: GoogleFonts.cairo(
                                           color: AppColors.hessaTextBrown,
                                           fontWeight: FontWeight.bold,
@@ -176,8 +184,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       const SizedBox(height: 8),
                                       QubahTextField(
                                         controller: _emailController,
-                                        hintText: 'اسم المستخدم',
-                                        prefixIcon: Icons.person_outline,
+                                        hintText: 'البريد الإلكتروني',
+                                        prefixIcon: Icons.email_outlined,
                                         keyboardType:
                                             TextInputType.emailAddress,
                                         validator: (v) => v == null || v.isEmpty
