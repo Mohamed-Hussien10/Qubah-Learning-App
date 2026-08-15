@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,6 +31,17 @@ class ProfileScreen extends StatelessWidget {
       create: (_) => sl<AuthCubit>(),
       child: Scaffold(
         appBar: AppBar(
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              // fallback
+              Navigator.of(context).pushReplacementNamed('/home');
+            }
+          },
+        )),
           title: Text(
             'الملف الشخصي',
             style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
@@ -427,7 +439,7 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                         style: GoogleFonts.cairo(),
                       ),
                       actions: [
-                        TextButton(
+                        HoverScale(child: TextButton(
                           onPressed: () => Navigator.pop(ctx),
                           child: Text(
                             'إغلاق',
@@ -435,7 +447,7 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
+                        )),
                       ],
                     ),
                   );
@@ -537,8 +549,10 @@ class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
     return Center(
       child: Stack(
         children: [
-          GestureDetector(
-            onTap: _pickImage,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: _pickImage,
             child: CircleAvatar(
               radius: 60,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
@@ -552,18 +566,22 @@ class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
                   : null,
             ),
           ),
+          ),
           Positioned(
             bottom: 0,
             right: 0,
-            child: GestureDetector(
-              onTap: _pickImage,
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: AppColors.primary,
-                child: const Icon(
-                  Icons.camera_alt_rounded,
-                  size: 18,
-                  color: Colors.white,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.primary,
+                  child: const Icon(
+                    Icons.camera_alt_rounded,
+                    size: 18,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

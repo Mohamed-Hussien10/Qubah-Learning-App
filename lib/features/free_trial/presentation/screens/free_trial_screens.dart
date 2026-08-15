@@ -1,5 +1,7 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qubah_learning_app/core/utils/responsive_utils.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/routing/app_router.dart';
@@ -83,6 +85,19 @@ class _FreeTrialSubjectsScreenState extends State<FreeTrialSubjectsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('المواد التجريبية', style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        )),
+      ),
       body: SafeArea(
         child: Container(
           decoration: widget.backgroundImageUrl != null &&
@@ -140,13 +155,12 @@ class _FreeTrialSubjectsScreenState extends State<FreeTrialSubjectsScreen> {
     }
 
     final itemCount = _subjects.length;
-    final crossAxisCount = itemCount == 1 ? 1 : 2;
-    final childAspectRatio = itemCount == 1 ? 1.5 : 0.85;
+    final childAspectRatio = context.responsiveValue(mobile: 0.85, tablet: 1.0, desktop: 1.2);
 
     return GridView.builder(
       padding: const EdgeInsets.all(16),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 280,
         childAspectRatio: childAspectRatio,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
@@ -294,6 +308,19 @@ class _FreeTrialLessonFilesScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('الملفات التجريبية', style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        )),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -333,11 +360,13 @@ class _FreeTrialLessonFilesScreenState
       );
     }
 
+    final childAspectRatio = context.responsiveValue(mobile: 0.85, tablet: 1.0, desktop: 1.2);
+
     return GridView.builder(
       padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.85,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 280,
+        childAspectRatio: childAspectRatio,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),

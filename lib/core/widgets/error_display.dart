@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -35,11 +36,11 @@ class ErrorDisplay extends StatelessWidget {
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 24),
-              ElevatedButton.icon(
+              HoverScale(child: ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('Try Again'),
-              ),
+              )),
             ],
           ],
         ),

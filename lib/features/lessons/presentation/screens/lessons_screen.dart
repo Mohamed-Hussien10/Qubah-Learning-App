@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/error_display.dart';
@@ -5,6 +6,7 @@ import '../../../../core/utils/error_utils.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../core/widgets/breadcrumb_nav.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
 import '../../../../core/storage/secure_storage.dart';
@@ -51,9 +53,24 @@ class _LessonsScreenState extends State<LessonsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      appBar: AppBar(
+        title: const Text('الدروس', style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        )),
+      ),
       body: SafeArea(
-        child: Container(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: Container(
         decoration: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty
             ? BoxDecoration(
                 image: DecorationImage(
@@ -100,18 +117,16 @@ class _LessonsScreenState extends State<LessonsScreen> {
                     );
                   }
                   final itemCount = _isGuest && state.lessons.isNotEmpty ? 1 : state.lessons.length;
-                  final crossAxisCount = itemCount == 1 ? 1 : 2;
-                  final childAspectRatio = itemCount == 1 ? 1.5 : 0.85;
+                  final childAspectRatio = context.responsiveValue(mobile: 0.85, tablet: 1.0, desktop: 1.2);
 
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          childAspectRatio: childAspectRatio,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 280,
+                      childAspectRatio: childAspectRatio,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
                     itemCount: itemCount,
                     itemBuilder: (context, index) {
                       final item = state.lessons[index];
@@ -134,12 +149,15 @@ class _LessonsScreenState extends State<LessonsScreen> {
                   );
                 }
                 return const SizedBox.shrink();
-              },
+            },
             ),
           ),
-        ],
+  
+  ],
       ),
-      ),
+        ),
+          ),
+        ),
       ),
     );
   }

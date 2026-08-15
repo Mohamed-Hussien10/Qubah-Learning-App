@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -105,7 +106,7 @@ class MaintenanceScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Exit Button
-              TextButton.icon(
+              HoverScale(child: TextButton.icon(
                 onPressed: () => SystemNavigator.pop(),
                 icon: const Icon(Icons.exit_to_app_rounded, color: Colors.grey),
                 label: const Text(
@@ -115,7 +116,7 @@ class MaintenanceScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.2, end: 0),
+              )).animate().fadeIn(delay: 800.ms).slideY(begin: 0.2, end: 0),
             ],
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/services/dependency_injection.dart';
+import '../../../../core/widgets/shimmer_loading.dart';
 
 class SupportScreen extends StatefulWidget {
   final String? initialContactEmail;
@@ -84,13 +86,13 @@ class _SupportScreenState extends State<SupportScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
+        leading: HoverScale(child: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87),
           onPressed: () => context.pop(),
-        ),
+        )),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const ShimmerList(itemCount: 4, itemHeight: 80)
           : ListView(
               padding: const EdgeInsets.all(24),
               children: [
@@ -146,7 +148,8 @@ class _SupportScreenState extends State<SupportScreen> {
     required VoidCallback onTap,
   }) {
     return InkWell(
-      onTap: onTap,
+      
+      mouseCursor: SystemMouseCursors.click,onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(20),

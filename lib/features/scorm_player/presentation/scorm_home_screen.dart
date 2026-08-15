@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -169,15 +170,15 @@ class _ScormHomeScreenState extends State<ScormHomeScreen>
           style: const TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
-          TextButton(
+          HoverScale(child: TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel'),
-          ),
-          TextButton(
+          )),
+          HoverScale(child: TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Delete'),
-          ),
+          )),
         ],
       ),
     );
@@ -206,6 +207,19 @@ class _ScormHomeScreenState extends State<ScormHomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF0A0E1A),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          },
+        )),
+      ),
       body: Stack(
         children: [
           // ── Background Gradient ──────────────────────────────────────────
@@ -361,8 +375,10 @@ class _ScormHomeScreenState extends State<ScormHomeScreen>
   Widget _buildActionCard() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-      child: GestureDetector(
-        onTap: _isLoading ? null : _pickAndLoadPackage,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: _isLoading ? null : _pickAndLoadPackage,
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -425,6 +441,7 @@ class _ScormHomeScreenState extends State<ScormHomeScreen>
               ),
             ],
           ),
+        ),
         ),
       ),
     );
@@ -539,7 +556,8 @@ class _ScormHomeScreenState extends State<ScormHomeScreen>
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
+              
+              mouseCursor: SystemMouseCursors.click,borderRadius: BorderRadius.circular(16),
               onTap: () => _resumePackage(package),
               child: Padding(
                 padding: const EdgeInsets.all(16),

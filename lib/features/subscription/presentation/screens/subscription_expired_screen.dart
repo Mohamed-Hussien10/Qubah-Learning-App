@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,7 +62,7 @@ class SubscriptionExpiredScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              TextButton(
+              HoverScale(child: TextButton(
                 onPressed: () {
                   context.read<AuthCubit>().logout();
                 },
@@ -71,7 +72,7 @@ class SubscriptionExpiredScreen extends StatelessWidget {
                     color: Colors.grey[600],
                   ),
                 ),
-              ),
+              )),
             ],
           ),
         ),

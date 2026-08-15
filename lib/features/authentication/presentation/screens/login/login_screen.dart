@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -46,13 +47,13 @@ class _LoginScreenState extends State<LoginScreen> {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            leading: IconButton(
+            leading: HoverScale(child: IconButton(
               icon: const Icon(
                 Icons.arrow_back_ios_new,
                 color: AppColors.hessaBrown,
               ),
               onPressed: () => context.go(AppRoutes.splash),
-            ),
+            )),
           ),
           body: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
@@ -222,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         hintText: 'كلمة المرور',
                                         prefixIcon: Icons.lock_outline,
                                         obscureText: _obscurePassword,
-                                        suffixIcon: IconButton(
+                                        suffixIcon: HoverScale(child: IconButton(
                                           icon: Icon(
                                             _obscurePassword
                                                 ? Icons.visibility_off_outlined
@@ -235,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   !_obscurePassword;
                                             });
                                           },
-                                        ),
+                                        )),
                                         validator: (v) => v == null || v.isEmpty
                                             ? 'يرجى إدخال كلمة المرور'
                                             : null,
@@ -270,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                       const SizedBox(height: 16),
                                       
-                                      TextButton(
+                                      HoverScale(child: TextButton(
                                         onPressed: () => context.push(AppRoutes.support),
                                         style: TextButton.styleFrom(
                                           foregroundColor: AppColors.hessaBrown,
@@ -284,7 +285,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           textAlign: TextAlign.center,
                                         ),
-                                      ),
+                                      )),
                                     ],
                                   ),
                                 ),

@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -54,6 +55,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       );
       setState(() {});
     } catch (e) {
+      debugPrint('Video Error:');
       setState(() => _hasError = true);
     }
   }
@@ -70,6 +72,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              // fallback
+              Navigator.of(context).pushReplacementNamed('/home');
+            }
+          },
+        )),
         backgroundColor: Colors.black,
         title: Text(
           widget.title,

@@ -54,6 +54,16 @@ class _AnimatedPressButtonState extends State<AnimatedPressButton>
     super.dispose();
   }
 
+  bool _isHovered = false;
+
+  void _onHover(bool isHovered) {
+    if (widget.onPressed != null) {
+      setState(() {
+        _isHovered = isHovered;
+      });
+    }
+  }
+
   void _handleTapDown(TapDownDetails details) {
     if (widget.onPressed != null) {
       _controller.forward();
@@ -78,14 +88,26 @@ class _AnimatedPressButtonState extends State<AnimatedPressButton>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
-      behavior: HitTestBehavior.opaque,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
+    final bool isPressed = _controller.isAnimating || _controller.isCompleted;
+    
+    return MouseRegion(
+      cursor: widget.onPressed != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      onEnter: (_) => _onHover(true),
+      onExit: (_) => _onHover(false),
+      child: GestureDetector(
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedScale(
+          scale: (_isHovered && !isPressed) ? 1.02 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: widget.child,
+          ),
+        ),
       ),
     );
   }

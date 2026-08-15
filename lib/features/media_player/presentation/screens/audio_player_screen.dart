@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -72,6 +73,17 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              // fallback
+              Navigator.of(context).pushReplacementNamed('/home');
+            }
+          },
+        )),
         title: Text(
           'درس صوتي',
           style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
@@ -134,16 +146,16 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton(
+                HoverScale(child: IconButton(
                   icon: const Icon(Icons.replay_10_rounded, size: 36),
                   onPressed: () =>
                       _player.seek(_position - const Duration(seconds: 10)),
-                ),
+                )),
                 const SizedBox(width: 16),
                 CircleAvatar(
                   radius: 36,
                   backgroundColor: AppColors.primary,
-                  child: IconButton(
+                  child: HoverScale(child: IconButton(
                     icon: Icon(
                       _isPlaying
                           ? Icons.pause_rounded
@@ -158,14 +170,14 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                         _player.play();
                       }
                     },
-                  ),
+                  )),
                 ),
                 const SizedBox(width: 16),
-                IconButton(
+                HoverScale(child: IconButton(
                   icon: const Icon(Icons.forward_10_rounded, size: 36),
                   onPressed: () =>
                       _player.seek(_position + const Duration(seconds: 10)),
-                ),
+                )),
               ],
             ),
           ],

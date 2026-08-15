@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/error_display.dart';
@@ -5,6 +6,7 @@ import '../../../../core/utils/error_utils.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../core/widgets/breadcrumb_nav.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
 import '../manager/cubit/lesson_files_cubit.dart';
@@ -70,11 +72,26 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      appBar: AppBar(
+        title: const Text('الملفات', style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        )),
+      ),
       body: SafeArea(
-        child: Column(
-        children: [
-          if (widget.titlePath.isNotEmpty)
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: Column(
+              children: [
+                if (widget.titlePath.isNotEmpty)
             BreadcrumbNav(pathNames: widget.titlePath),
           Expanded(
             child: BlocBuilder<LessonFilesCubit, LessonFilesState>(
@@ -106,15 +123,16 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
                       ),
                     );
                   }
+                  final childAspectRatio = context.responsiveValue(mobile: 0.85, tablet: 1.0, desktop: 1.2);
+
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.85,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 280,
+                      childAspectRatio: childAspectRatio,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
                     itemCount: state.lessonFiles.length,
                     itemBuilder: (context, index) {
                       final item = state.lessonFiles[index];
@@ -157,9 +175,10 @@ class _LessonFilesScreenState extends State<LessonFilesScreen> {
                 return const SizedBox.shrink();
               },
             ),
-          ),
-        ],
+            )],
       ),
+          ),
+        ),
       ),
     );
   }

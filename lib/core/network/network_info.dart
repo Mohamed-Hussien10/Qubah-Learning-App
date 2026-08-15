@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 /// ──────────────────────────────────────────────────────────────────────────────
@@ -18,5 +20,16 @@ class NetworkInfoImpl implements NetworkInfo {
   const NetworkInfoImpl(this._connectionChecker);
 
   @override
-  Future<bool> get isConnected => _connectionChecker.hasInternetAccess;
+  Future<bool> get isConnected async {
+    if (kIsWeb) return true;
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      try {
+        final result = await InternetAddress.lookup('qubahom.com');
+        return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+      } on SocketException catch (_) {
+        return false;
+      }
+    }
+    return _connectionChecker.hasInternetAccess;
+  }
 }

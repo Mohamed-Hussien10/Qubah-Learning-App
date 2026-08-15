@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -371,7 +372,7 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
           child: Row(
             children: [
               // Back button
-              IconButton(
+              HoverScale(child: IconButton(
                 icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
                 onPressed: () async {
                   final shouldPop = await _onWillPop();
@@ -380,7 +381,7 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
                   }
                 },
                 tooltip: 'Back',
-              ),
+              )),
               const SizedBox(width: 4),
               // Title
               Expanded(
@@ -396,11 +397,11 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
                 ),
               ),
               // Reload button
-              IconButton(
+              HoverScale(child: IconButton(
                 icon: const Icon(Icons.refresh_rounded, color: Colors.white70),
                 onPressed: _reloadWebView,
                 tooltip: 'Reload',
-              ),
+              )),
             ],
           ),
         ),
@@ -413,24 +414,27 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
     return AnimatedOpacity(
       opacity: _isLoading ? 0.0 : 0.7,
       duration: const Duration(milliseconds: 300),
-      child: GestureDetector(
-        onTap: _toggleFullscreen,
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.15),
-              width: 1,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: _toggleFullscreen,
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.15),
+                width: 1,
+              ),
             ),
-          ),
-          child: Icon(
-            _isFullscreen
-                ? Icons.fullscreen_exit_rounded
-                : Icons.fullscreen_rounded,
-            color: Colors.white70,
-            size: 22,
+            child: Icon(
+              _isFullscreen
+                  ? Icons.fullscreen_exit_rounded
+                  : Icons.fullscreen_rounded,
+              color: Colors.white70,
+              size: 22,
+            ),
           ),
         ),
       ),

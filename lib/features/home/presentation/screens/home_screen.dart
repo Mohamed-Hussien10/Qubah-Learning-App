@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import '../../../../core/storage/secure_storage.dart';
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/utils/package_access_helper.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../authentication/domain/repositories/auth_repository.dart';
 
 /// Main home screen with navigation to educational stages, profile, settings.
@@ -141,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          TextButton(
+          HoverScale(child: TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'إلغاء',
@@ -150,8 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
               ),
             ),
-          ),
-          FilledButton(
+          )),
+          HoverScale(child: FilledButton(
             onPressed: () {
               Navigator.pop(context);
               context.push(AppRoutes.subscriptionExpired);
@@ -166,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'تواصل مع الدعم',
               style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
             ),
-          ),
+          )),
         ],
       ),
     );
@@ -188,11 +190,14 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 // ── Header ──────────────────────────────────────────────
                 Row(
                   children: [
@@ -226,21 +231,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       Builder(
                         builder: (context) {
                           final avatarImage = _getAvatarImage();
-                          return GestureDetector(
-                            onTap: () async {
-                              await context.push(AppRoutes.profile);
-                              _loadImage();
-                            },
-                            child: CircleAvatar(
-                              radius: 22,
-                              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                              backgroundImage: avatarImage,
-                              child: avatarImage == null
-                                  ? const Icon(
-                                      Icons.person_rounded,
-                                      color: AppColors.primary,
-                                    )
-                                  : null,
+                          return MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () async {
+                                await context.push(AppRoutes.profile);
+                                _loadImage();
+                              },
+                              child: CircleAvatar(
+                                radius: 22,
+                                backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                                backgroundImage: avatarImage,
+                                child: avatarImage == null
+                                    ? const Icon(
+                                        Icons.person_rounded,
+                                        color: AppColors.primary,
+                                      )
+                                    : null,
+                              ),
                             ),
                           );
                         },
@@ -266,13 +274,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ).animate().fadeIn(delay: 400.ms),
                 const SizedBox(height: 16),
-                GridView.count(
-                  crossAxisCount: 2,
+                GridView.extent(
+                  maxCrossAxisExtent: 280,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  childAspectRatio: 0.85,
+                  childAspectRatio: context.responsiveValue(mobile: 0.85, tablet: 1.0, desktop: 1.2),
                   children:
                       [
                             ChildFriendlyCard(
@@ -317,7 +325,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-    );
+    ),
+  ));
   }
 
   Widget _buildHeroCard(BuildContext context) {
@@ -377,7 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      ElevatedButton(
+                      HoverScale(child: ElevatedButton(
                         onPressed: _isGuest ? _handleSubscribeNow : _handleStagesTap,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
@@ -399,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
+                      )),
                     ],
                   ),
                 ),

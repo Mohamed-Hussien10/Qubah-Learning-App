@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/utils/helpers.dart';
 import 'dart:convert';
@@ -9,6 +10,7 @@ import '../../../../core/utils/package_access_helper.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/responsive_utils.dart';
 import '../../../../core/widgets/breadcrumb_nav.dart';
 import '../../../../core/widgets/child_friendly_card.dart';
 import '../manager/cubit/grades_cubit.dart';
@@ -39,8 +41,24 @@ class _GradesScreenState extends State<GradesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('الصفوف الدراسية', style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        )),
+      ),
       body: SafeArea(
-        child: Container(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: Container(
           decoration: widget.backgroundImageUrl != null &&
                   widget.backgroundImageUrl!.isNotEmpty
               ? BoxDecoration(
@@ -123,13 +141,13 @@ class _GradesScreenState extends State<GradesScreen> {
                                     ),
                                     if (!isSubActive) ...[
                                       const SizedBox(height: 16),
-                                      ElevatedButton.icon(
+                                      HoverScale(child: ElevatedButton.icon(
                                         onPressed: () {
                                           context.push('/subscription-expired');
                                         },
                                         icon: const Icon(Icons.refresh_rounded),
                                         label: const Text('تجديد الاشتراك'),
-                                      ),
+                                      )),
                                     ],
                                   ],
                                 ),
@@ -138,18 +156,16 @@ class _GradesScreenState extends State<GradesScreen> {
                           }
 
                           final itemCount = displayGrades.length;
-                          final crossAxisCount = itemCount == 1 ? 1 : 2;
-                          final childAspectRatio = itemCount == 1 ? 1.5 : 0.85;
+                          final childAspectRatio = context.responsiveValue(mobile: 0.85, tablet: 1.0, desktop: 1.2);
 
                           return GridView.builder(
                             padding: const EdgeInsets.all(16),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: crossAxisCount,
-                              childAspectRatio: childAspectRatio,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                            ),
+                            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 280,
+                      childAspectRatio: childAspectRatio,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
                             itemCount: itemCount,
                             itemBuilder: (context, index) {
                               final item = displayGrades[index];
@@ -223,6 +239,8 @@ class _GradesScreenState extends State<GradesScreen> {
                 ),
               ),
             ],
+          ),
+        ),
           ),
         ),
       ),

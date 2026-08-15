@@ -82,6 +82,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_radius.xl),
           ),
           textStyle: AppTypography.lightTextTheme.labelLarge,
+        ).copyWith(
+          mouseCursor: const WidgetStatePropertyAll(SystemMouseCursors.click),
         ),
       ),
 
@@ -97,6 +99,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_radius.xl),
           ),
           textStyle: AppTypography.lightTextTheme.labelLarge,
+        ).copyWith(
+          mouseCursor: const WidgetStatePropertyAll(SystemMouseCursors.click),
         ),
       ),
 
@@ -111,7 +115,19 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_radius.md),
           ),
           textStyle: AppTypography.lightTextTheme.labelLarge,
+        ).copyWith(
+          mouseCursor: const WidgetStatePropertyAll(SystemMouseCursors.click),
         ),
+      ),
+
+      iconButtonTheme: IconButtonThemeData(
+        style: const ButtonStyle(
+          mouseCursor: WidgetStatePropertyAll(SystemMouseCursors.click),
+        ),
+      ),
+
+      listTileTheme: const ListTileThemeData(
+        mouseCursor: MaterialStateMouseCursor.clickable,
       ),
 
       inputDecorationTheme: InputDecorationTheme(
@@ -233,6 +249,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_radius.xl),
           ),
           textStyle: AppTypography.darkTextTheme.labelLarge,
+        ).copyWith(
+          mouseCursor: const WidgetStatePropertyAll(SystemMouseCursors.click),
         ),
       ),
 
@@ -248,6 +266,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_radius.xl),
           ),
           textStyle: AppTypography.darkTextTheme.labelLarge,
+        ).copyWith(
+          mouseCursor: const WidgetStatePropertyAll(SystemMouseCursors.click),
         ),
       ),
 
@@ -262,7 +282,19 @@ class AppTheme {
             borderRadius: BorderRadius.circular(_radius.md),
           ),
           textStyle: AppTypography.darkTextTheme.labelLarge,
+        ).copyWith(
+          mouseCursor: const WidgetStatePropertyAll(SystemMouseCursors.click),
         ),
+      ),
+
+      iconButtonTheme: IconButtonThemeData(
+        style: const ButtonStyle(
+          mouseCursor: WidgetStatePropertyAll(SystemMouseCursors.click),
+        ),
+      ),
+
+      listTileTheme: const ListTileThemeData(
+        mouseCursor: MaterialStateMouseCursor.clickable,
       ),
 
       inputDecorationTheme: InputDecorationTheme(

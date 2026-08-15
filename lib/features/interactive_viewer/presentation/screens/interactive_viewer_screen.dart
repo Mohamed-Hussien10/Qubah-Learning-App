@@ -1,3 +1,4 @@
+import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/services/dependency_injection.dart';
 import '../../../../core/network/dio_client.dart';
@@ -122,6 +123,17 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: HoverScale(child: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              // fallback
+              Navigator.of(context).pushReplacementNamed('/home');
+            }
+          },
+        )),
         title: Text(
           widget.title,
           style: GoogleFonts.fredoka(fontWeight: FontWeight.bold),
