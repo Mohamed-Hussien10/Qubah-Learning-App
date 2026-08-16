@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "qubah_learning_app" "\0"
+            VALUE "CompanyName", "com.hessa" "\0"
+            VALUE "FileDescription", "Hessa" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "qubah_learning_app" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "qubah_learning_app.exe" "\0"
-            VALUE "ProductName", "qubah_learning_app" "\0"
+            VALUE "InternalName", "Hessa" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Hessa. All rights reserved." "\0"
+            VALUE "OriginalFilename", "hessa.exe" "\0"
+            VALUE "ProductName", "Hessa" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

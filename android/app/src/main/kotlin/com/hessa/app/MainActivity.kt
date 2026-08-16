@@ -1,4 +1,4 @@
-package com.example.qubah_learning_app
+package com.hessa.app
 
 import io.flutter.embedding.android.FlutterActivity
 
