@@ -111,19 +111,6 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ]),
               const SizedBox(height: 32),
-              _buildSectionHeader(context, 'الأمان'),
-              const SizedBox(height: 12),
-              _buildSettingsCard(context, [
-                _buildSettingsTile(
-                  context: context,
-                  icon: Icons.admin_panel_settings_outlined,
-                  title: 'إعدادات الرقابة الأبوية',
-                  onTap: () {
-                    context.push(AppRoutes.parentLock);
-                  },
-                ),
-              ]),
-              const SizedBox(height: 32),
               _buildSectionHeader(context, 'المظهر'),
               const SizedBox(height: 12),
               _buildSettingsCard(context, [

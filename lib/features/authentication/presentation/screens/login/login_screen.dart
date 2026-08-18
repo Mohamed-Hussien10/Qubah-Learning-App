@@ -71,14 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
 
-                sl<SecureStorage>().hasParentPin().then((hasPin) {
-                  if (!context.mounted) return;
-                  if (hasPin) {
-                    context.go(AppRoutes.appEntryLock);
-                  } else {
-                    context.go(AppRoutes.home);
-                  }
-                });
+                context.go(AppRoutes.home);
               } else if (state is AuthError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

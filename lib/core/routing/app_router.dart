@@ -21,9 +21,6 @@ import '../../features/user_profile/presentation/screens/profile_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
-import '../../features/parent_lock/presentation/screens/parent_lock_screen.dart';
-import '../../features/parent_lock/presentation/screens/parent_settings_screen.dart';
-import '../../features/parent_lock/presentation/screens/change_pin_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_expired_screen.dart';
 import '../../features/settings/presentation/screens/support_screen.dart';
 import '../../features/splash/presentation/screens/maintenance_screen.dart';
@@ -51,11 +48,6 @@ class AppRoutes {
   static const String subscriptionExpired = '/subscription-expired';
   static const String settings = '/settings';
   static const String notifications = '/notifications';
-  static const String parentLock = '/parent-lock';
-  static const String parentSettings = '/parent-settings';
-  static const String changePin = '/change-pin';
-  static const String appEntryLock = '/app-entry-lock';
-  static const String appExitLock = '/app-exit-lock';
   static const String support = '/support';
   static const String maintenance = '/maintenance';
   static const String freeTrialSubjects = '/free-trial-subjects/:gradeId';
@@ -275,31 +267,6 @@ class AppRouter {
         path: AppRoutes.notifications,
         name: 'notifications',
         builder: (context, state) => const NotificationsScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.parentLock,
-        name: 'parentLock',
-        builder: (context, state) => const ParentLockScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.parentSettings,
-        name: 'parentSettings',
-        builder: (context, state) => const ParentSettingsScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.changePin,
-        name: 'changePin',
-        builder: (context, state) => const ChangePinScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.appEntryLock,
-        name: 'appEntryLock',
-        builder: (context, state) => const ParentLockScreen(isAppEntry: true),
-      ),
-      GoRoute(
-        path: AppRoutes.appExitLock,
-        name: 'appExitLock',
-        builder: (context, state) => const ParentLockScreen(isAppExit: true),
       ),
       GoRoute(
         path: AppRoutes.support,

@@ -47,10 +47,6 @@ Current features include:
 *   `home`: Main dashboard/landing screen.
 *   `interactive_viewer`: General viewer for interactive content.
 *   `media_player`: Custom implementation for audio/video playback.
-*   `notifications`: Handling app notifications.
-*   `parent_lock`: Security feature to restrict child access.
-*   `scorm_player`: Specific player for SCORM-compliant educational packages.
-*   `settings`: App settings and configuration.
 *   `splash`: Application launch screen.
 *   `subscription`: Premium content access and billing.
 *   `theme`: Dynamic theme switching (Light/Dark mode).
@@ -86,10 +82,6 @@ From `lesson-files`, users navigate to specialized players based on the content 
 *   `/subscription`: Subscription and billing
 *   `/settings`: General app settings
 *   `/notifications`: In-app notifications
-*   **Parental Controls**: 
-    *   `/parent-lock`: PIN validation screen (used for app entry, exit, or accessing settings)
-    *   `/parent-settings`: Parental dashboard
-    *   `/change-pin`: PIN management
 
 ## Global App Behavior
 *   **Localization**: Explicitly configured for Arabic (`'ar'`).

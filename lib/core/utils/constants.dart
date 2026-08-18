@@ -39,9 +39,6 @@ class AppConstants {
   static const double tabletBreakpoint = 900.0;
   static const double desktopBreakpoint = 1200.0;
 
-  // ── Parent Lock ───────────────────────────────────────────────────────
-  static const int parentPinLength = 4;
-
   // ── Subscription ──────────────────────────────────────────────────────
   static const int trialDurationDays = 7;
   static const int activationCodeLength = 12;

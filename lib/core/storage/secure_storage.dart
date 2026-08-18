@@ -20,7 +20,6 @@ class SecureStorage {
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userIdKey = 'user_id';
   static const String _userDataKey = 'user_data';
-  static const String _parentPinKey = 'parent_pin';
   static const String _activationCodeKey = 'activation_code';
   static const String _subscriptionExpiryKey = 'subscription_expiry';
   static const String _deviceIdKey = 'device_id';
@@ -69,20 +68,6 @@ class SecureStorage {
 
   Future<String?> getUserData() async {
     return _storage.read(key: _userDataKey);
-  }
-
-  // ── Parent PIN ─────────────────────────────────────────────────────────
-  Future<void> saveParentPin(String pin) async {
-    await _storage.write(key: _parentPinKey, value: pin);
-  }
-
-  Future<String?> getParentPin() async {
-    return _storage.read(key: _parentPinKey);
-  }
-
-  Future<bool> hasParentPin() async {
-    final pin = await _storage.read(key: _parentPinKey);
-    return pin != null && pin.isNotEmpty;
   }
 
   // ── Activation Code ───────────────────────────────────────────────────

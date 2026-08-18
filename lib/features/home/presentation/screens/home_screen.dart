@@ -179,14 +179,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        final hasPin = await sl<SecureStorage>().hasParentPin();
-        if (hasPin && context.mounted) {
-          context.push(AppRoutes.appExitLock);
-        } else {
-          SystemNavigator.pop();
-        }
+        SystemNavigator.pop();
       },
       child: Scaffold(
         body: SafeArea(
@@ -301,18 +296,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () => context.push(AppRoutes.settings),
                             ),
                             ChildFriendlyCard(
-                              title: 'قفل الوالدين',
-                              subtitle: 'مراقبة وتقييد',
+                              title: 'الملف الشخصي',
+                              subtitle: 'عرض وتعديل الحساب',
                               imageUrl: null,
                               color: AppColors.green,
-                              defaultIcon: Icons.lock_rounded,
+                              defaultIcon: Icons.person_rounded,
                               onTap: () async {
-                                final unlocked = await context.push<bool>(
-                                  AppRoutes.parentLock,
-                                );
-                                if (unlocked == true && context.mounted) {
-                                  context.push(AppRoutes.parentSettings);
-                                }
+                                await context.push(AppRoutes.profile);
+                                _loadImage();
                               },
                             ),
                           ]

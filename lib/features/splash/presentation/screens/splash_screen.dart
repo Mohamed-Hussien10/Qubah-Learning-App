@@ -40,15 +40,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuth() async {
     final secureStorage = sl<SecureStorage>();
     
-    // Optimize: run storage checks concurrently
-    final results = await Future.wait([
-      secureStorage.isAuthenticated(),
-      secureStorage.hasParentPin(),
-    ]);
+    final isAuthenticated = await secureStorage.isAuthenticated();
     if (!mounted) return;
-    
-    final isAuthenticated = results[0];
-    final hasParentPin = results[1];
 
     if (isAuthenticated) {
       try {
@@ -103,11 +96,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (isAuthenticated) {
-      if (hasParentPin) {
-        context.go(AppRoutes.appEntryLock);
-      } else {
-        context.go(AppRoutes.home);
-      }
+      context.go(AppRoutes.home);
     } else {
       setState(() {
         _isLoading = false;

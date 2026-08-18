@@ -159,9 +159,6 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetLessonFilesUseCase(sl()));
   sl.registerFactory(() => LessonFilesCubit(getLessonFilesUseCase: sl()));
 
-  // ── Parent Lock Feature ────────────────────────────────────────────────
-  // sl.registerFactory(() => ParentLockCubit(secureStorage: sl()));
-
   // ── Theme Feature ──────────────────────────────────────────────────────
   sl.registerFactory(() => ThemeCubit(secureStorage: sl()));
 

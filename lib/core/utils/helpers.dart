@@ -78,11 +78,6 @@ class AppHelpers {
     return cleaned.length >= 8 && RegExp(r'^[A-Z0-9]+$').hasMatch(cleaned);
   }
 
-  /// Validates a parent PIN (4 digits).
-  static bool isValidPin(String pin) {
-    return pin.length == 4 && RegExp(r'^\d{4}$').hasMatch(pin);
-  }
-
   // ── Responsive Layout ─────────────────────────────────────────────────
 
   /// Returns the number of grid columns based on screen width.
