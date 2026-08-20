@@ -24,6 +24,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool _isLoading = true;
+  bool _enablePayment = true;
 
   @override
   void initState() {
@@ -70,27 +71,27 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     }
 
-    // 1. Fetch Maintenance Mode Status
+    // 1. Fetch Remote Config (Enable Payment)
     try {
       final dioClient = sl<DioClient>();
-      // Fallback to getting base URL from ApiEndpoints if needed, but DioClient usually has it.
       final response = await dioClient.get(ApiEndpoints.appConfig);
       final data = response.data['data'] ?? response.data;
-      final bool isMaintenance = data['maintenanceMode'] ?? false;
-      
-      if (isMaintenance) {
-        if (!mounted) return;
-        context.go(
-          AppRoutes.maintenance,
-          extra: {
-            'contactEmail': data['contactEmail'],
-            'contactPhone': data['contactPhone'],
-          },
-        );
-        return;
+      if (data is Map) {
+        final dynamic rawEnablePayment = data['enablePayment'] ??
+            data['enable_payment'] ??
+            data['maintenanceMode'] ??
+            data['maintenance_mode'];
+        if (rawEnablePayment != null) {
+          _enablePayment = rawEnablePayment == true ||
+              rawEnablePayment == 'true' ||
+              rawEnablePayment == 1 ||
+              rawEnablePayment == '1';
+        }
+        await secureStorage.saveEnablePayment(_enablePayment);
       }
     } catch (e) {
-      debugPrint('Failed to check maintenance mode: $e');
+      debugPrint('Failed to check remote config: $e');
+      _enablePayment = await secureStorage.isPaymentEnabled();
     }
 
     if (!mounted) return;
@@ -283,16 +284,18 @@ class _SplashScreenState extends State<SplashScreen> {
                     onPressed: () => context.push(AppRoutes.login),
                   ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
 
-                  const SizedBox(height: 20),
-                  Text(
-                    '!ليس لديك حساب بعد؟ احصل على اشتراك الآن',
-                    style: GoogleFonts.cairo(
-                      color: AppColors.hessaTextBrown.withValues(alpha: 0.7),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ).animate().fadeIn(delay: 500.ms),
+                  if (_enablePayment) ...[
+                    const SizedBox(height: 20),
+                    Text(
+                      '!ليس لديك حساب بعد؟ احصل على اشتراك الآن',
+                      style: GoogleFonts.cairo(
+                        color: AppColors.hessaTextBrown.withValues(alpha: 0.7),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ).animate().fadeIn(delay: 500.ms),
+                  ],
                   const SizedBox(height: 20),
 
                   QubahButton(

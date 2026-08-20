@@ -49,7 +49,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
   late TextEditingController _baseUrlCtrl;
   late TextEditingController _apiKeyCtrl;
 
-  bool _maintenanceMode = false;
+  bool _enablePayment = true;
 
   @override
   void initState() {
@@ -96,7 +96,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
 
     _baseUrlCtrl.text = settings.baseUrl;
     _apiKeyCtrl.text = settings.apiKey;
-    _maintenanceMode = settings.maintenanceMode;
+    _enablePayment = settings.enablePayment;
   }
 
   @override
@@ -247,7 +247,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
               ),
             ),
             const SizedBox(height: 16),
-            // Maintenance Mode Card
+            // Enable Payment Card
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -258,12 +258,12 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'وضع الصيانة (Maintenance Mode)',
+                            'تفعيل الدفع (Enable Payment)',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'عند تفعيل وضع الصيانة، لن يتمكن الطلاب أو أولياء الأمور من استخدام التطبيقات المحمولة وستظهر لهم شاشة صيانة توضيحية.',
+                            'عند تفعيل خيار الدفع، سيظهر زر "اشترك الآن" في النسخة التجريبية للتطبيق المحمول. وعند تعطيله، سيتم إخفاء خيارات الاشتراك.',
                             style: TextStyle(
                               fontSize: 12,
                               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
@@ -274,11 +274,11 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
                     ),
                     const SizedBox(width: 24),
                     Switch.adaptive(
-                      value: _maintenanceMode,
-                      activeTrackColor: AppColors.error,
+                      value: _enablePayment,
+                      activeTrackColor: AppColors.primary,
                       onChanged: (val) {
                         setState(() {
-                          _maintenanceMode = val;
+                          _enablePayment = val;
                         });
                       },
                     ),
@@ -299,7 +299,7 @@ class _SettingsViewState extends State<_SettingsView> with SingleTickerProviderS
                                   appName: _appNameCtrl.text.trim(),
                                   contactEmail: _emailCtrl.text.trim(),
                                   contactPhone: _phoneCtrl.text.trim(),
-                                  maintenanceMode: _maintenanceMode,
+                                  enablePayment: _enablePayment,
                                 );
                           }
                         },

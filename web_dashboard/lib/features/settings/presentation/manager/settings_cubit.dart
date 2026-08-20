@@ -42,9 +42,9 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  Future<void> toggleMaintenanceMode() async {
+  Future<void> toggleEnablePayment() async {
     try {
-      final updated = await _repository.toggleMaintenanceMode();
+      final updated = await _repository.toggleEnablePayment();
       emit(state.copyWith(settings: updated));
     } catch (e) {
       emit(state.copyWith(
@@ -59,7 +59,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     String? contactEmail,
     String? contactPhone,
     String? logoUrl,
-    bool? maintenanceMode,
+    bool? enablePayment,
   }) async {
     emit(state.copyWith(status: SettingsStatus.saving));
     try {
@@ -68,7 +68,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         contactEmail: contactEmail,
         contactPhone: contactPhone,
         logoUrl: logoUrl,
-        maintenanceMode: maintenanceMode,
+        enablePayment: enablePayment,
       );
       emit(state.copyWith(
         status: SettingsStatus.loaded,

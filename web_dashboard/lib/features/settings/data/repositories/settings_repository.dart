@@ -19,9 +19,9 @@ class SettingsRepository {
     return AppSettingsModel.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<AppSettingsModel> toggleMaintenanceMode() async {
+  Future<AppSettingsModel> toggleEnablePayment() async {
     final settings = await getSettings();
-    final updated = settings.copyWith(maintenanceMode: !settings.maintenanceMode);
+    final updated = settings.copyWith(enablePayment: !settings.enablePayment);
     return updateSettings(updated);
   }
 
@@ -36,7 +36,7 @@ class SettingsRepository {
     String? contactEmail,
     String? contactPhone,
     String? logoUrl,
-    bool? maintenanceMode,
+    bool? enablePayment,
   }) async {
     final settings = await getSettings();
     final updated = settings.copyWith(
@@ -44,7 +44,7 @@ class SettingsRepository {
       contactEmail: contactEmail,
       contactPhone: contactPhone,
       logoUrl: logoUrl,
-      maintenanceMode: maintenanceMode,
+      enablePayment: enablePayment,
     );
     return updateSettings(updated);
   }

@@ -6,7 +6,7 @@ class AppSettingsModel extends Equatable {
   final String contactEmail;
   final String contactPhone;
   final Map<String, String> socialLinks;
-  final bool maintenanceMode;
+  final bool enablePayment;
   final String defaultLanguage;
   final String baseUrl;
   final String apiKey;
@@ -17,7 +17,7 @@ class AppSettingsModel extends Equatable {
     required this.contactEmail,
     required this.contactPhone,
     required this.socialLinks,
-    required this.maintenanceMode,
+    required this.enablePayment,
     required this.defaultLanguage,
     required this.baseUrl,
     required this.apiKey,
@@ -29,7 +29,7 @@ class AppSettingsModel extends Equatable {
     String? contactEmail,
     String? contactPhone,
     Map<String, String>? socialLinks,
-    bool? maintenanceMode,
+    bool? enablePayment,
     String? defaultLanguage,
     String? baseUrl,
     String? apiKey,
@@ -40,7 +40,7 @@ class AppSettingsModel extends Equatable {
       contactEmail: contactEmail ?? this.contactEmail,
       contactPhone: contactPhone ?? this.contactPhone,
       socialLinks: socialLinks ?? this.socialLinks,
-      maintenanceMode: maintenanceMode ?? this.maintenanceMode,
+      enablePayment: enablePayment ?? this.enablePayment,
       defaultLanguage: defaultLanguage ?? this.defaultLanguage,
       baseUrl: baseUrl ?? this.baseUrl,
       apiKey: apiKey ?? this.apiKey,
@@ -48,6 +48,18 @@ class AppSettingsModel extends Equatable {
   }
 
   factory AppSettingsModel.fromJson(Map<String, dynamic> json) {
+    final dynamic rawPayment = json['enablePayment'] ??
+        json['enable_payment'] ??
+        json['maintenanceMode'] ??
+        json['maintenance_mode'];
+
+    final bool parsedPayment = rawPayment == null
+        ? true
+        : (rawPayment == true ||
+            rawPayment == 'true' ||
+            rawPayment == 1 ||
+            rawPayment == '1');
+
     return AppSettingsModel(
       appName: json['appName']?.toString() ?? '',
       logoUrl: json['logoUrl']?.toString(),
@@ -56,10 +68,7 @@ class AppSettingsModel extends Equatable {
       socialLinks: json['socialLinks'] != null
           ? Map<String, String>.from(json['socialLinks'] as Map)
           : {},
-      maintenanceMode: json['maintenanceMode'] == true ||
-          json['maintenanceMode'] == 'true' ||
-          json['maintenanceMode'] == 1 ||
-          json['maintenanceMode'] == '1',
+      enablePayment: parsedPayment,
       defaultLanguage: json['defaultLanguage']?.toString() ?? 'ar',
       baseUrl: json['baseUrl']?.toString() ?? '',
       apiKey: json['apiKey']?.toString() ?? '',
@@ -73,7 +82,10 @@ class AppSettingsModel extends Equatable {
       'contactEmail': contactEmail,
       'contactPhone': contactPhone,
       'socialLinks': socialLinks,
-      'maintenanceMode': maintenanceMode,
+      'enablePayment': enablePayment,
+      'enable_payment': enablePayment,
+      'maintenanceMode': enablePayment,
+      'maintenance_mode': enablePayment,
       'defaultLanguage': defaultLanguage,
       'baseUrl': baseUrl,
       'apiKey': apiKey,
@@ -91,7 +103,7 @@ class AppSettingsModel extends Equatable {
       'instagram': 'https://instagram.com/qubahapp',
       'youtube': 'https://youtube.com/@qubahapp',
     },
-    maintenanceMode: false,
+    enablePayment: true,
     defaultLanguage: 'ar',
     baseUrl: 'https://qubahom.com/api/v1',
     apiKey: 'qubah-api-key-2026-xxxx-yyyy',
@@ -104,7 +116,7 @@ class AppSettingsModel extends Equatable {
         contactEmail,
         contactPhone,
         socialLinks,
-        maintenanceMode,
+        enablePayment,
         defaultLanguage,
         baseUrl,
         apiKey,

@@ -28,6 +28,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _isGuest = false;
+  bool _enablePayment = false;
+  bool _isStatusLoaded = false;
   String? _imagePath;
   String? _avatarUrl;
 
@@ -71,10 +73,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _checkGuestStatus() async {
-    final isGuest = await sl<SecureStorage>().isGuest();
+    final secureStorage = sl<SecureStorage>();
+    final isGuest = await secureStorage.isGuest();
+    final enablePayment = await secureStorage.isPaymentEnabled();
     if (mounted) {
       setState(() {
         _isGuest = isGuest;
+        _enablePayment = enablePayment;
+        _isStatusLoaded = true;
       });
     }
   }
@@ -221,34 +227,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     // Profile Avatar
-                    if (!_isGuest) ...[
-                      const SizedBox(width: 4),
-                      Builder(
-                        builder: (context) {
-                          final avatarImage = _getAvatarImage();
-                          return MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () async {
-                                await context.push(AppRoutes.profile);
-                                _loadImage();
-                              },
-                              child: CircleAvatar(
-                                radius: 22,
-                                backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                                backgroundImage: avatarImage,
-                                child: avatarImage == null
-                                    ? const Icon(
-                                        Icons.person_rounded,
-                                        color: AppColors.primary,
-                                      )
-                                    : null,
-                              ),
+                    const SizedBox(width: 4),
+                    Builder(
+                      builder: (context) {
+                        final avatarImage = _getAvatarImage();
+                        return MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () async {
+                              await context.push(AppRoutes.profile);
+                              _loadImage();
+                            },
+                            child: CircleAvatar(
+                              radius: 22,
+                              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
+                              backgroundImage: avatarImage,
+                              child: avatarImage == null
+                                  ? const Icon(
+                                      Icons.person_rounded,
+                                      color: AppColors.primary,
+                                    )
+                                  : null,
                             ),
-                          );
-                        },
-                      ),
-                    ],
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ).animate().fadeIn(duration: 400.ms),
 
@@ -358,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _isGuest ? 'اشترك الآن!' : 'ابدأ التعلم',
+                        (_isGuest && _enablePayment) ? 'اشترك الآن!' : 'ابدأ التعلم',
                         style: GoogleFonts.cairo(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
@@ -368,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        _isGuest
+                        (_isGuest && _enablePayment)
                             ? 'اشترك عبر موقعنا لفتح جميع الدروس والمميزات'
                             : 'استكشف المواد، شاهد الفيديوهات، والعب!',
                         style: TextStyle(
@@ -376,30 +380,32 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      HoverScale(child: ElevatedButton(
-                        onPressed: _isGuest ? _handleSubscribeNow : _handleStagesTap,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: AppColors.primary,
-                          elevation: 4,
-                          shadowColor: Colors.black26,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                      if (_isStatusLoaded && (!_isGuest || _enablePayment)) ...[
+                        const SizedBox(height: 20),
+                        HoverScale(child: ElevatedButton(
+                          onPressed: _isGuest ? _handleSubscribeNow : _handleStagesTap,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.primary,
+                            elevation: 4,
+                            shadowColor: Colors.black26,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
                           ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
+                          child: Text(
+                            _isGuest ? 'اشترك الآن' : 'استكشف الآن',
+                            style: GoogleFonts.cairo(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          _isGuest ? 'اشترك الآن' : 'استكشف الآن',
-                          style: GoogleFonts.cairo(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      )),
+                        )),
+                      ],
                     ],
                   ),
                 ),

@@ -25,6 +25,7 @@ class SecureStorage {
   static const String _deviceIdKey = 'device_id';
   static const String _themeModeKey = 'theme_mode';
   static const String _isGuestKey = 'is_guest';
+  static const String _enablePaymentKey = 'enable_payment';
 
   // ── Access Token ────────────────────────────────────────────────────────
   Future<void> saveAccessToken(String token) async {
@@ -121,6 +122,17 @@ class SecureStorage {
 
   Future<bool> isGuest() async {
     final value = await _storage.read(key: _isGuestKey);
+    return value == 'true';
+  }
+
+  // ── Remote Config: Enable Payment ──────────────────────────────────────
+  Future<void> saveEnablePayment(bool enablePayment) async {
+    await _storage.write(key: _enablePaymentKey, value: enablePayment.toString());
+  }
+
+  Future<bool> isPaymentEnabled() async {
+    final value = await _storage.read(key: _enablePaymentKey);
+    if (value == null) return true; // Default to true if not set
     return value == 'true';
   }
 

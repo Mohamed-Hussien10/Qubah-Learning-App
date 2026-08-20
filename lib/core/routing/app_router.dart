@@ -23,7 +23,6 @@ import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_expired_screen.dart';
 import '../../features/settings/presentation/screens/support_screen.dart';
-import '../../features/splash/presentation/screens/maintenance_screen.dart';
 import '../../features/free_trial/presentation/screens/free_trial_screens.dart';
 
 /// Route name constants.
@@ -49,7 +48,6 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String notifications = '/notifications';
   static const String support = '/support';
-  static const String maintenance = '/maintenance';
   static const String freeTrialSubjects = '/free-trial-subjects/:gradeId';
   static const String freeTrialLessonFiles = '/free-trial-lesson-files/:subjectId';
 }
@@ -89,17 +87,6 @@ class AppRouter {
         path: AppRoutes.splash,
         name: 'splash',
         builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.maintenance,
-        name: 'maintenance',
-        builder: (context, state) {
-          final extra = state.extra as Map<String, dynamic>? ?? {};
-          return MaintenanceScreen(
-            contactEmail: extra['contactEmail']?.toString() ?? 'support@qubah.com',
-            contactPhone: extra['contactPhone']?.toString() ?? '+966500000000',
-          );
-        },
       ),
       GoRoute(
         path: AppRoutes.login,
