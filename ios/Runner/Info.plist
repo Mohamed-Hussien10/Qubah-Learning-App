@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -26,6 +28,14 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Hessa accesses your photo library so you can select images to use in your learning content.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Hessa uses the microphone so you can record audio for interactive learning activities.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Hessa uses the camera so you can capture images for interactive learning activities.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Hessa uses your location to show location-specific educational content.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
