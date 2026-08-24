@@ -18,28 +18,26 @@ class FilePickerService {
     }
 
     if (Platform.isAndroid) {
-      // For Android 13+ (API 33), we don't need READ_EXTERNAL_STORAGE
-      // file_picker handles the SAF-based picking internally
+      // file_picker uses the system Storage Access Framework (SAF) which doesn't
+      // require runtime permissions on Android 10+ (API 29+).
+      // For legacy Android versions (API <= 32), we check Permission.storage if needed.
+      final isGranted = await Permission.storage.isGranted;
+      if (isGranted) {
+        return true;
+      }
       final status = await Permission.storage.request();
-      if (status.isGranted) {
+      if (status.isGranted || status.isLimited) {
         DebugLogger.success('Storage permission granted.');
         return true;
       }
-
-      // Try manage external storage for broader access
-      if (await Permission.manageExternalStorage.request().isGranted) {
-        DebugLogger.success('Manage external storage permission granted.');
-        return true;
-      }
-
-      DebugLogger.warning('Storage permission denied.');
-      return false;
+      // On Android 13+ (API 33+), Permission.storage is deprecated / denied by default,
+      // but file_picker (SAF) works directly without permissions.
+      DebugLogger.info('Proceeding with file picker SAF.');
+      return true;
     }
 
-    // iOS
-    final status = await Permission.storage.request();
-    DebugLogger.info('iOS storage permission: $status');
-    return status.isGranted || status.isLimited;
+    // iOS and other platforms don't need explicit storage permission for file_picker
+    return true;
   }
 
   /// Open file picker to select a ZIP file.

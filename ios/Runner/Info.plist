@@ -29,13 +29,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Hessa accesses your photo library so you can select images to use in your learning content.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Hessa uses the microphone so you can record audio for interactive learning activities.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Hessa uses the camera so you can capture images for interactive learning activities.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Hessa uses your location to show location-specific educational content.</string>
+	<string>Hessa needs access to your photo library to let you select a profile picture.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

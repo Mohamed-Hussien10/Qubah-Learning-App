@@ -4,17 +4,9 @@
     <!-- Internet access for WebView (may load remote resources) -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- Storage access for reading SCORM ZIP files -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
-    <!-- Android 11+ scoped storage – broader file access if needed -->
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
-
-    <!-- Media permissions for Android 13+ (granular) -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+    <!-- Storage access for legacy Android (API <= 32) only -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
 
     <application
         android:label="Hessa"
