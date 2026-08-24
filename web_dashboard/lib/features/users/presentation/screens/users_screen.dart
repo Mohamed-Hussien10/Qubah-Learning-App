@@ -8,6 +8,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:web_dashboard/core/constants/app_colors.dart';
 import 'package:web_dashboard/core/constants/app_strings.dart';
@@ -717,12 +718,16 @@ class _UsersScreenState extends State<_UsersScreenBody> {
               color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           FilledButton.icon(
-            onPressed: () => context.read<UsersCubit>().loadUsers(),
-            icon: const Icon(Icons.refresh),
-            label: Text(AppStrings.refresh, style: GoogleFonts.cairo()),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+            onPressed: () => context.go('/login'),
+            icon: const Icon(Icons.login_rounded),
+            label: Text(AppStrings.login, style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
           ),
         ],
       ),

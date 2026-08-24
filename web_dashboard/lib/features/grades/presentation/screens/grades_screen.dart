@@ -305,12 +305,16 @@ class _GradesView extends StatelessWidget {
           const Icon(Icons.error_outline, size: 80, color: AppColors.error),
           const SizedBox(height: 16),
           Text(message, style: const TextStyle(color: AppColors.error)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           FilledButton.icon(
-            onPressed: () =>
-                context.read<GradesCubit>().loadGrades(stageId),
-            icon: const Icon(Icons.refresh),
-            label: const Text(AppStrings.refresh),
+            onPressed: () => context.go('/login'),
+            icon: const Icon(Icons.login_rounded),
+            label: const Text(AppStrings.login),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
           ),
         ],
       ),

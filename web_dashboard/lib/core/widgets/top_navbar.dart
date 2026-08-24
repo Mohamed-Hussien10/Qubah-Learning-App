@@ -101,34 +101,6 @@ class TopNavbar extends StatelessWidget implements PreferredSizeWidget {
 
           const Spacer(),
 
-          // ── Search Bar ──────────────────────────────────────────
-          SizedBox(
-            width: 260,
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: AppStrings.search,
-                prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                isDense: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                filled: true,
-                fillColor: isDark
-                    ? AppColors.backgroundDark
-                    : AppColors.backgroundLight,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
           // ── Theme Toggle ────────────────────────────────────────
           BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {

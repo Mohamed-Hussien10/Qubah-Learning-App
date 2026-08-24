@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:web_dashboard/core/constants/app_colors.dart';
 import 'package:web_dashboard/core/constants/app_strings.dart';
 
@@ -77,19 +78,34 @@ class AppErrorWidget extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
 
-            // ── Retry Button ────────────────────────────────────────
-            if (onRetry != null) ...[
-              const SizedBox(height: 24),
-              OutlinedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh_rounded, size: 20),
-                label: const Text(AppStrings.refresh),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.error,
-                  side: const BorderSide(color: AppColors.error),
+            // ── Actions ─────────────────────────────────────────────
+            const SizedBox(height: 24),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FilledButton.icon(
+                  onPressed: () => context.go('/login'),
+                  icon: const Icon(Icons.login_rounded, size: 20),
+                  label: const Text(AppStrings.login),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
                 ),
-              ),
-            ],
+                if (onRetry != null) ...[
+                  const SizedBox(width: 12),
+                  OutlinedButton.icon(
+                    onPressed: onRetry,
+                    icon: const Icon(Icons.refresh_rounded, size: 20),
+                    label: const Text(AppStrings.refresh),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ],
         ),
       ),

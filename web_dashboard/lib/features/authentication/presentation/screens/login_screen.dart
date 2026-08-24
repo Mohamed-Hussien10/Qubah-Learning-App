@@ -6,10 +6,11 @@ import 'package:go_router/go_router.dart';
 
 import 'package:web_dashboard/core/constants/app_colors.dart';
 import 'package:web_dashboard/core/constants/app_strings.dart';
+import 'package:web_dashboard/core/theme/theme_cubit.dart';
 import 'package:web_dashboard/features/authentication/presentation/manager/auth_cubit.dart';
 import 'package:web_dashboard/features/authentication/presentation/manager/auth_state.dart';
 
-/// Premium SaaS-style login screen.
+/// Premium SaaS-style login screen with full light/dark mode support.
 ///
 /// Desktop: split layout with branded left panel + form right panel.
 /// Mobile: full-width form only.
@@ -46,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isDesktop = size.width >= 900;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -69,21 +71,67 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
       child: Scaffold(
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFF8F9FD),
-                Color(0xFFEDE9FE),
-                Color(0xFFF0F9FF),
-              ],
+        backgroundColor: isDark ? AppColors.backgroundDark : const Color(0xFFF8F9FD),
+        body: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              height: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? const [
+                          Color(0xFF0B0F19),
+                          Color(0xFF131127),
+                          Color(0xFF0F172A),
+                        ]
+                      : const [
+                          Color(0xFFF8F9FD),
+                          Color(0xFFEDE9FE),
+                          Color(0xFFF0F9FF),
+                        ],
+                ),
+              ),
+              child: isDesktop ? _buildDesktopLayout(isDark) : _buildMobileLayout(isDark),
             ),
-          ),
-          child: isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
+            // Theme toggle button on top-left
+            Positioned(
+              top: 20,
+              left: 20,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF1E293B).withValues(alpha: 0.8)
+                        : Colors.white.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF334155) : AppColors.borderLight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                      color: isDark ? Colors.amber : AppColors.textPrimaryLight,
+                      size: 20,
+                    ),
+                    tooltip: isDark ? 'الوضع النهاري' : 'الوضع الليلي',
+                    onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -92,13 +140,13 @@ class _LoginScreenState extends State<LoginScreen> {
   // ═══════════════════════════════════════════════════════════════════════
   // Desktop – split layout
   // ═══════════════════════════════════════════════════════════════════════
-  Widget _buildDesktopLayout() {
+  Widget _buildDesktopLayout(bool isDark) {
     return Row(
       children: [
         // ── Left branded panel ──────────────────────────────────────────
         Expanded(
           flex: 5,
-          child: _buildBrandPanel(),
+          child: _buildBrandPanel(isDark),
         ),
         // ── Right form panel ────────────────────────────────────────────
         Expanded(
@@ -108,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 48),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 440),
-                child: _buildLoginForm(),
+                child: _buildLoginForm(isDark),
               ),
             ),
           ),
@@ -120,13 +168,13 @@ class _LoginScreenState extends State<LoginScreen> {
   // ═══════════════════════════════════════════════════════════════════════
   // Mobile – form only
   // ═══════════════════════════════════════════════════════════════════════
-  Widget _buildMobileLayout() {
+  Widget _buildMobileLayout(bool isDark) {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 440),
-          child: _buildLoginForm(),
+          child: _buildLoginForm(isDark),
         ),
       ),
     );
@@ -135,17 +183,23 @@ class _LoginScreenState extends State<LoginScreen> {
   // ═══════════════════════════════════════════════════════════════════════
   // Brand panel (left side on desktop)
   // ═══════════════════════════════════════════════════════════════════════
-  Widget _buildBrandPanel() {
+  Widget _buildBrandPanel(bool isDark) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary,
-            AppColors.primaryDark,
-            Color(0xFF2D1B69),
-          ],
+          colors: isDark
+              ? const [
+                  Color(0xFF311B92),
+                  Color(0xFF1E1035),
+                  Color(0xFF0F0B1E),
+                ]
+              : const [
+                  AppColors.primary,
+                  AppColors.primaryDark,
+                  Color(0xFF2D1B69),
+                ],
         ),
       ),
       child: Stack(
@@ -200,8 +254,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
                       borderRadius: BorderRadius.circular(24),
+                      border: isDark ? Border.all(color: const Color(0xFF334155)) : null,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.1),
@@ -314,7 +369,7 @@ class _LoginScreenState extends State<LoginScreen> {
   // ═══════════════════════════════════════════════════════════════════════
   // Login form (glassmorphism card)
   // ═══════════════════════════════════════════════════════════════════════
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(bool isDark) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -324,11 +379,12 @@ class _LoginScreenState extends State<LoginScreen> {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
               borderRadius: BorderRadius.circular(18),
+              border: isDark ? Border.all(color: const Color(0xFF334155)) : null,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -355,20 +411,26 @@ class _LoginScreenState extends State<LoginScreen> {
         Container(
           padding: const EdgeInsets.all(36),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.85),
+            color: isDark
+                ? const Color(0xFF1E293B).withValues(alpha: 0.95)
+                : Colors.white.withValues(alpha: 0.85),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: isDark
+                  ? const Color(0xFF334155)
+                  : Colors.white.withValues(alpha: 0.3),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.06),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : AppColors.primary.withValues(alpha: 0.06),
                 blurRadius: 40,
                 offset: const Offset(0, 12),
               ),
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                 blurRadius: 20,
                 offset: const Offset(0, 4),
               ),
@@ -385,7 +447,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: GoogleFonts.cairo(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimaryLight,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -393,7 +457,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   AppStrings.loginSubtitle,
                   style: GoogleFonts.cairo(
                     fontSize: 15,
-                    color: AppColors.textSecondaryLight,
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -404,7 +470,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: GoogleFonts.cairo(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimaryLight,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -412,8 +480,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   textDirection: TextDirection.ltr,
-                  style: GoogleFonts.cairo(fontSize: 15),
+                  style: GoogleFonts.cairo(
+                    fontSize: 15,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                  ),
+                  cursorColor: AppColors.primary,
                   decoration: _inputDecoration(
+                    isDark: isDark,
                     hint: 'example@email.com',
                     prefixIcon: Icons.email_outlined,
                   ),
@@ -436,7 +511,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: GoogleFonts.cairo(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimaryLight,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -444,8 +521,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   textDirection: TextDirection.ltr,
-                  style: GoogleFonts.cairo(fontSize: 15),
+                  style: GoogleFonts.cairo(
+                    fontSize: 15,
+                    color: isDark
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimaryLight,
+                  ),
+                  cursorColor: AppColors.primary,
                   decoration: _inputDecoration(
+                    isDark: isDark,
                     hint: '••••••••',
                     prefixIcon: Icons.lock_outline_rounded,
                     suffixIcon: IconButton(
@@ -453,7 +537,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         _obscurePassword
                             ? Icons.visibility_off_outlined
                             : Icons.visibility_outlined,
-                        color: AppColors.textTertiaryLight,
+                        color: isDark
+                            ? AppColors.textTertiaryDark
+                            : AppColors.textTertiaryLight,
                         size: 20,
                       ),
                       onPressed: () =>
@@ -514,7 +600,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   },
                 ),
-
               ],
             ),
           ),
@@ -533,6 +618,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   InputDecoration _inputDecoration({
+    required bool isDark,
     required String hint,
     required IconData prefixIcon,
     Widget? suffixIcon,
@@ -540,25 +626,29 @@ class _LoginScreenState extends State<LoginScreen> {
     return InputDecoration(
       hintText: hint,
       hintStyle: GoogleFonts.cairo(
-        color: AppColors.textTertiaryLight,
+        color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight,
         fontSize: 14,
       ),
       prefixIcon: Icon(
         prefixIcon,
-        color: AppColors.textTertiaryLight,
+        color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight,
         size: 20,
       ),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: const Color(0xFFF8F9FD),
+      fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8F9FD),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.borderLight),
+        borderSide: BorderSide(
+          color: isDark ? const Color(0xFF334155) : AppColors.borderLight,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.borderLight),
+        borderSide: BorderSide(
+          color: isDark ? const Color(0xFF334155) : AppColors.borderLight,
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
