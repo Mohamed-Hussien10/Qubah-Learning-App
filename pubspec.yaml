@@ -93,8 +93,4 @@ msix_config:
   publisher: "CN=044C8A57-4AC3-4C6A-8328-8E00E1981138" # Format: CN=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
   msix_version: 1.0.0.0          # Last number must always be 0 for Microsoft Store
   logo_path: assets/images/logo.png
-  capabilities:
-    - internetClient
-    - internetClientServer
-    - privateNetworkClientServer
-    - runFullTrust
+  capabilities: "internetClient, internetClientServer, privateNetworkClientServer, runFullTrust"
