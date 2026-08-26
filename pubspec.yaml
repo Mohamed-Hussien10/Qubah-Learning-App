@@ -94,3 +94,6 @@ msix_config:
   msix_version: 1.0.0.0          # Last number must always be 0 for Microsoft Store
   logo_path: assets/images/logo.png
   capabilities: "internetClient, internetClientServer, privateNetworkClientServer"
+  store: true
+  install_certificate: false
+  sign_msix: false
