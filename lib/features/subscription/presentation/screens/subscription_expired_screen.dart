@@ -34,7 +34,7 @@ class SubscriptionExpiredScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'يرجى التواصل مع إدارة التطبيق لتجديد اشتراكك والتمتع بكافة المحتويات التعليمية.',
+                'عزيزي المستخدم، لا يوجد اشتراك فعّال مرتبط بهذا الحساب حالياً للوصول إلى هذا المحتوى التعليمي.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.cairo(
                   fontSize: 16,

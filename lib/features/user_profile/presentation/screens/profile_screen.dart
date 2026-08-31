@@ -76,6 +76,8 @@ class ProfileScreen extends StatelessWidget {
                         name = user.name.isNotEmpty ? user.name : name;
                         stage = user.stageName ?? stage;
                         grade = user.gradeName ?? grade;
+                      } else {
+                        name = 'زائر (تجربة مجانية)';
                       }
 
                       return Column(
@@ -208,34 +210,55 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isGuest = widget.user == null;
     final bool isActive = widget.user?.isSubscriptionValid ?? false;
     final package = _fetchedPackage ?? widget.user?.package;
-    final String packageName = package?.name ?? 'الباقة الفعالة';
-    final String scopeText =
-        package?.scopeText ??
-        '${widget.user?.stageName ?? "المرحلة"} - ${widget.user?.gradeName ?? "الصف"}';
-    final String scopeLevelLabel = package?.scopeLevelLabel ?? 'باقة شاملة';
+    final String packageName = isGuest
+        ? 'تجربة مجانية'
+        : (isActive ? (package?.name ?? 'الباقة الفعالة') : 'لا يوجد اشتراك فعال');
+    final String scopeText = isGuest
+        ? 'دروس ومراحل تجريبية'
+        : (package?.scopeText ??
+            '${widget.user?.stageName ?? "المرحلة"} - ${widget.user?.gradeName ?? "الصف"}');
+    final String scopeLevelLabel = isGuest
+        ? 'تصفح مجاني'
+        : (package?.scopeLevelLabel ?? 'باقة شاملة');
 
     final exp = widget.user?.subscriptionExpiry;
-    final String expiryText = (exp != null)
-        ? exp.toString().split(" ").first.split("T").first
-        : 'غير محدد';
+    final String expiryText = isGuest
+        ? 'مفتوح'
+        : ((exp != null)
+            ? exp.toString().split(" ").first.split("T").first
+            : 'غير محدد');
+
+    final Color statusColor = isGuest
+        ? Colors.blue
+        : (isActive ? Colors.green : Colors.red);
+    final String statusText = isGuest
+        ? 'زائر'
+        : (isActive ? 'مفعل' : 'منتهي');
+    final IconData statusIcon = isGuest
+        ? Icons.explore_rounded
+        : (isActive ? Icons.check_circle_rounded : Icons.cancel_rounded);
+    final Color cardBorderColor = (isActive || isGuest)
+        ? AppColors.primary.withValues(alpha: 0.3)
+        : AppColors.error.withValues(alpha: 0.3);
+    final Color cardShadowColor = (isActive || isGuest)
+        ? AppColors.primary.withValues(alpha: 0.08)
+        : AppColors.error.withValues(alpha: 0.08);
+    final Color headerIconColor = (isActive || isGuest) ? AppColors.primary : Colors.grey;
 
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isActive
-              ? AppColors.primary.withValues(alpha: 0.3)
-              : AppColors.error.withValues(alpha: 0.3),
+          color: cardBorderColor,
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: (isActive ? AppColors.primary : AppColors.error).withValues(
-              alpha: 0.08,
-            ),
+            color: cardShadowColor,
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -252,13 +275,12 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: (isActive ? AppColors.primary : Colors.grey)
-                      .withValues(alpha: 0.1),
+                  color: headerIconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   Icons.card_membership_rounded,
-                  color: isActive ? AppColors.primary : Colors.grey,
+                  color: headerIconColor,
                   size: 26,
                 ),
               ),
@@ -268,7 +290,7 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                   children: [
                     Expanded(
                       child: Text(
-                        isActive ? packageName : 'لا يوجد اشتراك فعال',
+                        packageName,
                         style: GoogleFonts.cairo(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -298,7 +320,7 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: (isActive ? Colors.green : Colors.red).withValues(
+                  color: statusColor.withValues(
                     alpha: 0.12,
                   ),
                   borderRadius: BorderRadius.circular(20),
@@ -307,19 +329,17 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      isActive
-                          ? Icons.check_circle_rounded
-                          : Icons.cancel_rounded,
+                      statusIcon,
                       size: 14,
-                      color: isActive ? Colors.green : Colors.red,
+                      color: statusColor,
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      isActive ? 'مفعل' : 'منتهي',
+                      statusText,
                       style: GoogleFonts.cairo(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: isActive ? Colors.green : Colors.red,
+                        color: statusColor,
                       ),
                     ),
                   ],
@@ -420,53 +440,6 @@ class _StudentPackageCardState extends State<_StudentPackageCard> {
               ),
             ],
           ),
-
-          if (!isActive) ...[
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text(
-                        'تفعيل اشتراك',
-                        style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
-                      ),
-                      content: Text(
-                        'عزيزي الطالب، يرجى التواصل مع إدارة التطبيق أو استخدام كود التفعيل لتجديد اشتراكك.',
-                        style: GoogleFonts.cairo(),
-                      ),
-                      actions: [
-                        HoverScale(child: TextButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: Text(
-                            'إغلاق',
-                            style: GoogleFonts.cairo(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        )),
-                      ],
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: Text(
-                  'تجديد الباقة / كود التفعيل',
-                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
-                ),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );
