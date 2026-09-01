@@ -28,6 +28,11 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+<string>We use your location to provide location-based features relevant to your current location.</string>
+
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>We use your location to provide location-based features and relevant content, including when the app is not actively in use.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Hessa needs access to your photo library to let you select a profile picture.</string>
 	<key>NSMicrophoneUsageDescription</key>
