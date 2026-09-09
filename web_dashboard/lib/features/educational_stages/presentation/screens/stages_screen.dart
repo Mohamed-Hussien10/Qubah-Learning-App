@@ -291,7 +291,7 @@ class _StagesView extends StatelessWidget {
               style: const TextStyle(color: AppColors.error, fontSize: 16)),
           const SizedBox(height: 20),
           FilledButton.icon(
-            onPressed: () => context.go('/login'),
+            onPressed: () => context.go('/force-logout'),
             icon: const Icon(Icons.login_rounded),
             label: const Text(AppStrings.login),
             style: FilledButton.styleFrom(

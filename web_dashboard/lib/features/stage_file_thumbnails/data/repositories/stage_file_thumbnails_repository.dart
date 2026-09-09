@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_dashboard/core/network/api_client.dart';
@@ -11,23 +13,51 @@ class StageFileThumbnailsRepository {
   StageFileThumbnailsRepository(this._apiClient, this._prefs);
 
   /// Fetch configured thumbnails for a specific stage as a Map of format to thumbnailUrl.
-  Future<Map<String, String>> getThumbnailsForStage(String stageId) async {
+  Future<Map<String, String>> getThumbnailsForStage(String stageId, {bool isFreeTrial = false}) async {
     final map = <String, String>{};
-    const formats = [
-      'pdf', 'video', 'audio', 'scorm',
-      'free_trial_pdf', 'free_trial_video', 'free_trial_audio', 'free_trial_scorm'
-    ];
+    
+    final formats = isFreeTrial
+        ? ['free_trial_pdf', 'free_trial_video', 'free_trial_audio', 'free_trial_scorm']
+        : ['pdf', 'video', 'audio', 'scorm'];
 
-    // 1. Read from SharedPreferences cache/fallback first
+    // 1. Read instantly from SharedPreferences cache
     for (final fmt in formats) {
       final key = 'stage_file_thumb_${stageId}_$fmt';
-      final url = _prefs.getString(key);
+      String? url = _prefs.getString(key);
+      if (url == null || url.isEmpty) {
+        final defaultKey = 'stage_file_thumb_$fmt';
+        url = _prefs.getString(defaultKey);
+      }
       if (url != null && url.isNotEmpty) {
         map[fmt] = url;
       }
     }
 
-    // Backend doesn't support stage-level file thumbnails yet, skipping GET
+    // 2. Fetch from backend with a fast timeout (2s) so it doesn't block UI loading
+    try {
+      final response = await _apiClient.get(
+        '/stages/$stageId/file-thumbnails',
+        options: Options(
+          sendTimeout: const Duration(seconds: 2),
+          receiveTimeout: const Duration(seconds: 2),
+        ),
+      );
+      final data = response.data['data'] ?? response.data;
+      if (data is Map) {
+        for (final entry in data.entries) {
+          final fmt = entry.key.toString();
+          if (formats.contains(fmt)) {
+            final url = entry.value.toString();
+            map[fmt] = url;
+            _prefs.setString('stage_file_thumb_${stageId}_$fmt', url);
+            _prefs.setString('stage_file_thumb_$fmt', url);
+          }
+        }
+      }
+    } catch (_) {
+      // Graceful fallback to cached values
+    }
+
     return map;
   }
 
@@ -50,30 +80,48 @@ class StageFileThumbnailsRepository {
       final data = uploadRes.data['data'] ?? uploadRes.data;
       path = data['path']?.toString() ?? '';
       
-      // Backend doesn't support POST to stage-level file thumbnails yet, skipping POST
+      // Persist to backend API endpoint
+      if (path.isNotEmpty) {
+        unawaited(() async {
+          try {
+            await _apiClient.post(
+              '/stages/$stageId/file-thumbnails',
+              data: {
+                'format': format,
+                'thumbnail_url': path,
+              },
+              options: Options(
+                sendTimeout: const Duration(seconds: 3),
+                receiveTimeout: const Duration(seconds: 3),
+              ),
+            );
+          } catch (_) {}
+        }());
+      }
     } catch (e) {
       debugPrint('API upload fallback: $e');
     }
 
-    // Fallback to Base64 data URI if path is empty (e.g. offline mode or API endpoint missing)
+    // Fallback to Base64 data URI if path is empty
     if (path.isEmpty && imageBytes.isNotEmpty) {
       final ext = fileName.split('.').last.toLowerCase();
       final mime = (ext == 'png') ? 'image/png' : (ext == 'gif' ? 'image/gif' : 'image/jpeg');
       path = 'data:$mime;base64,${base64Encode(imageBytes)}';
     }
 
-    if (path.isNotEmpty) {
-      // Background update all lesson files in this stage matching the format
-      _updateAllFilesOfFormatInStage(stageId, format, path);
-    }
-
-    // Save in local storage cache (both stage-specific and format-default fallback)
+    // Save in local storage cache immediately
     final key = 'stage_file_thumb_${stageId}_$format';
     final defaultKey = 'stage_file_thumb_$format';
     if (path.isNotEmpty) {
       await _prefs.setString(key, path);
       await _prefs.setString(defaultKey, path);
     }
+
+    if (path.isNotEmpty) {
+      // Fire-and-forget background update of lesson files without blocking UI
+      unawaited(_updateAllFilesOfFormatInStage(stageId, format, path));
+    }
+
     return path;
   }
 
@@ -82,13 +130,24 @@ class StageFileThumbnailsRepository {
     required String stageId,
     required String format,
   }) async {
-    // Backend doesn't support DELETE for stage-level file thumbnails yet, skipping DELETE
-    
     final key = 'stage_file_thumb_${stageId}_$format';
     final defaultKey = 'stage_file_thumb_$format';
     await _prefs.remove(key);
     await _prefs.remove(defaultKey);
+
+    unawaited(() async {
+      try {
+        await _apiClient.delete(
+          '/stages/$stageId/file-thumbnails/$format',
+          options: Options(
+            sendTimeout: const Duration(seconds: 3),
+            receiveTimeout: const Duration(seconds: 3),
+          ),
+        );
+      } catch (_) {}
+    }());
   }
+
 
   Future<void> _updateAllFilesOfFormatInStage(String stageId, String format, String thumbnailPath) async {
     try {

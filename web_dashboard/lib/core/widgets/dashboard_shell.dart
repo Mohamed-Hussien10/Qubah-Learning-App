@@ -68,7 +68,7 @@ class _DashboardShellState extends State<DashboardShell> {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthInitial) {
-            context.go('/login');
+            context.go('/force-logout');
           }
         },
         child: Row(

@@ -19,7 +19,10 @@ class StageFileThumbnailsCubit extends Cubit<StageFileThumbnailsState> {
         _thumbnailsRepository = thumbnailsRepository,
         super(const StageFileThumbnailsInitial());
 
+  bool _isFreeTrial = false;
+
   Future<void> loadData({bool isFreeTrial = false}) async {
+    _isFreeTrial = isFreeTrial;
     emit(const StageFileThumbnailsLoading());
     try {
       List<StageModel> stages = [];
@@ -46,36 +49,42 @@ class StageFileThumbnailsCubit extends Cubit<StageFileThumbnailsState> {
       Map<String, String> thumbnails = {};
 
       if (selectedStage != null) {
-        thumbnails = await _thumbnailsRepository.getThumbnailsForStage(selectedStage.id);
+        thumbnails = await _thumbnailsRepository.getThumbnailsForStage(selectedStage.id, isFreeTrial: _isFreeTrial);
       }
 
-      emit(StageFileThumbnailsLoaded(
-        stages: stages,
-        selectedStage: selectedStage,
-        thumbnails: thumbnails,
-      ));
+      if (!isClosed) {
+        emit(StageFileThumbnailsLoaded(
+          stages: stages,
+          selectedStage: selectedStage,
+          thumbnails: thumbnails,
+        ));
+      }
     } catch (e) {
-      emit(StageFileThumbnailsLoaded(
-        stages: StageModel.dummyList,
-        selectedStage: StageModel.dummyList.first,
-        thumbnails: const {},
-      ));
+      if (!isClosed) {
+        emit(StageFileThumbnailsLoaded(
+          stages: StageModel.dummyList,
+          selectedStage: StageModel.dummyList.first,
+          thumbnails: const {},
+        ));
+      }
     }
   }
 
   Future<void> selectStage(StageModel stage) async {
     final currentState = state;
     if (currentState is StageFileThumbnailsLoaded) {
-      emit(currentState.copyWith(isUpdating: true, selectedStage: stage));
+      if (!isClosed) emit(currentState.copyWith(isUpdating: true, selectedStage: stage));
       try {
-        final thumbnails = await _thumbnailsRepository.getThumbnailsForStage(stage.id);
-        emit(currentState.copyWith(
-          selectedStage: stage,
-          thumbnails: thumbnails,
-          isUpdating: false,
-        ));
+        final thumbnails = await _thumbnailsRepository.getThumbnailsForStage(stage.id, isFreeTrial: _isFreeTrial);
+        if (!isClosed) {
+          emit(currentState.copyWith(
+            selectedStage: stage,
+            thumbnails: thumbnails,
+            isUpdating: false,
+          ));
+        }
       } catch (e) {
-        emit(currentState.copyWith(isUpdating: false));
+        if (!isClosed) emit(currentState.copyWith(isUpdating: false));
       }
     }
   }
@@ -87,7 +96,7 @@ class StageFileThumbnailsCubit extends Cubit<StageFileThumbnailsState> {
   }) async {
     final currentState = state;
     if (currentState is StageFileThumbnailsLoaded && currentState.selectedStage != null) {
-      emit(currentState.copyWith(isUpdating: true));
+      if (!isClosed) emit(currentState.copyWith(isUpdating: true));
       try {
         final path = await _thumbnailsRepository.saveThumbnail(
           stageId: currentState.selectedStage!.id,
@@ -99,13 +108,15 @@ class StageFileThumbnailsCubit extends Cubit<StageFileThumbnailsState> {
         final updatedThumbnails = Map<String, String>.from(currentState.thumbnails);
         updatedThumbnails[format] = path;
 
-        emit(currentState.copyWith(
-          thumbnails: updatedThumbnails,
-          isUpdating: false,
-        ));
+        if (!isClosed) {
+          emit(currentState.copyWith(
+            thumbnails: updatedThumbnails,
+            isUpdating: false,
+          ));
+        }
         return true;
       } catch (e) {
-        emit(currentState.copyWith(isUpdating: false));
+        if (!isClosed) emit(currentState.copyWith(isUpdating: false));
         return false;
       }
     }
@@ -115,7 +126,7 @@ class StageFileThumbnailsCubit extends Cubit<StageFileThumbnailsState> {
   Future<bool> removeFormatThumbnail(String format) async {
     final currentState = state;
     if (currentState is StageFileThumbnailsLoaded && currentState.selectedStage != null) {
-      emit(currentState.copyWith(isUpdating: true));
+      if (!isClosed) emit(currentState.copyWith(isUpdating: true));
       try {
         await _thumbnailsRepository.removeThumbnail(
           stageId: currentState.selectedStage!.id,
@@ -125,13 +136,15 @@ class StageFileThumbnailsCubit extends Cubit<StageFileThumbnailsState> {
         final updatedThumbnails = Map<String, String>.from(currentState.thumbnails);
         updatedThumbnails.remove(format);
 
-        emit(currentState.copyWith(
-          thumbnails: updatedThumbnails,
-          isUpdating: false,
-        ));
+        if (!isClosed) {
+          emit(currentState.copyWith(
+            thumbnails: updatedThumbnails,
+            isUpdating: false,
+          ));
+        }
         return true;
       } catch (e) {
-        emit(currentState.copyWith(isUpdating: false));
+        if (!isClosed) emit(currentState.copyWith(isUpdating: false));
         return false;
       }
     }

@@ -204,5 +204,18 @@ final GoRouter appRouter = GoRouter(
         ),
       ],
     ),
+    GoRoute(
+      path: '/force-logout',
+      builder: (context, state) {
+        sl<AuthRepository>().logout().then((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+             if (context.mounted) {
+               context.go('/login');
+             }
+          });
+        });
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      },
+    ),
   ],
 );

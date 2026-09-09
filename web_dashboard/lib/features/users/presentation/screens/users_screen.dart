@@ -720,7 +720,7 @@ class _UsersScreenState extends State<_UsersScreenBody> {
           ),
           const SizedBox(height: 20),
           FilledButton.icon(
-            onPressed: () => context.go('/login'),
+            onPressed: () => context.go('/force-logout'),
             icon: const Icon(Icons.login_rounded),
             label: Text(AppStrings.login, style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
             style: FilledButton.styleFrom(

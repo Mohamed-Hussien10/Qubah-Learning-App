@@ -461,7 +461,7 @@ class _DashboardViewState extends State<_DashboardView> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => context.go('/login'),
+              onPressed: () => context.go('/force-logout'),
               icon: const Icon(Icons.login_rounded),
               label: Text(
                 AppStrings.login,

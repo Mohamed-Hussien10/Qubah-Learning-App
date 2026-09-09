@@ -84,7 +84,7 @@ class AppErrorWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 FilledButton.icon(
-                  onPressed: () => context.go('/login'),
+                  onPressed: () => context.go('/force-logout'),
                   icon: const Icon(Icons.login_rounded, size: 20),
                   label: const Text(AppStrings.login),
                   style: FilledButton.styleFrom(

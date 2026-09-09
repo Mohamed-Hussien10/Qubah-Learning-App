@@ -379,7 +379,7 @@ class _AnalyticsView extends StatelessWidget {
           Text(message, style: const TextStyle(color: AppColors.error)),
           const SizedBox(height: 20),
           FilledButton.icon(
-            onPressed: () => context.go('/login'),
+            onPressed: () => context.go('/force-logout'),
             icon: const Icon(Icons.login_rounded),
             label: const Text(AppStrings.login),
             style: FilledButton.styleFrom(
