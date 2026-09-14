@@ -8,8 +8,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/debug_logger.dart';
 import '../../../core/widgets/loading_overlay.dart';
+import '../../../core/security/protected_lesson_scaffold.dart';
 import '../domain/scorm_package.dart';
-import '../services/security_service.dart';
 
 /// ──────────────────────────────────────────────────────────────────────────────
 /// SCORM Player Screen – renders the extracted HTML package inside InAppWebView.
@@ -78,14 +78,10 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
     super.initState();
     DebugLogger.webView('Player opened for: ${widget.package.name}');
     DebugLogger.webView('Entry file: ${widget.package.entryFilePath}');
-
-    // Enable screenshot protection placeholder
-    SecurityService.enableScreenshotProtection();
   }
 
   @override
   void dispose() {
-    SecurityService.disableScreenshotProtection();
 
     // Restore system UI when leaving player
     SystemChrome.setEnabledSystemUIMode(
@@ -164,9 +160,9 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
           Navigator.of(context).pop();
         }
       },
-      child: Scaffold(
+      child: ProtectedLessonScaffold(
         backgroundColor: Colors.black,
-        body: Stack(
+        child: Stack(
           children: [
             // ── WebView ──────────────────────────────────────────────────
             Positioned.fill(

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/helpers.dart';
+import '../../../../core/security/protected_lesson_scaffold.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
@@ -53,36 +54,49 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         placeholder: Container(color: Colors.black),
         autoInitialize: true,
       );
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     } catch (e) {
-      debugPrint('Video Error:');
-      setState(() => _hasError = true);
+      debugPrint('Video Error: $e');
+      if (mounted) {
+        setState(() => _hasError = true);
+      }
+    }
+  }
+
+  void _onCaptureStateChanged(bool isCaptured) {
+    if (isCaptured) {
+      _chewieController?.pause();
+      _videoPlayerController.pause();
     }
   }
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
     _chewieController?.dispose();
+    _videoPlayerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ProtectedLessonScaffold(
       backgroundColor: Colors.black,
+      onCaptureStateChanged: _onCaptureStateChanged,
       appBar: AppBar(
-        leading: HoverScale(child: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            } else {
-              // fallback
-              Navigator.of(context).pushReplacementNamed('/home');
-            }
-          },
-        )),
+        leading: HoverScale(
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pushReplacementNamed('/home');
+              }
+            },
+          ),
+        ),
         backgroundColor: Colors.black,
         title: Text(
           widget.title,
@@ -90,16 +104,16 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
+      child: Center(
         child: _hasError
             ? const Text(
                 'Error loading video',
                 style: TextStyle(color: Colors.white),
               )
             : _chewieController != null &&
-                  _chewieController!.videoPlayerController.value.isInitialized
-            ? Chewie(controller: _chewieController!)
-            : const CircularProgressIndicator(color: AppColors.primary),
+                    _chewieController!.videoPlayerController.value.isInitialized
+                ? Chewie(controller: _chewieController!)
+                : const CircularProgressIndicator(color: AppColors.primary),
       ),
     );
   }

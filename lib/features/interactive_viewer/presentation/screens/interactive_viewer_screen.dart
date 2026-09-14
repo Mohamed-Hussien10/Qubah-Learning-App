@@ -9,6 +9,7 @@ import '../../../../core/utils/helpers.dart';
 import '../../../scorm_player/domain/scorm_package.dart';
 import '../../../scorm_player/services/scorm_extractor_service.dart';
 import '../../../scorm_player/presentation/scorm_player_screen.dart';
+import '../../../../core/security/protected_lesson_scaffold.dart';
 
 class InteractiveViewerScreen extends StatefulWidget {
   final String contentUrl;
@@ -121,7 +122,8 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
       return ScormPlayerScreen(package: _package!);
     }
 
-    return Scaffold(
+    return ProtectedLessonScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         leading: HoverScale(child: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
@@ -140,7 +142,7 @@ class _InteractiveViewerScreenState extends State<InteractiveViewerScreen> {
         ),
         elevation: 1,
       ),
-      body: Center(
+      child: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: _isLoading

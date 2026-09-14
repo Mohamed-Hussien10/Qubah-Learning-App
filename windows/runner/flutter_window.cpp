@@ -1,8 +1,21 @@
 #include "flutter_window.h"
 
 #include <optional>
+#include <windows.h>
 
 #include "flutter/generated_plugin_registrant.h"
+
+#ifndef WDA_NONE
+#define WDA_NONE 0x00000000
+#endif
+
+#ifndef WDA_MONITOR
+#define WDA_MONITOR 0x00000001
+#endif
+
+#ifndef WDA_EXCLUDEFROMCAPTURE
+#define WDA_EXCLUDEFROMCAPTURE 0x00000011
+#endif
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
@@ -27,6 +40,30 @@ bool FlutterWindow::OnCreate() {
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
+  // Setup security method channel for SetWindowDisplayAffinity
+  HWND window_handle = GetHandle();
+  security_channel_ = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+      flutter_controller_->engine()->messenger(),
+      "com.qubah.learning/security",
+      &flutter::StandardMethodCodec::GetInstance());
+
+  security_channel_->SetMethodCallHandler(
+      [window_handle](const flutter::MethodCall<flutter::EncodableValue>& call,
+                      std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
+        if (call.method_name().compare("enableProtection") == 0) {
+          BOOL success = SetWindowDisplayAffinity(window_handle, WDA_EXCLUDEFROMCAPTURE);
+          if (!success) {
+            success = SetWindowDisplayAffinity(window_handle, WDA_MONITOR);
+          }
+          result->Success(flutter::EncodableValue(success != FALSE));
+        } else if (call.method_name().compare("disableProtection") == 0) {
+          BOOL success = SetWindowDisplayAffinity(window_handle, WDA_NONE);
+          result->Success(flutter::EncodableValue(success != FALSE));
+        } else {
+          result->NotImplemented();
+        }
+      });
+
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
     this->Show();
   });
@@ -40,6 +77,10 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  if (security_channel_) {
+    security_channel_ = nullptr;
+  }
+
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }

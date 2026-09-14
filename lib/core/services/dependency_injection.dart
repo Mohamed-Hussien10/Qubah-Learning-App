@@ -6,6 +6,7 @@ import '../network/network_info.dart';
 import '../network/interceptors/auth_interceptor.dart';
 import '../network/interceptors/error_interceptor.dart';
 import '../storage/secure_storage.dart';
+import '../security/screen_security_service.dart';
 
 // Feature imports - Authentication
 import '../../features/authentication/data/data_sources/auth_api_service.dart';
@@ -74,6 +75,7 @@ final GetIt sl = GetIt.instance;
 Future<void> initDependencies() async {
   // ── Core Services ───────────────────────────────────────────────────────
   sl.registerLazySingleton<SecureStorage>(() => SecureStorage());
+  sl.registerLazySingleton<ScreenSecurityService>(() => ScreenSecurityService());
   sl.registerLazySingleton<NetworkInfo>(
     () => NetworkInfoImpl(InternetConnection()),
   );

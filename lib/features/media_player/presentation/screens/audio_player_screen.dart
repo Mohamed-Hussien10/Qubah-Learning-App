@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/helpers.dart';
+import '../../../../core/security/protected_lesson_scaffold.dart';
 
 class AudioPlayerScreen extends StatefulWidget {
   final String audioUrl;
@@ -60,6 +61,12 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     }
   }
 
+  void _onCaptureStateChanged(bool isCaptured) {
+    if (isCaptured && _isPlaying) {
+      _player.pause();
+    }
+  }
+
   @override
   void dispose() {
     for (var sub in _subscriptions) {
@@ -71,25 +78,28 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ProtectedLessonScaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      onCaptureStateChanged: _onCaptureStateChanged,
       appBar: AppBar(
-        leading: HoverScale(child: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            } else {
-              // fallback
-              Navigator.of(context).pushReplacementNamed('/home');
-            }
-          },
-        )),
+        leading: HoverScale(
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pushReplacementNamed('/home');
+              }
+            },
+          ),
+        ),
         title: Text(
           'درس صوتي',
           style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
         ),
       ),
-      body: Padding(
+      child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -123,9 +133,9 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
               min: 0,
               max: _duration.inSeconds.toDouble(),
               value: _position.inSeconds.toDouble().clamp(
-                0,
-                _duration.inSeconds.toDouble(),
-              ),
+                    0,
+                    _duration.inSeconds.toDouble(),
+                  ),
               onChanged: (value) {
                 _player.seek(Duration(seconds: value.toInt()));
               },
@@ -146,38 +156,44 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                HoverScale(child: IconButton(
-                  icon: const Icon(Icons.replay_10_rounded, size: 36),
-                  onPressed: () =>
-                      _player.seek(_position - const Duration(seconds: 10)),
-                )),
+                HoverScale(
+                  child: IconButton(
+                    icon: const Icon(Icons.replay_10_rounded, size: 36),
+                    onPressed: () =>
+                        _player.seek(_position - const Duration(seconds: 10)),
+                  ),
+                ),
                 const SizedBox(width: 16),
                 CircleAvatar(
                   radius: 36,
                   backgroundColor: AppColors.primary,
-                  child: HoverScale(child: IconButton(
-                    icon: Icon(
-                      _isPlaying
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
-                      size: 36,
-                      color: Colors.white,
+                  child: HoverScale(
+                    child: IconButton(
+                      icon: Icon(
+                        _isPlaying
+                            ? Icons.pause_rounded
+                            : Icons.play_arrow_rounded,
+                        size: 36,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        if (_isPlaying) {
+                          _player.pause();
+                        } else {
+                          _player.play();
+                        }
+                      },
                     ),
-                    onPressed: () {
-                      if (_isPlaying) {
-                        _player.pause();
-                      } else {
-                        _player.play();
-                      }
-                    },
-                  )),
+                  ),
                 ),
                 const SizedBox(width: 16),
-                HoverScale(child: IconButton(
-                  icon: const Icon(Icons.forward_10_rounded, size: 36),
-                  onPressed: () =>
-                      _player.seek(_position + const Duration(seconds: 10)),
-                )),
+                HoverScale(
+                  child: IconButton(
+                    icon: const Icon(Icons.forward_10_rounded, size: 36),
+                    onPressed: () =>
+                        _player.seek(_position + const Duration(seconds: 10)),
+                  ),
+                ),
               ],
             ),
           ],
