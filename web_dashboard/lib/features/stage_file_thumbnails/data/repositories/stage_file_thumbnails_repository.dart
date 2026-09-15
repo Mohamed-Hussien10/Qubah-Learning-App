@@ -33,13 +33,17 @@ class StageFileThumbnailsRepository {
       }
     }
 
-    // 2. Fetch from backend with a fast timeout (2s) so it doesn't block UI loading
+    // Return immediately if all formats are already cached
+    if (map.length == formats.length) {
+      return map;
+    }
+
+    // 2. Fetch from backend with a fast timeout (800ms) so it doesn't block UI loading
     try {
       final response = await _apiClient.get(
         '/stages/$stageId/file-thumbnails',
         options: Options(
-          sendTimeout: const Duration(seconds: 2),
-          receiveTimeout: const Duration(seconds: 2),
+          receiveTimeout: const Duration(milliseconds: 800),
         ),
       );
       final data = response.data['data'] ?? response.data;
@@ -48,14 +52,16 @@ class StageFileThumbnailsRepository {
           final fmt = entry.key.toString();
           if (formats.contains(fmt)) {
             final url = entry.value.toString();
-            map[fmt] = url;
-            _prefs.setString('stage_file_thumb_${stageId}_$fmt', url);
-            _prefs.setString('stage_file_thumb_$fmt', url);
+            if (url.isNotEmpty && url != 'null') {
+              map[fmt] = url;
+              _prefs.setString('stage_file_thumb_${stageId}_$fmt', url);
+              _prefs.setString('stage_file_thumb_$fmt', url);
+            }
           }
         }
       }
     } catch (_) {
-      // Graceful fallback to cached values
+      // Graceful fallback to cached values or file search
     }
 
     return map;
@@ -140,7 +146,6 @@ class StageFileThumbnailsRepository {
         await _apiClient.delete(
           '/stages/$stageId/file-thumbnails/$format',
           options: Options(
-            sendTimeout: const Duration(seconds: 3),
             receiveTimeout: const Duration(seconds: 3),
           ),
         );
