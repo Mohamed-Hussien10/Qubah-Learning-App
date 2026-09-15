@@ -1,5 +1,6 @@
 import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qubah_learning_app/core/utils/responsive_utils.dart';
 import '../../../../core/network/dio_client.dart';
@@ -104,7 +105,7 @@ class _FreeTrialSubjectsScreenState extends State<FreeTrialSubjectsScreen> {
                   widget.backgroundImageUrl!.isNotEmpty
               ? BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(
+                    image: CachedNetworkImageProvider(
                       AppHelpers.resolveMediaUrl(widget.backgroundImageUrl!),
                     ),
                     fit: BoxFit.cover,

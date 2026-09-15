@@ -5,15 +5,20 @@ import 'package:qubah_learning_app/core/errors/error_handler.dart';
 
 class LessonsCubit extends Cubit<LessonsState> {
   final GetLessonsUseCase _getLessonsUseCase;
+  String? _lastParentId;
 
   LessonsCubit({required GetLessonsUseCase getLessonsUseCase})
     : _getLessonsUseCase = getLessonsUseCase,
       super(LessonsInitial());
 
-  Future<void> loadLessons(String subjectId) async {
+  Future<void> loadLessons(String subjectId, {bool forceRefresh = false}) async {
+    // Skip reload if same parent's data is already loaded
+    if (_lastParentId == subjectId && state is LessonsLoaded && !forceRefresh) return;
+
     emit(LessonsLoading());
     try {
       final lessons = await _getLessonsUseCase(subjectId);
+      _lastParentId = subjectId;
       emit(LessonsLoaded(lessons));
     } catch (e) {
       emit(LessonsError(ErrorHandler.handle(e)));

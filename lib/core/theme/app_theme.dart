@@ -54,6 +54,8 @@ class AppTheme {
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
+          systemNavigationBarColor: AppColors.scaffoldLight,
+          systemNavigationBarIconBrightness: Brightness.dark,
         ),
       ),
 
@@ -223,6 +225,8 @@ class AppTheme {
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: AppColors.scaffoldDark,
+          systemNavigationBarIconBrightness: Brightness.light,
         ),
       ),
 

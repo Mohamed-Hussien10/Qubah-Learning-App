@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../utils/helpers.dart';
 
 class ChildFriendlyCard extends StatefulWidget {
@@ -135,12 +136,15 @@ class _ChildFriendlyCardState extends State<ChildFriendlyCard>
                           child:
                               widget.imageUrl != null &&
                                   widget.imageUrl!.isNotEmpty
-                              ? Image.network(
-                                  AppHelpers.resolveMediaUrl(widget.imageUrl!),
+                              ? CachedNetworkImage(
+                                  imageUrl: AppHelpers.resolveMediaUrl(widget.imageUrl!),
                                   fit: BoxFit.cover,
                                   width: double.infinity,
                                   height: double.infinity,
-                                  errorBuilder: (_, __, ___) => Icon(
+                                  placeholder: (context, url) => Container(
+                                    color: widget.color.withValues(alpha: 0.1),
+                                  ),
+                                  errorWidget: (context, url, error) => Icon(
                                     widget.defaultIcon,
                                     size: 60,
                                     color: widget.color,

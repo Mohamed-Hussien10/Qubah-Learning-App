@@ -2,6 +2,7 @@ import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -67,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return FileImage(File(_imagePath!));
     }
     if (_avatarUrl != null && _avatarUrl!.isNotEmpty) {
-      return NetworkImage(AppHelpers.resolveMediaUrl(_avatarUrl!));
+      return CachedNetworkImageProvider(AppHelpers.resolveMediaUrl(_avatarUrl!));
     }
     return null;
   }

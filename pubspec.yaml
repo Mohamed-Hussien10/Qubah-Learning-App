@@ -41,6 +41,7 @@ dependencies:
   video_player: ^2.9.5
   chewie: ^1.10.0
   just_audio: ^0.9.44
+  just_audio_windows: ^0.2.3
 
   # ── Document Viewers ────────────────────────────────────────────────────
   syncfusion_flutter_pdfviewer: ^29.1.41

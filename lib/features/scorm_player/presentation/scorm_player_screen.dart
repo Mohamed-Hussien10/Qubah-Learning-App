@@ -214,8 +214,8 @@ class _ScormPlayerScreenState extends State<ScormPlayerScreen> {
         allowsInlineMediaPlayback: true,
 
         // ── File & Local Access ────────────────────────────────────────
-        allowFileAccessFromFileURLs: false,
-        allowUniversalAccessFromFileURLs: false,
+        allowFileAccessFromFileURLs: true,
+        allowUniversalAccessFromFileURLs: true,
         allowFileAccess: true,
         allowContentAccess: true,
 

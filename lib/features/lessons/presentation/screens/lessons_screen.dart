@@ -1,5 +1,7 @@
 import 'package:qubah_learning_app/core/widgets/hover_scale.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/error_display.dart';
 import '../../../../core/utils/error_utils.dart';
@@ -52,36 +54,44 @@ class _LessonsScreenState extends State<LessonsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('الدروس', style: TextStyle(fontWeight: FontWeight.bold)),
-        leading: HoverScale(child: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/home');
-            }
-          },
-        )),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
       ),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: Container(
-        decoration: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty
-            ? BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(AppHelpers.resolveMediaUrl(widget.backgroundImageUrl!)),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(Colors.white.withValues(alpha: 0.15), BlendMode.lighten),
-                ),
-              )
-            : null,
-        child: Column(
-          children: [
+      child: Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty ? Colors.transparent : null,
+          elevation: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty ? 0 : null,
+          title: const Text('الدروس', style: TextStyle(fontWeight: FontWeight.bold)),
+          leading: HoverScale(child: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          )),
+        ),
+        body: Container(
+          decoration: widget.backgroundImageUrl != null && widget.backgroundImageUrl!.isNotEmpty
+              ? BoxDecoration(
+                  image: DecorationImage(
+                    image: CachedNetworkImageProvider(AppHelpers.resolveMediaUrl(widget.backgroundImageUrl!)),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(Colors.white.withValues(alpha: 0.15), BlendMode.lighten),
+                  ),
+                )
+              : null,
+          child: SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Column(
+                  children: [
             if (widget.titlePath.isNotEmpty)
               BreadcrumbNav(pathNames: widget.titlePath),
             Expanded(
@@ -153,13 +163,14 @@ class _LessonsScreenState extends State<LessonsScreen> {
             ),
           ),
   
-  ],
-      ),
-        ),
+            ],
           ),
         ),
       ),
-    );
+    ),
+  ),
+),
+);
   }
 }
 

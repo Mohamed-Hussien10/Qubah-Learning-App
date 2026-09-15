@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -511,7 +512,7 @@ class _ProfileAvatarWidgetState extends State<_ProfileAvatarWidget> {
       return FileImage(File(_imagePath!));
     }
     if (_avatarUrl != null && _avatarUrl!.isNotEmpty) {
-      return NetworkImage(AppHelpers.resolveMediaUrl(_avatarUrl!));
+      return CachedNetworkImageProvider(AppHelpers.resolveMediaUrl(_avatarUrl!));
     }
     return null;
   }
