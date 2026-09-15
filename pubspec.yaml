@@ -1,7 +1,7 @@
 name: qubah_learning_app
 description: "Hessa - Educational Platform for Children"
 publish_to: 'none'
-version: 1.0.0+6
+version: 1.0.1+1
 
 environment:
   sdk: ^3.11.5
