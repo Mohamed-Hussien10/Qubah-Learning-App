@@ -54,6 +54,18 @@ class SmartImage extends StatelessWidget {
       fit: fit,
       width: width,
       height: height,
+      loadingBuilder: (ctx, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Center(
+          child: CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded /
+                    loadingProgress.expectedTotalBytes!
+                : null,
+            strokeWidth: 2,
+          ),
+        );
+      },
       errorBuilder: (ctx, err, stack) =>
           errorBuilder?.call(ctx, err, stack) ?? const SizedBox.shrink(),
     );

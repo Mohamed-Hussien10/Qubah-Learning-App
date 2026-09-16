@@ -38,12 +38,12 @@ class StageFileThumbnailsRepository {
       return map;
     }
 
-    // 2. Fetch from backend with a fast timeout (800ms) so it doesn't block UI loading
+    // 2. Fetch from backend
     try {
       final response = await _apiClient.get(
-        '/stages/$stageId/file-thumbnails',
+        '/educational-stages/$stageId/file-thumbnails',
         options: Options(
-          receiveTimeout: const Duration(milliseconds: 800),
+          receiveTimeout: const Duration(seconds: 10),
         ),
       );
       final data = response.data['data'] ?? response.data;
@@ -60,8 +60,8 @@ class StageFileThumbnailsRepository {
           }
         }
       }
-    } catch (_) {
-      // Graceful fallback to cached values or file search
+    } catch (e) {
+      debugPrint('Error fetching thumbnails for stage $stageId: $e');
     }
 
     return map;
@@ -91,7 +91,7 @@ class StageFileThumbnailsRepository {
         unawaited(() async {
           try {
             await _apiClient.post(
-              '/stages/$stageId/file-thumbnails',
+              '/educational-stages/$stageId/file-thumbnails',
               data: {
                 'format': format,
                 'thumbnail_url': path,
@@ -144,7 +144,7 @@ class StageFileThumbnailsRepository {
     unawaited(() async {
       try {
         await _apiClient.delete(
-          '/stages/$stageId/file-thumbnails/$format',
+          '/educational-stages/$stageId/file-thumbnails/$format',
           options: Options(
             receiveTimeout: const Duration(seconds: 3),
           ),

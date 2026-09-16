@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:web_dashboard/features/educational_stages/data/models/stage_model.dart';
 import 'package:web_dashboard/features/educational_stages/data/repositories/stages_repository.dart';
@@ -60,6 +61,7 @@ class StageFileThumbnailsCubit extends Cubit<StageFileThumbnailsState> {
         ));
       }
     } catch (e) {
+      debugPrint('StageFileThumbnailsCubit.loadData error: $e');
       if (!isClosed) {
         emit(StageFileThumbnailsLoaded(
           stages: StageModel.dummyList,
