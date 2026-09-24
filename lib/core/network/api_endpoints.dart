@@ -25,21 +25,15 @@ class ApiEndpoints {
   static const String resetPassword = 'auth/reset-password';
   static const String verifyEmail = 'auth/verify-email';
 
-  // ── Activation Codes ───────────────────────────────────────────────────
-  static const String activateCode = 'activation/activate';
-  static const String validateCode = 'activation/validate';
-  static const String activationStatus = 'activation/status';
-
   // ── User Profile ───────────────────────────────────────────────────────
   static const String profile = 'user/profile';
   static const String updateProfile = 'user/profile/update';
   static const String changePassword = 'user/change-password';
-  static const String uploadAvatar = 'user/avatar';
 
   // ── Educational Stages ─────────────────────────────────────────────────
-  static const String stages = 'stages';
-  static String stageById(String id) => 'stages/$id';
-  static String stageSubjects(String stageId) => 'stages/$stageId'; // Returns subject with topics
+  static const String stages = 'educational-stages';
+  static String stageById(String id) => 'educational-stages/$id';
+  static String stageSubjects(String stageId) => 'educational-stages/$stageId'; // Returns subject with topics
 
   // ── Subjects ───────────────────────────────────────────────────────────
   static const String subjects = 'subjects';
@@ -55,21 +49,6 @@ class ApiEndpoints {
   // ── Media / Content ────────────────────────────────────────────────────
   static String mediaStream(String mediaId) => 'media/$mediaId/stream';
   static String mediaDownload(String mediaId) => 'media/$mediaId/download';
-
-  // ── Subscription ──────────────────────────────────────────────────────
-  static const String subscriptions = 'subscriptions';
-  static const String subscriptionPlans = 'subscriptions/plans';
-  static String subscriptionById(String id) => 'subscriptions/$id';
-  static const String subscriptionStatus = 'subscriptions/status';
-
-  // ── Notifications ─────────────────────────────────────────────────────
-  static const String notifications = 'notifications';
-  static String notificationById(String id) => 'notifications/$id';
-  static const String notificationsMarkAllRead = 'notifications/mark-all-read';
-
-  // ── Admin Sync ────────────────────────────────────────────────────────
-  static const String syncData = 'admin/sync';
-  static const String syncStatus = 'admin/sync/status';
 
   // ── Settings ──────────────────────────────────────────────────────────
   static const String settings = 'settings';

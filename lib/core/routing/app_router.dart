@@ -20,7 +20,6 @@ import '../../features/interactive_viewer/presentation/screens/interactive_viewe
 import '../../features/user_profile/presentation/screens/profile_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_expired_screen.dart';
 import '../../features/settings/presentation/screens/support_screen.dart';
 import '../../features/free_trial/presentation/screens/free_trial_screens.dart';
@@ -46,7 +45,6 @@ class AppRoutes {
   static const String subscription = '/subscription';
   static const String subscriptionExpired = '/subscription-expired';
   static const String settings = '/settings';
-  static const String notifications = '/notifications';
   static const String support = '/support';
   static const String freeTrialSubjects = '/free-trial-subjects/:gradeId';
   static const String freeTrialLessonFiles = '/free-trial-lesson-files/:subjectId';
@@ -70,7 +68,6 @@ class AppRouter {
         AppRoutes.profile,
         AppRoutes.subscription,
         AppRoutes.settings,
-        AppRoutes.notifications,
       ];
       
       final isProtected = protectedRoutes.any((r) => state.matchedLocation.startsWith(r));
@@ -249,11 +246,6 @@ class AppRouter {
         path: AppRoutes.settings,
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.notifications,
-        name: 'notifications',
-        builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
         path: AppRoutes.support,
