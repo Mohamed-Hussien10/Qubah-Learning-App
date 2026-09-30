@@ -18,7 +18,6 @@ import '../../features/media_player/presentation/screens/audio_player_screen.dar
 import '../../features/media_player/presentation/screens/pdf_viewer_screen.dart';
 import '../../features/interactive_viewer/presentation/screens/interactive_viewer_screen.dart';
 import '../../features/user_profile/presentation/screens/profile_screen.dart';
-import '../../features/subscription/presentation/screens/subscription_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_expired_screen.dart';
 import '../../features/settings/presentation/screens/support_screen.dart';
@@ -42,7 +41,6 @@ class AppRoutes {
   static const String pdfViewer = '/player/pdf';
   static const String interactiveViewer = '/player/interactive';
   static const String profile = '/profile';
-  static const String subscription = '/subscription';
   static const String subscriptionExpired = '/subscription-expired';
   static const String settings = '/settings';
   static const String support = '/support';
@@ -66,7 +64,6 @@ class AppRouter {
         AppRoutes.home,
         AppRoutes.stages,
         AppRoutes.profile,
-        AppRoutes.subscription,
         AppRoutes.settings,
       ];
       
@@ -231,11 +228,6 @@ class AppRouter {
         path: AppRoutes.profile,
         name: 'profile',
         builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.subscription,
-        name: 'subscription',
-        builder: (context, state) => const SubscriptionScreen(),
       ),
       GoRoute(
         path: AppRoutes.subscriptionExpired,
