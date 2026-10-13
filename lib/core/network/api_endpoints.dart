@@ -20,10 +20,6 @@ class ApiEndpoints {
   static const String login = 'auth/login';
   static const String register = 'auth/register';
   static const String logout = 'auth/logout';
-  static const String refreshToken = 'auth/refresh';
-  static const String forgotPassword = 'auth/forgot-password';
-  static const String resetPassword = 'auth/reset-password';
-  static const String verifyEmail = 'auth/verify-email';
 
   // ── User Profile ───────────────────────────────────────────────────────
   static const String profile = 'user/profile';
@@ -44,7 +40,6 @@ class ApiEndpoints {
   static const String lessons = 'contents';
   static String lessonById(String id) => 'contents/$id';
   static String lessonContent(String lessonId) => 'contents/$lessonId';
-  static String lessonProgress(String lessonId) => 'progress/$lessonId';
 
   // ── Media / Content ────────────────────────────────────────────────────
   static String mediaStream(String mediaId) => 'media/$mediaId/stream';
