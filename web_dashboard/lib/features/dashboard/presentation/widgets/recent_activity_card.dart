@@ -65,7 +65,7 @@ class RecentActivityCard extends StatelessWidget {
                 ],
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () => _showAllActivitiesDialog(context),
                 child: Text(
                   'عرض الكل',
                   style: GoogleFonts.cairo(
@@ -80,19 +80,197 @@ class RecentActivityCard extends StatelessWidget {
           const SizedBox(height: 16),
 
           // ── Activity list ─────────────────────────────────────────────
-          ...activities.asMap().entries.map((entry) {
-            final i = entry.key;
-            final activity = entry.value;
-            final isLast = i == activities.length - 1;
-            return _buildActivityItem(
-              context,
-              activity: activity,
-              isLast: isLast,
-              isDark: isDark,
-            );
-          }),
+          if (activities.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Text(
+                  'لا توجد أنشطة حديثة',
+                  style: GoogleFonts.cairo(
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
+            )
+          else
+            ...activities.asMap().entries.map((entry) {
+              final i = entry.key;
+              final activity = entry.value;
+              final isLast = i == activities.length - 1;
+              return _buildActivityItem(
+                context,
+                activity: activity,
+                isLast: isLast,
+                isDark: isDark,
+              );
+            }),
         ],
       ),
+    );
+  }
+
+  void _showAllActivitiesDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        String query = '';
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final filtered = activities.where((act) {
+              final title = (act['title'] as String? ?? '').toLowerCase();
+              final desc = (act['description'] as String? ?? '').toLowerCase();
+              return title.contains(query.toLowerCase()) ||
+                  desc.contains(query.toLowerCase());
+            }).toList();
+
+            return Directionality(
+              textDirection: TextDirection.rtl,
+              child: Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                backgroundColor:
+                    isDark ? AppColors.cardDark : AppColors.cardLight,
+                child: Container(
+                  width: 600,
+                  height: 520,
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.warning.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.history_rounded,
+                              color: AppColors.warning,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'سجل النشاطات الكامل',
+                            style: GoogleFonts.cairo(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDark
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimaryLight,
+                            ),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Search field
+                      TextField(
+                        onChanged: (val) => setState(() => query = val),
+                        style: GoogleFonts.cairo(
+                          color: isDark
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimaryLight,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: 'البحث في النشاطات...',
+                          hintStyle: GoogleFonts.cairo(
+                            color: isDark
+                                ? AppColors.textTertiaryDark
+                                : AppColors.textTertiaryLight,
+                          ),
+                          prefixIcon: const Icon(Icons.search, size: 20),
+                          filled: true,
+                          fillColor: isDark
+                              ? AppColors.surfaceDark
+                              : AppColors.backgroundLight,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? AppColors.borderDark
+                                  : AppColors.borderLight,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // List
+                      Expanded(
+                        child: filtered.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'لا توجد نتائج تطابق بحثك',
+                                  style: GoogleFonts.cairo(
+                                    color: isDark
+                                        ? AppColors.textSecondaryDark
+                                        : AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                              )
+                            : ListView.separated(
+                                itemCount: filtered.length,
+                                separatorBuilder: (_, _) => Divider(
+                                  height: 1,
+                                  color: (isDark
+                                          ? AppColors.borderDark
+                                          : AppColors.borderLight)
+                                      .withValues(alpha: 0.5),
+                                ),
+                                itemBuilder: (context, i) {
+                                  return _buildActivityItem(
+                                    context,
+                                    activity: filtered[i],
+                                    isLast: i == filtered.length - 1,
+                                    isDark: isDark,
+                                  );
+                                },
+                              ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Close button
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: FilledButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'إغلاق',
+                            style: GoogleFonts.cairo(
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -104,6 +282,8 @@ class RecentActivityCard extends StatelessWidget {
   }) {
     final iconData = _getIconData(activity['icon'] as String? ?? 'info');
     final color = _getColor(activity['color'] as String? ?? 'primary');
+    final rawTime = activity['time'];
+    final arabicTime = _formatArabicTime(rawTime);
 
     return Column(
       children: [
@@ -154,11 +334,12 @@ class RecentActivityCard extends StatelessWidget {
                 ),
               ),
 
-              // Timestamp
+              // Timestamp (pure Arabic)
               Text(
-                activity['time'] as String? ?? '',
+                arabicTime,
                 style: GoogleFonts.cairo(
                   fontSize: 11,
+                  fontWeight: FontWeight.w500,
                   color: isDark
                       ? AppColors.textTertiaryDark
                       : AppColors.textTertiaryLight,
@@ -175,6 +356,78 @@ class RecentActivityCard extends StatelessWidget {
           ),
       ],
     );
+  }
+
+  String _formatArabicTime(dynamic rawTime) {
+    if (rawTime == null) return '';
+    String text = rawTime.toString().trim();
+    if (text.isEmpty) return '';
+
+    // If it's already pure Arabic, return it
+    if (text.startsWith('منذ') || text == 'الآن' || text == 'مؤخراً') {
+      return text;
+    }
+
+    final lower = text.toLowerCase();
+
+    // Just now
+    if (lower.contains('just now') || lower.contains('second')) {
+      return 'الآن';
+    }
+
+    // Extract any integer
+    final numberMatch = RegExp(r'\d+').firstMatch(lower);
+    final count = numberMatch != null ? int.tryParse(numberMatch.group(0)!) ?? 1 : 1;
+
+    // Month
+    if (lower.contains('month')) {
+      if (count == 1) return 'منذ شهر';
+      if (count == 2) return 'منذ شهرين';
+      if (count >= 3 && count <= 10) return 'منذ $count أشهر';
+      return 'منذ $count شهراً';
+    }
+
+    // Day
+    if (lower.contains('day')) {
+      if (count == 1) return 'منذ يوم';
+      if (count == 2) return 'منذ يومين';
+      if (count >= 3 && count <= 10) return 'منذ $count أيام';
+      return 'منذ $count يوماً';
+    }
+
+    // Week
+    if (lower.contains('week')) {
+      if (count == 1) return 'منذ أسبوع';
+      if (count == 2) return 'منذ أسبوعين';
+      if (count >= 3 && count <= 10) return 'منذ $count أسابيع';
+      return 'منذ $count أسبوعاً';
+    }
+
+    // Hour
+    if (lower.contains('hour')) {
+      if (count == 1) return 'منذ ساعة';
+      if (count == 2) return 'منذ ساعتين';
+      if (count >= 3 && count <= 10) return 'منذ $count ساعات';
+      return 'منذ $count ساعة';
+    }
+
+    // Minute
+    if (lower.contains('minute') || lower.contains('min')) {
+      if (count == 1) return 'منذ دقيقة';
+      if (count == 2) return 'منذ دقيقتين';
+      if (count >= 3 && count <= 10) return 'منذ $count دقائق';
+      return 'منذ $count دقيقة';
+    }
+
+    // Year
+    if (lower.contains('year')) {
+      if (count == 1) return 'منذ سنة';
+      if (count == 2) return 'منذ سنتين';
+      if (count >= 3 && count <= 10) return 'منذ $count سنوات';
+      return 'منذ $count سنة';
+    }
+
+    return text;
   }
 
   IconData _getIconData(String iconName) {

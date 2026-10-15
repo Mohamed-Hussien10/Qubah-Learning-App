@@ -59,8 +59,6 @@ class _AnalyticsView extends StatelessWidget {
                   _buildChartsRow(state),
                   const SizedBox(height: 24),
                   _buildPieChartsRow(state),
-                  const SizedBox(height: 24),
-                  _buildMostViewedLessons(state, isDark),
                 ],
               ),
             ),
@@ -110,59 +108,79 @@ class _AnalyticsView extends StatelessWidget {
     final content = state.contentAnalytics!;
     final revenue = state.revenueAnalytics!;
 
+    final cards = [
+      StatCard(
+        title: 'إجمالي المستخدمين',
+        value: '${user.totalUsers}',
+        icon: Icons.people_rounded,
+        iconColor: AppColors.primary,
+        iconBackgroundColor: AppColors.primary.withValues(alpha: 0.15),
+        changeText: '+${user.newUsersThisMonth} هذا الشهر',
+        isPositiveTrend: true,
+      ),
+      StatCard(
+        title: 'المستخدمون النشطون',
+        value: '${user.activeUsers}',
+        icon: Icons.offline_bolt_rounded,
+        iconColor: AppColors.accent,
+        iconBackgroundColor: AppColors.accent.withValues(alpha: 0.15),
+        changeText: '${user.activePercentage.toStringAsFixed(1)}% نسبة النشاط',
+        isPositiveTrend: true,
+      ),
+      StatCard(
+        title: 'الدروس التعليمية',
+        value: '${content.totalLessons}',
+        icon: Icons.menu_book_rounded,
+        iconColor: AppColors.info,
+        iconBackgroundColor: AppColors.info.withValues(alpha: 0.15),
+        subtitle: 'موزعة على كافة المراحل',
+      ),
+      StatCard(
+        title: 'إجمالي الإيرادات',
+        value: '${revenue.totalRevenue.toInt()} ر.س',
+        icon: Icons.account_balance_wallet_rounded,
+        iconColor: AppColors.success,
+        iconBackgroundColor: AppColors.success.withValues(alpha: 0.15),
+        changeText: '+12% النمو',
+        isPositiveTrend: true,
+      ),
+    ];
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount = 4;
-        if (constraints.maxWidth < 600) {
-          crossAxisCount = 1;
-        } else if (constraints.maxWidth < 1000) {
-          crossAxisCount = 2;
+        if (constraints.maxWidth >= 840) {
+          return IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: cards[0]),
+                const SizedBox(width: 14),
+                Expanded(child: cards[1]),
+                const SizedBox(width: 14),
+                Expanded(child: cards[2]),
+                const SizedBox(width: 14),
+                Expanded(child: cards[3]),
+              ],
+            ),
+          );
         }
 
-        return GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: crossAxisCount == 1 ? 2.5 : 1.6,
-          children: [
-            StatCard(
-              title: 'إجمالي المستخدمين',
-              value: '${user.totalUsers}',
-              icon: Icons.people_rounded,
-              iconColor: AppColors.primary,
-              iconBackgroundColor: AppColors.primary.withValues(alpha: 0.15),
-              changeText: '+${user.newUsersThisMonth} هذا الشهر',
-              isPositiveTrend: true,
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(width: 220, child: cards[0]),
+                const SizedBox(width: 14),
+                SizedBox(width: 220, child: cards[1]),
+                const SizedBox(width: 14),
+                SizedBox(width: 220, child: cards[2]),
+                const SizedBox(width: 14),
+                SizedBox(width: 220, child: cards[3]),
+              ],
             ),
-            StatCard(
-              title: 'المستخدمون النشطون',
-              value: '${user.activeUsers}',
-              icon: Icons.offline_bolt_rounded,
-              iconColor: AppColors.accent,
-              iconBackgroundColor: AppColors.accent.withValues(alpha: 0.15),
-              changeText: '${user.activePercentage.toStringAsFixed(1)}% نسبة النشاط',
-              isPositiveTrend: true,
-            ),
-            StatCard(
-              title: 'الدروس التعليمية',
-              value: '${content.totalLessons}',
-              icon: Icons.menu_book_rounded,
-              iconColor: AppColors.info,
-              iconBackgroundColor: AppColors.info.withValues(alpha: 0.15),
-              subtitle: 'موزعة على كافة المراحل',
-            ),
-            StatCard(
-              title: 'إجمالي الإيرادات',
-              value: '${revenue.totalRevenue.toInt()} ر.س',
-              icon: Icons.account_balance_wallet_rounded,
-              iconColor: AppColors.success,
-              iconBackgroundColor: AppColors.success.withValues(alpha: 0.15),
-              changeText: '+12% النمو',
-              isPositiveTrend: true,
-            ),
-          ],
+          ),
         );
       },
     );
@@ -187,7 +205,7 @@ class _AnalyticsView extends StatelessWidget {
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 320,
+                  height: 350,
                   child: BarChartWidget(
                     title: 'نمو المستخدمين (شهرياً)',
                     labels: userLabels,
@@ -199,7 +217,7 @@ class _AnalyticsView extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: SizedBox(
-                  height: 320,
+                  height: 350,
                   child: BarChartWidget(
                     title: 'الإيرادات الشهرية',
                     labels: revLabels,
@@ -215,7 +233,7 @@ class _AnalyticsView extends StatelessWidget {
         return Column(
           children: [
             SizedBox(
-              height: 320,
+              height: 350,
               child: BarChartWidget(
                 title: 'نمو المستخدمين (شهرياً)',
                 labels: userLabels,
@@ -225,7 +243,7 @@ class _AnalyticsView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 320,
+              height: 350,
               child: BarChartWidget(
                 title: 'الإيرادات الشهرية',
                 labels: revLabels,
@@ -240,11 +258,17 @@ class _AnalyticsView extends StatelessWidget {
   }
 
   Widget _buildPieChartsRow(AnalyticsState state) {
-    final userRoles = state.userAnalytics!.usersByRole;
+    final rawUserRoles = state.userAnalytics!.usersByRole;
     final subscriptions = state.revenueAnalytics!.subscriptionBreakdown;
 
-    final Map<String, double> userRolesDouble =
-        userRoles.map((k, v) => MapEntry(k, v.toDouble()));
+    // The system has only two roles: students and admins
+    final Map<String, double> userRolesDouble = {};
+    if (rawUserRoles.containsKey('طلاب')) {
+      userRolesDouble['طلاب'] = rawUserRoles['طلاب']!.toDouble();
+    }
+    if (rawUserRoles.containsKey('مدراء')) {
+      userRolesDouble['مدراء'] = rawUserRoles['مدراء']!.toDouble();
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -255,7 +279,7 @@ class _AnalyticsView extends StatelessWidget {
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 250,
+                  height: 310,
                   child: PieChartWidget(
                     title: 'المستخدمون حسب الدور',
                     data: userRolesDouble,
@@ -266,7 +290,7 @@ class _AnalyticsView extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: SizedBox(
-                  height: 250,
+                  height: 310,
                   child: PieChartWidget(
                     title: 'توزيع مبيعات الباقات',
                     data: subscriptions,
@@ -281,7 +305,7 @@ class _AnalyticsView extends StatelessWidget {
         return Column(
           children: [
             SizedBox(
-              height: 250,
+              height: 310,
               child: PieChartWidget(
                 title: 'المستخدمون حسب الدور',
                 data: userRolesDouble,
@@ -290,7 +314,7 @@ class _AnalyticsView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 250,
+              height: 310,
               child: PieChartWidget(
                 title: 'توزيع مبيعات الباقات',
                 data: subscriptions,
@@ -300,72 +324,6 @@ class _AnalyticsView extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  Widget _buildMostViewedLessons(AnalyticsState state, bool isDark) {
-    final lessons = state.contentAnalytics!.mostViewedLessons;
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'الدروس الأكثر مشاهدة ومتابعة',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 16),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: lessons.length,
-              separatorBuilder: (_, _) => Divider(
-                color: isDark ? AppColors.borderDark : AppColors.borderLight,
-              ),
-              itemBuilder: (context, index) {
-                final lesson = lessons[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        radius: 18,
-                        child: Text(
-                          '${index + 1}',
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          lesson.name,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.remove_red_eye_rounded, size: 16, color: Colors.grey),
-                          const SizedBox(width: 6),
-                          Text(
-                            '${lesson.views} مشاهدة',
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 

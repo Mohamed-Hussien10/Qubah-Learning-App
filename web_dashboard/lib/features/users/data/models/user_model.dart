@@ -122,7 +122,7 @@ class UserModel extends Equatable {
       'package_id': packageId,
       'created_at': createdAt.toIso8601String(),
       'last_login': lastLogin?.toIso8601String(),
-      'subscription_expiry': subscriptionExpiry?.toIso8601String(),
+      'subscription_expiry': subscriptionExpiry?.toIso8601String().split('T').first,
     };
   }
 

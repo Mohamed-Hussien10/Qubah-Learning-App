@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:web_dashboard/core/constants/app_colors.dart';
 
 class BarChartWidget extends StatelessWidget {
@@ -59,27 +60,30 @@ class BarChartWidget extends StatelessWidget {
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+                        reservedSize: 48,
                         getTitlesWidget: (double value, TitleMeta meta) {
                           final idx = value.toInt();
                           if (idx >= 0 && idx < labels.length) {
                             return SideTitleWidget(
                               meta: meta,
                               space: 6,
-                              child: Text(
-                                labels[idx],
-                                style: TextStyle(
-                                  color: isDark
-                                      ? AppColors.textTertiaryDark
-                                      : AppColors.textTertiaryLight,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
+                              child: Transform.rotate(
+                                angle: -0.65,
+                                child: Text(
+                                  labels[idx],
+                                  style: GoogleFonts.cairo(
+                                    color: isDark
+                                        ? AppColors.textTertiaryDark
+                                        : AppColors.textTertiaryLight,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             );
                           }
                           return const SizedBox.shrink();
                         },
-                        reservedSize: 28,
                       ),
                     ),
                     leftTitles: AxisTitles(

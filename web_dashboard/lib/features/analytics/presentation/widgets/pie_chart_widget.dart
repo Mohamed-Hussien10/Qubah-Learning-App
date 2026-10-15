@@ -43,86 +43,93 @@ class _PieChartWidgetState extends State<PieChartWidget> {
               child: Row(
                 children: [
                   Expanded(
-                    flex: 3,
-                    child: PieChart(
-                      PieChartData(
-                        pieTouchData: PieTouchData(
-                          touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                            setState(() {
-                              if (!event.isInterestedForInteractions ||
-                                  pieTouchResponse == null ||
-                                  pieTouchResponse.touchedSection == null) {
-                                touchedIndex = -1;
-                                return;
-                              }
-                              touchedIndex = pieTouchResponse
-                                  .touchedSection!.touchedSectionIndex;
-                            });
-                          },
-                        ),
-                        borderData: FlBorderData(show: false),
-                        sectionsSpace: 4,
-                        centerSpaceRadius: widget.isDonut ? 40 : 0,
-                        sections: List.generate(entries.length, (i) {
-                          final entry = entries[i];
-                          final isTouched = i == touchedIndex;
-                          final fontSize = isTouched ? 16.0 : 12.0;
-                          final radius = isTouched ? 60.0 : 50.0;
-                          final color = AppColors.chartPalette[i % AppColors.chartPalette.length];
-                          final percent = total > 0 ? (entry.value / total) * 100 : 0;
+                    flex: 1,
+                    child: Center(
+                      child: PieChart(
+                        PieChartData(
+                          pieTouchData: PieTouchData(
+                            touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                              setState(() {
+                                if (!event.isInterestedForInteractions ||
+                                    pieTouchResponse == null ||
+                                    pieTouchResponse.touchedSection == null) {
+                                  touchedIndex = -1;
+                                  return;
+                                }
+                                touchedIndex = pieTouchResponse
+                                    .touchedSection!.touchedSectionIndex;
+                              });
+                            },
+                          ),
+                          borderData: FlBorderData(show: false),
+                          sectionsSpace: 4,
+                          centerSpaceRadius: widget.isDonut ? 40 : 0,
+                          sections: List.generate(entries.length, (i) {
+                            final entry = entries[i];
+                            final isTouched = i == touchedIndex;
+                            final fontSize = isTouched ? 15.0 : 12.0;
+                            final radius = isTouched ? 58.0 : 48.0;
+                            final color = AppColors.chartPalette[i % AppColors.chartPalette.length];
+                            final percent = total > 0 ? (entry.value / total) * 100 : 0;
 
-                          return PieChartSectionData(
-                            color: color,
-                            value: entry.value,
-                            title: '${percent.toStringAsFixed(0)}%',
-                            radius: radius,
-                            titleStyle: TextStyle(
-                              fontSize: fontSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          );
-                        }),
+                            return PieChartSectionData(
+                              color: color,
+                              value: entry.value,
+                              title: '${percent.toStringAsFixed(0)}%',
+                              radius: radius,
+                              titleStyle: TextStyle(
+                                fontSize: fontSize,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            );
+                          }),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 16),
                   // Legend
                   Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(vertical: 4),
                       itemCount: entries.length,
                       itemBuilder: (context, i) {
                         final entry = entries[i];
                         final color = AppColors.chartPalette[i % AppColors.chartPalette.length];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  entry.key,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark
-                                        ? AppColors.textSecondaryDark
-                                        : AppColors.textSecondaryLight,
+                        final percent = total > 0 ? (entry.value / total) * 100 : 0;
+                        return Tooltip(
+                          message: '${entry.key}: ${entry.value.toInt()} (${percent.toStringAsFixed(1)}%)',
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: color,
+                                    shape: BoxShape.circle,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    entry.key,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: isDark
+                                          ? AppColors.textPrimaryDark
+                                          : AppColors.textPrimaryLight,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },

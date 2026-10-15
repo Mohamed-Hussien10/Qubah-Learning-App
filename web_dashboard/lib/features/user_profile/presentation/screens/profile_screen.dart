@@ -239,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      admin.role == 'super_admin' ? 'مدير عام النظام' : 'مدير محتوى',
+                      'مدير النظام',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,

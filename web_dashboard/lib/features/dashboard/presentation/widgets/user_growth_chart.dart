@@ -102,7 +102,7 @@ class UserGrowthChart extends StatelessWidget {
 
           // ── Chart ─────────────────────────────────────────────────────
           SizedBox(
-            height: 260,
+            height: 290,
             child: LineChart(
               LineChartData(
                 lineTouchData: LineTouchData(
@@ -163,22 +163,22 @@ class UserGrowthChart extends StatelessWidget {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 32,
+                      reservedSize: 42,
                       interval: 1,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
                         if (index < 0 || index >= data.length) {
                           return const SizedBox.shrink();
                         }
-                        final label = data[index].label.length > 3
-                            ? data[index].label.substring(0, 3)
-                            : data[index].label;
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8),
+                        final label = data[index].label;
+                        return SideTitleWidget(
+                          meta: meta,
+                          space: 6,
                           child: Text(
                             label,
                             style: GoogleFonts.cairo(
-                              fontSize: 10,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
                               color: isDark
                                   ? AppColors.textTertiaryDark
                                   : AppColors.textTertiaryLight,

@@ -170,33 +170,36 @@ class _UserFormDialogState extends State<UserFormDialog> {
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Name (Admins Only) ───────────────────────
-                  if (_selectedRole == UserRole.admin) ...[
-                    Text(
-                      'الاسم الكامل',
-                      style: GoogleFonts.cairo(
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimaryLight,
-                      ),
+                  // ── Full Name (Both Roles) ───────────────────
+                  Text(
+                    'الاسم الكامل',
+                    style: GoogleFonts.cairo(
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimaryLight,
                     ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _nameController,
-                      style: GoogleFonts.cairo(
-                        color: isDark
-                            ? AppColors.textPrimaryDark
-                            : AppColors.textPrimaryLight,
-                      ),
-                      decoration: _inputDecoration('أدخل الاسم الكامل', isDark),
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'الاسم مطلوب';
-                        return null;
-                      },
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _nameController,
+                    style: GoogleFonts.cairo(
+                      color: isDark
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimaryLight,
                     ),
-                    const SizedBox(height: 16),
-                  ],
+                    decoration: _inputDecoration(
+                      _selectedRole == UserRole.admin
+                          ? 'أدخل اسم المدير'
+                          : 'أدخل اسم الطالب',
+                      isDark,
+                    ),
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return 'الاسم مطلوب';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
 
                   // ── Identifier ─────────────────────────────────
                   Text(
@@ -580,9 +583,9 @@ class _UserFormDialogState extends State<UserFormDialog> {
         ? int.tryParse(_selectedPackageId!)
         : null;
 
-    final finalName = _selectedRole == UserRole.student
-        ? _usernameController.text.trim()
-        : _nameController.text.trim();
+    final finalName = _nameController.text.trim().isNotEmpty
+        ? _nameController.text.trim()
+        : _usernameController.text.trim();
 
     if (isEditing) {
       cubit.updateUser(widget.user!.copyWith(

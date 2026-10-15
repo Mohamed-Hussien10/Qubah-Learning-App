@@ -20,11 +20,22 @@ class UserAnalytics extends Equatable {
 
   factory UserAnalytics.fromJson(Map<String, dynamic> json) {
     final growthJson = json['monthly_growth'] as List? ?? json['monthlyGrowth'] as List? ?? [];
+    final rawRoles = Map<String, dynamic>.from(json['users_by_role'] ?? json['usersByRole'] ?? {});
+    final filteredRoles = <String, int>{};
+    rawRoles.forEach((key, val) {
+      final intVal = int.tryParse(val.toString()) ?? 0;
+      if (key == 'طلاب' || key == 'student') {
+        filteredRoles['طلاب'] = (filteredRoles['طلاب'] ?? 0) + intVal;
+      } else if (key == 'مدراء' || key == 'admin') {
+        filteredRoles['مدراء'] = (filteredRoles['مدراء'] ?? 0) + intVal;
+      }
+    });
+
     return UserAnalytics(
       totalUsers: json['total_users'] as int? ?? json['totalUsers'] as int? ?? 0,
       activeUsers: json['active_users'] as int? ?? json['activeUsers'] as int? ?? 0,
       newUsersThisMonth: json['new_users_this_month'] as int? ?? json['newUsersThisMonth'] as int? ?? 0,
-      usersByRole: Map<String, int>.from(json['users_by_role'] ?? json['usersByRole'] ?? {}),
+      usersByRole: filteredRoles,
       monthlyGrowth: growthJson.map((e) => MonthlyData.fromJson(e as Map<String, dynamic>)).toList(),
     );
   }
@@ -35,7 +46,6 @@ class UserAnalytics extends Equatable {
     newUsersThisMonth: 85,
     usersByRole: {
       'طلاب': 850,
-      'أولياء أمور': 320,
       'مدراء': 80,
     },
     monthlyGrowth: [
@@ -67,7 +77,7 @@ class ContentAnalytics extends Equatable {
   const ContentAnalytics({
     required this.totalLessons,
     required this.totalDownloads,
-    required this.mostViewedLessons,
+    this.mostViewedLessons = const [],
     required this.contentByStage,
   });
 
@@ -117,9 +127,13 @@ class RevenueAnalytics extends Equatable {
 
   factory RevenueAnalytics.fromJson(Map<String, dynamic> json) {
     final revenueJson = json['monthly_revenue'] as List? ?? json['monthlyRevenue'] as List? ?? [];
+    final monthly = revenueJson.map((e) => MonthlyData.fromJson(e as Map<String, dynamic>)).toList();
+    final monthlySum = monthly.fold<double>(0.0, (sum, item) => sum + item.value);
+    final rawTotal = (json['total_revenue'] as num? ?? json['totalRevenue'] as num? ?? 0.0).toDouble();
+    final effectiveTotal = rawTotal >= monthlySum ? rawTotal : monthlySum;
     return RevenueAnalytics(
-      totalRevenue: (json['total_revenue'] as num? ?? json['totalRevenue'] as num? ?? 0.0).toDouble(),
-      monthlyRevenue: revenueJson.map((e) => MonthlyData.fromJson(e as Map<String, dynamic>)).toList(),
+      totalRevenue: effectiveTotal,
+      monthlyRevenue: monthly,
       subscriptionBreakdown: Map<String, double>.from(json['subscription_breakdown'] ?? json['subscriptionBreakdown'] ?? {}),
     );
   }

@@ -31,6 +31,24 @@ class SidebarSection {
 
 /// Sidebar navigation items definition.
 final List<SidebarSection> sidebarSections = [
+  // Overview & Analytics
+  const SidebarSection(
+    label: 'الرئيسية والتحليلات',
+    items: [
+      SidebarItem(
+        label: AppStrings.dashboard,
+        icon: Icons.dashboard_outlined,
+        activeIcon: Icons.dashboard_rounded,
+        route: '/dashboard',
+      ),
+      SidebarItem(
+        label: AppStrings.analytics,
+        icon: Icons.analytics_outlined,
+        activeIcon: Icons.analytics_rounded,
+        route: '/analytics',
+      ),
+    ],
+  ),
   // Educational Management
   const SidebarSection(
     label: 'الإدارة التعليمية',

@@ -10,7 +10,6 @@ import 'package:web_dashboard/core/constants/app_strings.dart';
 import 'package:web_dashboard/core/widgets/stat_card.dart';
 import 'package:web_dashboard/features/dashboard/presentation/manager/dashboard_cubit.dart';
 import 'package:web_dashboard/features/dashboard/presentation/manager/dashboard_state.dart';
-import 'package:web_dashboard/features/dashboard/presentation/widgets/quick_actions_card.dart';
 import 'package:web_dashboard/features/dashboard/presentation/widgets/recent_activity_card.dart';
 
 import 'package:web_dashboard/features/dashboard/presentation/widgets/user_growth_chart.dart';
@@ -134,22 +133,11 @@ class _DashboardViewState extends State<_DashboardView> {
             ),
           ],
         ),
-        Row(
-          children: [
-            _buildHeaderAction(
-              icon: Icons.refresh_rounded,
-              tooltip: AppStrings.refresh,
-              onTap: () => context.read<DashboardCubit>().refresh(),
-              isDark: isDark,
-            ),
-            const SizedBox(width: 8),
-            _buildHeaderAction(
-              icon: Icons.file_download_outlined,
-              tooltip: AppStrings.exportData,
-              onTap: () {},
-              isDark: isDark,
-            ),
-          ],
+        _buildHeaderAction(
+          icon: Icons.refresh_rounded,
+          tooltip: AppStrings.refresh,
+          onTap: () => context.read<DashboardCubit>().refresh(),
+          isDark: isDark,
         ),
       ],
     )
@@ -218,27 +206,23 @@ class _DashboardViewState extends State<_DashboardView> {
       ),
     ];
 
-    // Responsive: 2 cols desktop, 2 tablet, 1 mobile
-    int crossAxisCount;
-    if (width >= 1200) {
-      crossAxisCount = 2;
-    } else if (width >= 700) {
-      crossAxisCount = 2;
-    } else {
-      crossAxisCount = 1;
+    if (width >= 700) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: cards[0]),
+          const SizedBox(width: 16),
+          Expanded(child: cards[1]),
+        ],
+      );
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: crossAxisCount == 1 ? 2.5 : 1.6,
-      ),
-      itemCount: cards.length,
-      itemBuilder: (_, i) => cards[i],
+    return Column(
+      children: [
+        cards[0],
+        const SizedBox(height: 16),
+        cards[1],
+      ],
     );
   }
 
@@ -255,7 +239,7 @@ class _DashboardViewState extends State<_DashboardView> {
   }
 
   // ─────────────────────────────────────────────────────────────────────
-  // Bottom row – recent activity + quick actions
+  // Bottom row – recent activity (quick actions removed)
   // ─────────────────────────────────────────────────────────────────────
   Widget _buildBottomRow(DashboardLoaded state, double width) {
     final activityCard = RecentActivityCard(activities: state.recentActivity)
@@ -263,36 +247,7 @@ class _DashboardViewState extends State<_DashboardView> {
         .fadeIn(duration: 600.ms, delay: 500.ms)
         .slideY(begin: 0.1, end: 0, duration: 600.ms, delay: 500.ms);
 
-    final actionsCard = QuickActionsCard(
-      onActionTap: (action) => _handleQuickAction(action),
-    )
-        .animate()
-        .fadeIn(duration: 600.ms, delay: 600.ms)
-        .slideY(begin: 0.1, end: 0, duration: 600.ms, delay: 600.ms);
-
-    if (width >= 900) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 3, child: activityCard),
-          const SizedBox(width: 16),
-          Expanded(flex: 2, child: actionsCard),
-        ],
-      );
-    }
-
-    return Column(
-      children: [
-        activityCard,
-        const SizedBox(height: 16),
-        actionsCard,
-      ],
-    );
-  }
-
-  void _handleQuickAction(String action) {
-    // TODO: Navigate to the appropriate route
-    debugPrint('Quick action tapped: $action');
+    return activityCard;
   }
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -334,78 +289,48 @@ class _DashboardViewState extends State<_DashboardView> {
             const SizedBox(height: 24),
 
             // Stat cards shimmer
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: _responsiveColumns(context),
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 1.6,
-              children: List.generate(
-                3,
-                (_) => Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 140,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Container(
+                    height: 140,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
 
             // Chart shimmer
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    height: 340,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    height: 340,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ],
+            Container(
+              height: 320,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
             const SizedBox(height: 24),
 
             // Bottom row shimmer
-            Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    height: 400,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    height: 400,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ],
+            Container(
+              height: 350,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ],
         ),
@@ -413,12 +338,6 @@ class _DashboardViewState extends State<_DashboardView> {
     );
   }
 
-  int _responsiveColumns(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    if (w >= 1200) return 2;
-    if (w >= 700) return 2;
-    return 1;
-  }
 
   // ═══════════════════════════════════════════════════════════════════════
   // Error state

@@ -73,7 +73,7 @@ class _StatCardState extends State<StatCard> {
           transform: _isHovered
               ? (Matrix4.identity()..setTranslationRaw(0.0, -2.0, 0.0))
               : Matrix4.identity(),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             color: theme.cardTheme.color,
             borderRadius: BorderRadius.circular(16),
@@ -98,34 +98,34 @@ class _StatCardState extends State<StatCard> {
                     ),
                   ],
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // ── Top Row: Icon + Trend ────────────────────────────────
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Icon container
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: effectiveIconBg,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        widget.icon,
-                        color: effectiveIconColor,
-                        size: 24,
-                      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ── Top Row: Icon + Trend ────────────────────────────────
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Icon container
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: effectiveIconBg,
+                      borderRadius: BorderRadius.circular(10),
                     ),
+                    child: Icon(
+                      widget.icon,
+                      color: effectiveIconColor,
+                      size: 22,
+                    ),
+                  ),
 
-                    // Trend badge
-                    if (widget.changeText != null &&
-                        widget.isPositiveTrend != null)
-                      Container(
+                  // Trend badge
+                  if (widget.changeText != null &&
+                      widget.isPositiveTrend != null)
+                    Flexible(
+                      child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
@@ -147,63 +147,67 @@ class _StatCardState extends State<StatCard> {
                                   : AppColors.error,
                             ),
                             const SizedBox(width: 4),
-                            Text(
-                              widget.changeText!,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: widget.isPositiveTrend!
-                                    ? AppColors.success
-                                    : AppColors.error,
-                                fontWeight: FontWeight.w600,
+                            Flexible(
+                              child: Text(
+                                widget.changeText!,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: widget.isPositiveTrend!
+                                      ? AppColors.success
+                                      : AppColors.error,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
                         ),
                       ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // ── Title ───────────────────────────────────────────────
-                Text(
-                  widget.title,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: isDark
-                        ? AppColors.textSecondaryDark
-                        : AppColors.textSecondaryLight,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-
-                const SizedBox(height: 4),
-
-                // ── Value ───────────────────────────────────────────────
-                Text(
-                  widget.value,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-
-                // ── Subtitle ────────────────────────────────────────────
-                if (widget.subtitle != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.subtitle!,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: isDark
-                          ? AppColors.textTertiaryDark
-                          : AppColors.textTertiaryLight,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
                 ],
+              ),
+
+              const SizedBox(height: 10),
+
+              // ── Title ───────────────────────────────────────────────
+              Text(
+                widget.title,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isDark
+                      ? AppColors.textSecondaryDark
+                      : AppColors.textSecondaryLight,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+
+              const SizedBox(height: 4),
+
+              // ── Value ───────────────────────────────────────────────
+              Text(
+                widget.value,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+
+              // ── Subtitle ────────────────────────────────────────────
+              if (widget.subtitle != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  widget.subtitle!,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: isDark
+                        ? AppColors.textTertiaryDark
+                        : AppColors.textTertiaryLight,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
-            ),
+            ],
           ),
         ),
       ),
